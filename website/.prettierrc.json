@@ -1,0 +1,15 @@
+{
+  "plugins": ["@ianvs/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "<BUILTIN_MODULES>",
+    "^react($|/)",
+    "^react-dom($|/)",
+    "^next($|/)",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@(styles|interfaces|services|components|lib|utils|artifacts|contracts|pages|hooks|layout|middleware|schemas|shared|contexts)($|/).*",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}

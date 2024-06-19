@@ -1,0 +1,13 @@
+{
+  "name": "ol-nextjs-starter",
+  "scripts": {
+    "lint-staged": "cd website && npm run lint-staged"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "concurrently": "^8.2.2",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2"
+  }
+}

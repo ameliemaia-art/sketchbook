@@ -1,0 +1,32 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:jsx-a11y/strict",
+    "next",
+    "plugin:prettier/recommended"
+  ],
+  "ignorePatterns": ["public/*"],
+  "plugins": ["prettier", "unused-imports"],
+  "rules": {
+    "no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
+    "@next/next/no-img-element": "off",
+    "unused-imports/no-unused-imports": "error",
+    "react/no-unescaped-entities": "warn",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      {
+        "depth": 3,
+        "asset": "either"
+      }
+    ]
+  }
+}
