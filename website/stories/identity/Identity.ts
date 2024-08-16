@@ -1,16 +1,20 @@
 import paper from "paper";
-import { Pane } from "tweakpane";
+import { FolderApi, Pane } from "tweakpane";
 
 import { saveImage } from "@utils/common/file";
-import { creation, moon, realm, stars, structure } from "./Form";
+import GUIController from "@utils/gui/gui";
+import { creation, moon, realm, stars, structure } from "./form";
+import { Settings } from "./types";
 
 // Adjust this if canvas size changes
 // 512 = 1 for original logo
 const strokeScale = 1;
 
 export default class Identity {
-  settings = {
-    scale: 0.25,
+  settings: Settings = {
+    // scale: 0.25,
+    scale: 0.5,
+    opacity: 0.25,
     creation: {
       width: 2 * strokeScale,
       alpha: 1,
@@ -48,18 +52,26 @@ export default class Identity {
     },
   };
 
-  constructor(public canvas: HTMLCanvasElement) {
+  constructor(
+    public canvas: HTMLCanvasElement,
+    setup = true,
+  ) {
     this.canvas = canvas;
 
-    canvas.width = 500;
-    canvas.height = 500;
-    paper.setup(canvas);
+    if (setup) {
+      canvas.width = 500;
+      canvas.height = 500;
+      paper.setup(canvas);
+    }
 
     this.draw();
   }
 
   draw = () => {
     paper.project.activeLayer.removeChildren();
+
+    let group = new paper.Group();
+    group.opacity = this.settings.opacity;
 
     const radius = paper.view.size.width * this.settings.scale;
     const center = paper.view.bounds.center;
@@ -100,27 +112,33 @@ export default class Identity {
     ]);
     paper.view.rotate(180);
 
-    structure(
-      this.settings,
-      center,
-      radius / 0.5,
-      innerRadius / 0.5,
-      false,
-      true,
+    group.addChild(
+      structure(
+        this.settings,
+        center,
+        radius / 0.5,
+        innerRadius / 0.5,
+        false,
+        true,
+      ),
     );
-    creation(this.settings, center, radius);
-    structure(this.settings, center, radius, innerRadius);
-    realm(this.settings, center, radius, innerRadius);
-    moon(this.settings, center, radius, innerRadius);
-    stars(this.settings, center, radius, innerRadius);
-    structure(
-      this.settings,
-      center,
-      radius / 0.5,
-      innerRadius / 0.5,
-      true,
-      false,
+    group.addChild(creation(this.settings, center, radius));
+    group.addChild(structure(this.settings, center, radius, innerRadius));
+    group.addChild(realm(this.settings, center, radius, innerRadius));
+    group.addChild(moon(this.settings, center, radius, innerRadius));
+    group.addChild(stars(this.settings, center, radius, innerRadius));
+    group.addChild(
+      structure(
+        this.settings,
+        center,
+        radius / 0.5,
+        innerRadius / 0.5,
+        true,
+        false,
+      ),
     );
+
+    paper.view.rotate(180);
   };
 
   export = () => {
@@ -128,24 +146,31 @@ export default class Identity {
   };
 }
 
-export class IdentityGUI {
-  gui: Pane;
+export class IdentityGUI extends GUIController {
+  gui: FolderApi;
 
-  constructor(public target: Identity) {
-    this.gui = new Pane({ title: "Identity" });
+  constructor(
+    gui: FolderApi,
+    public target: Identity,
+  ) {
+    super(gui);
+    this.gui = this.addFolder(gui, { title: "Identity" });
 
     this.gui.addButton({ title: "Export" }).on("click", target.export);
     this.gui
       .addBinding(target.settings, "scale", { min: 0, max: 0.5 })
       .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings, "opacity", { min: 0, max: 1 })
+      .on("change", target.draw);
 
-    const guiCreation = this.gui.addFolder({ title: "creation" });
-    const guiRealm = this.gui.addFolder({ title: "realm" });
-    const guiStars = this.gui.addFolder({ title: "stars" });
-    const guiMoon = this.gui.addFolder({ title: "moon" });
-    const guiFront = this.gui.addFolder({ title: "front" });
-    const guiBack = this.gui.addFolder({ title: "back" });
-    const guiDebug = this.gui.addFolder({ title: "debug" });
+    const guiCreation = this.addFolder(this.gui, { title: "creation" });
+    const guiRealm = this.addFolder(this.gui, { title: "realm" });
+    const guiStars = this.addFolder(this.gui, { title: "stars" });
+    const guiMoon = this.addFolder(this.gui, { title: "moon" });
+    const guiFront = this.addFolder(this.gui, { title: "front" });
+    const guiBack = this.addFolder(this.gui, { title: "back" });
+    const guiDebug = this.addFolder(this.gui, { title: "debug" });
 
     guiCreation
       .addBinding(target.settings.creation, "width", { min: 0, max: 5 })

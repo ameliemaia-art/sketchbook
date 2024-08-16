@@ -15,3 +15,25 @@ export function saveImage(
     quality,
   );
 }
+
+export function composite(
+  width: number,
+  height: number,
+  layers: HTMLCanvasElement[],
+) {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  if (ctx) {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, width, height);
+
+    layers.forEach((layer) => {
+      ctx.drawImage(layer, 0, 0);
+    });
+  }
+
+  return canvas;
+}
