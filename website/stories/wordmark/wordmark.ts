@@ -12,8 +12,9 @@ const strokeScale = 1;
 export default class Wordmark {
   settings = {
     text: {
-      size: 74.5,
+      size: 0.071,
       color: "#ffffff",
+      letterSpacing: 0.01,
     },
     debug: {
       width: 1,
@@ -95,8 +96,10 @@ export default class Wordmark {
     // Text
     const text = "I · XIII I IX I";
 
-    this.textCtx.font = `${this.settings.text.size}px 'Berlingske Serif Text'`;
+    const fontSize = this.settings.text.size * this.canvas.height;
+    this.textCtx.font = `${fontSize}px 'Berlingske Serif Text'`;
     this.textCtx.fillStyle = "#ffffff";
+    this.textCtx.letterSpacing = `${this.settings.text.letterSpacing * this.canvas.height}px`;
 
     const metrics = this.textCtx.measureText(text);
 
@@ -141,13 +144,23 @@ export class WordmarkGUI extends GUIController {
     const text = this.gui.addFolder({ title: "Text" });
 
     text.addBinding(target.settings.text, "color", {}).on("change", (event) => {
-      console.log(event);
-
       target.draw();
     });
 
     text
-      .addBinding(target.settings.text, "size", { min: 1, max: 100 })
+      .addBinding(target.settings.text, "letterSpacing", {
+        min: 0,
+        max: 0.1,
+        step: 0.00001,
+      })
+      .on("change", target.draw);
+
+    text
+      .addBinding(target.settings.text, "size", {
+        min: 0,
+        max: 1,
+        step: 0.00001,
+      })
       .on("change", target.draw);
 
     new IdentityGUI(gui, target.identity);
