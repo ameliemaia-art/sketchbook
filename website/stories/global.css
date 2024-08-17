@@ -34,6 +34,6 @@
 }
 
 .sb-show-main canvas {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-sizing: border-box;
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+  /* box-sizing: border-box; */
 }

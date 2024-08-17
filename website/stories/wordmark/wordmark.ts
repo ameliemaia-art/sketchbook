@@ -1,7 +1,7 @@
 import paper from "paper";
 import { FolderApi, Pane } from "tweakpane";
 
-import { composite, saveImage } from "@utils/common/file";
+import { composite, saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import Identity, { IdentityGUI } from "../identity/identity";
 
@@ -13,8 +13,8 @@ export default class Wordmark {
   settings = {
     text: {
       size: 0.0735,
-      color: "#eb0000",
-      letterSpacing: 0.005,
+      color: "#ffffff", // eb0000
+      letterSpacing: 0.004325,
     },
     debug: {
       width: 1,
@@ -95,7 +95,7 @@ export default class Wordmark {
     }
 
     // Text
-    const text = "I · XIII I IX I";
+    const text = "IXIIIIIXI";
 
     const fontSize = this.settings.text.size * this.canvas.height;
     this.textCtx.font = `${fontSize}px 'Berlingske Serif Text'`;
@@ -117,13 +117,19 @@ export default class Wordmark {
     );
   };
 
-  export = () => {
+  saveImage = () => {
     const composition = composite(
       this.canvas.width / 2,
       this.canvas.height / 2,
       [this.canvas, this.textCanvas],
     );
+
+    // saveImage(this.canvas, "wordmark");
     saveImage(composition, "wordmark");
+  };
+
+  saveSVG = () => {
+    saveSVG(paper.project, "wordmark");
   };
 }
 
@@ -138,7 +144,7 @@ export class WordmarkGUI extends GUIController {
     this.gui = this.addFolder(gui, { title: "Wordmark" });
 
     this.gui.addButton({ title: "Draw" }).on("click", target.draw);
-    this.gui.addButton({ title: "Export" }).on("click", target.export);
+    this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
     this.gui
       .addBinding(target.settings.debug, "enabled")
       .on("change", target.draw);
@@ -152,7 +158,7 @@ export class WordmarkGUI extends GUIController {
     text
       .addBinding(target.settings.text, "letterSpacing", {
         min: 0,
-        max: 0.1,
+        max: 0.2,
         step: 0.00001,
       })
       .on("change", target.draw);

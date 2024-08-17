@@ -16,6 +16,16 @@ export function saveImage(
   );
 }
 
+export function saveSVG(project: paper.Project, title: string) {
+  const url =
+    "data:image/svg+xml;utf8," +
+    encodeURIComponent(project.exportSVG({ asString: true }) as string);
+  const link = document.createElement("a");
+  link.download = title;
+  link.href = url;
+  link.click();
+}
+
 export function composite(
   width: number,
   height: number,

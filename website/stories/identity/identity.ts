@@ -1,7 +1,7 @@
 import paper from "paper";
 import { FolderApi, Pane } from "tweakpane";
 
-import { saveImage } from "@utils/common/file";
+import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { creation, moon, realm, stars, structure } from "./form";
 import { Settings } from "./types";
@@ -140,8 +140,12 @@ export default class Identity {
     paper.view.rotate(180);
   };
 
-  export = () => {
+  saveImage = () => {
     saveImage(this.canvas, "identity");
+  };
+
+  saveSVG = () => {
+    saveSVG(paper.project, "identity");
   };
 }
 
@@ -155,7 +159,8 @@ export class IdentityGUI extends GUIController {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Identity" });
 
-    this.gui.addButton({ title: "Export" }).on("click", target.export);
+    this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
+    this.gui.addButton({ title: "Save SVG" }).on("click", target.saveSVG);
     this.gui
       .addBinding(target.settings, "scale", { min: 0, max: 0.5 })
       .on("change", target.draw);
