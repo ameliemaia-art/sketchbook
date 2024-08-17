@@ -20,7 +20,7 @@ export default class WordmarkAlternative {
     },
     debug: {
       width: 1,
-      color: "#ffffff",
+      color: "#ff0000",
       enabled: false,
     },
   };
@@ -41,6 +41,7 @@ export default class WordmarkAlternative {
     paper.setup(canvas);
 
     this.identity = new Identity(canvas, false);
+    this.identity.settings.opacity = 0.25;
 
     // Canvas
     this.textCanvas = document.createElement("canvas");
@@ -76,24 +77,6 @@ export default class WordmarkAlternative {
     const height = this.textCanvas.width;
     const centerX = this.textCanvas.width / 4;
     const centerY = this.textCanvas.height / 4;
-
-    // Horizontal line
-    if (this.settings.debug.enabled) {
-      this.textCtx.beginPath();
-      this.textCtx.lineWidth = this.settings.debug.width;
-      this.textCtx.strokeStyle = this.settings.debug.color;
-      this.textCtx.moveTo(0, centerY);
-      this.textCtx.lineTo(width, centerY);
-      this.textCtx.stroke();
-
-      // Vertical line
-      this.textCtx.beginPath();
-      this.textCtx.lineWidth = this.settings.debug.width;
-      this.textCtx.strokeStyle = this.settings.debug.color;
-      this.textCtx.moveTo(centerX, 0);
-      this.textCtx.lineTo(centerX, height);
-      this.textCtx.stroke();
-    }
 
     // Text
     const lines = [
@@ -143,13 +126,32 @@ export default class WordmarkAlternative {
     });
 
     this.textCtx?.restore();
+
+    // Horizontal line
+    if (this.settings.debug.enabled) {
+      this.textCtx.beginPath();
+      this.textCtx.lineWidth = this.settings.debug.width;
+      this.textCtx.strokeStyle = this.settings.debug.color;
+      this.textCtx.moveTo(0, centerY);
+      this.textCtx.lineTo(width, centerY);
+      this.textCtx.stroke();
+
+      // Vertical line
+      this.textCtx.beginPath();
+      this.textCtx.lineWidth = this.settings.debug.width;
+      this.textCtx.strokeStyle = this.settings.debug.color;
+      this.textCtx.moveTo(centerX, 0);
+      this.textCtx.lineTo(centerX, height);
+      this.textCtx.stroke();
+    }
   };
 
   export = () => {
-    const composition = composite(this.canvas.width, this.canvas.height, [
-      this.canvas,
-      this.textCanvas,
-    ]);
+    const composition = composite(
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      [this.canvas, this.textCanvas],
+    );
     saveImage(composition, "wordmark");
   };
 }
@@ -167,7 +169,7 @@ export class WordmarkAlternativeGUI extends GUIController {
     this.gui.addButton({ title: "Draw" }).on("click", target.draw);
     this.gui.addButton({ title: "Export" }).on("click", target.export);
     this.gui
-      .addBinding(target.settings.debug, "enabled")
+      .addBinding(target.settings.debug, "enabled", { label: "guidelines" })
       .on("change", target.draw);
 
     this.gui

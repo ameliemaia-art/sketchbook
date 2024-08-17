@@ -12,9 +12,9 @@ const strokeScale = 1;
 export default class Wordmark {
   settings = {
     text: {
-      size: 0.071,
-      color: "#ffffff",
-      letterSpacing: 0.01,
+      size: 0.0735,
+      color: "#eb0000",
+      letterSpacing: 0.005,
     },
     debug: {
       width: 1,
@@ -39,6 +39,7 @@ export default class Wordmark {
     paper.setup(canvas);
 
     this.identity = new Identity(canvas, false);
+    this.identity.settings.opacity = 0.25;
 
     // Canvas
     this.textCanvas = document.createElement("canvas");
@@ -99,7 +100,7 @@ export default class Wordmark {
     const fontSize = this.settings.text.size * this.canvas.height;
     this.textCtx.font = `${fontSize}px 'Berlingske Serif Text'`;
     this.textCtx.fillStyle = "#ffffff";
-    this.textCtx.letterSpacing = `${this.settings.text.letterSpacing * this.canvas.height}px`;
+    this.textCtx.letterSpacing = `${this.settings.text.letterSpacing * fontSize}px`;
 
     const metrics = this.textCtx.measureText(text);
 
@@ -117,10 +118,11 @@ export default class Wordmark {
   };
 
   export = () => {
-    const composition = composite(this.canvas.width, this.canvas.height, [
-      this.canvas,
-      this.textCanvas,
-    ]);
+    const composition = composite(
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      [this.canvas, this.textCanvas],
+    );
     saveImage(composition, "wordmark");
   };
 }
@@ -158,7 +160,7 @@ export class WordmarkGUI extends GUIController {
     text
       .addBinding(target.settings.text, "size", {
         min: 0,
-        max: 1,
+        max: 0.1,
         step: 0.00001,
       })
       .on("change", target.draw);

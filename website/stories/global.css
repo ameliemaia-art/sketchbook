@@ -28,3 +28,12 @@
   --tp-monitor-background-color: hsla(0, 0%, 8%, 1);
   --tp-monitor-foreground-color: hsla(0, 0%, 48%, 1);
 }
+
+.tp-dfwv {
+  width: 300px !important;
+}
+
+.sb-show-main canvas {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-sizing: border-box;
+}

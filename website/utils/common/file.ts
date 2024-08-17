@@ -31,7 +31,7 @@ export function composite(
     ctx.fillRect(0, 0, width, height);
 
     layers.forEach((layer) => {
-      ctx.drawImage(layer, 0, 0);
+      ctx.drawImage(layer, 0, 0, width, height);
     });
   }
 

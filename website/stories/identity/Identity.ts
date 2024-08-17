@@ -12,9 +12,8 @@ const strokeScale = 1;
 
 export default class Identity {
   settings: Settings = {
-    // scale: 0.25,
-    scale: 0.5,
-    opacity: 0.0,
+    scale: 0.25,
+    opacity: 1,
     creation: {
       width: 2 * strokeScale,
       alpha: 1,
