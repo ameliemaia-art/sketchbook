@@ -94,7 +94,7 @@ export default class Wordmark {
     const text = "IXIIIIIXI";
 
     const fontSize = this.settings.text.size * this.canvas.height;
-    this.textCtx.font = `${fontSize}px 'Berlingske Serif Text'`;
+    this.textCtx.font = `${fontSize}px 'Berlingske Serif Stencil'`;
     this.textCtx.fillStyle = "#ffffff";
     this.textCtx.letterSpacing = `${this.settings.text.letterSpacing * fontSize}px`;
 

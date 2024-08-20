@@ -37,3 +37,15 @@
   outline: 1px solid rgba(255, 255, 255, 0.5);
   /* box-sizing: border-box; */
 }
+
+@font-face {
+  font-family: "Berlingske Serif Stencil";
+  src: url("/assets/fonts/BerlingskeSerifStencil-Rg.eot");
+  src:
+    url("/assets/fonts/BerlingskeSerifStencil-Rg.eot?#iefix")
+      format("embedded-opentype"),
+    url("/assets/fonts/BerlingskeSerifStencil-Rg.woff2") format("woff2"),
+    url("/assets/fonts/BerlingskeSerifStencil-Rg.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}

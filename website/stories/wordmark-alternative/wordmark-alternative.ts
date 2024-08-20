@@ -86,7 +86,7 @@ export default class WordmarkAlternative {
 
     const fontSize = this.settings.text.size * this.canvas.height;
 
-    this.textCtx.font = `${fontSize}px 'Berlingske Serif Text'`;
+    this.textCtx.font = `${fontSize}px 'Berlingske Serif Stencil'`;
     this.textCtx.fillStyle = this.settings.text.color;
     this.textCtx.letterSpacing = `${this.settings.text.letterSpacing * this.canvas.height}px`;
 
