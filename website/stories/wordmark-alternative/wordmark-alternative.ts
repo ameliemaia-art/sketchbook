@@ -5,15 +5,11 @@ import { composite, saveImage } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import Identity, { IdentityGUI } from "../identity/identity";
 
-// Adjust this if canvas size changes
-// 512 = 1 for original logo
-const strokeScale = 1;
-
 export default class WordmarkAlternative {
   settings = {
     scale: 0.5,
     text: {
-      size: 0.1455,
+      size: 0.145,
       color: "#ffffff",
       lineSpacing: 0.1,
       letterSpacing: 0.01,
@@ -98,7 +94,8 @@ export default class WordmarkAlternative {
     // this.textCtx?.scale(2 * this.settings.scale, 2 * this.settings.scale);
 
     this.textCtx.translate(centerX, centerY);
-    this.textCtx.scale(2 * this.settings.scale, 2 * this.settings.scale);
+    const scale = 2 * 0.5 * this.settings.scale;
+    this.textCtx.scale(scale, scale);
     this.textCtx.translate(-centerX, -centerY);
 
     const lineSpacing = this.settings.text.lineSpacing * this.canvas.height;
@@ -124,6 +121,8 @@ export default class WordmarkAlternative {
       const yPos = startY + index * lineSpacing + textHeight / 2;
       this.textCtx.fillText(line, xPositions[index], yPos);
     });
+
+    this.textCtx.scale(1, 1);
 
     this.textCtx?.restore();
 

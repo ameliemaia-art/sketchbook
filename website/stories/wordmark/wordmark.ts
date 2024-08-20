@@ -5,10 +5,6 @@ import { composite, saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import Identity, { IdentityGUI } from "../identity/identity";
 
-// Adjust this if canvas size changes
-// 512 = 1 for original logo
-const strokeScale = 1;
-
 export default class Wordmark {
   settings = {
     text: {

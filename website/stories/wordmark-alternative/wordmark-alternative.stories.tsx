@@ -21,7 +21,10 @@ export const WordmarkAlternative = () => {
         rootRef.current,
         canvasRef.current,
       );
-      new WordmarkAlternativeGUI(new Pane({ title: "Wordmark" }), wordmark);
+      new WordmarkAlternativeGUI(
+        new Pane({ title: "Wordmark Alternative" }),
+        wordmark,
+      );
     }
 
     return () => {};
