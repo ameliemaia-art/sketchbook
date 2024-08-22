@@ -1,7 +1,7 @@
 import paper from "paper";
 import { FolderApi, Pane } from "tweakpane";
 
-import { saveImage, saveSVG } from "@utils/common/file";
+import { composite, saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { creation, moon, realm, stars, structure } from "./form";
 import { Settings } from "./types";
@@ -72,6 +72,15 @@ export default class Identity {
     let group = new paper.Group();
     group.opacity = this.settings.opacity;
 
+    // create a rectangle to fill the background
+    const background = new paper.Path.Rectangle(
+      paper.view.bounds.topLeft,
+      paper.view.bounds.bottomRight,
+    );
+    // color the background black
+    background.fillColor = new paper.Color(0, 0, 0);
+    group.addChild(background);
+
     const radius = paper.view.size.width * this.settings.scale;
     const center = paper.view.bounds.center;
 
@@ -141,7 +150,14 @@ export default class Identity {
   };
 
   saveImage = () => {
-    saveImage(this.canvas, "identity");
+    // saveImage(this.canvas, "identity");
+
+    const composition = composite(
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      [this.canvas],
+    );
+    saveImage(composition, "identity");
   };
 
   saveSVG = () => {
