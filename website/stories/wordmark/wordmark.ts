@@ -120,8 +120,8 @@ export default class Wordmark {
       [this.canvas, this.textCanvas],
     );
 
-    // saveImage(this.canvas, "wordmark");
-    saveImage(composition, "wordmark");
+    saveImage(this.textCanvas, "wordmark");
+    // saveImage(composition, "wordmark");
   };
 
   saveSVG = () => {
