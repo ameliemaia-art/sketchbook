@@ -6,7 +6,9 @@ import "../global.css";
 
 import { Pane } from "tweakpane";
 
-export default { title: "Sketchbook/Identity" };
+export default {
+  title: "Sketchbook/Identity",
+};
 
 export const Identity = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
