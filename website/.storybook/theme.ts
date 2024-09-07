@@ -5,9 +5,9 @@ const text = "rgba(255, 255, 255, 0.5)";
 
 export default create({
   base: "dark",
-  brandTitle: "Amelie Maia",
+  brandTitle: "IXIIIIIXI",
   brandUrl: "https://ameliemaia.art/",
-  brandImage: "./ameliemaia.png",
+  brandImage: "./identity.png",
   brandTarget: "_self",
 
   //
