@@ -32,7 +32,7 @@ export const WordmarkAlternative = () => {
 
   return (
     <>
-      <p className="load">I · XIII I IX I</p>
+      <p className="load-font">IXIIIIIXI</p>
       <div className="wordmark-alternative" ref={rootRef}>
         <canvas ref={canvasRef} />;
       </div>

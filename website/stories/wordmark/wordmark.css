@@ -1,20 +1,3 @@
-/* canvas {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-sizing: border-box;
-} */
-
-p {
-  color: white;
-  font-family: "Berlingske Serif Text";
-  font-size: 10rem;
-}
-
-.load {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
 .wordmark {
   position: relative;
 }

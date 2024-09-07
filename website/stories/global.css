@@ -49,3 +49,11 @@
   font-weight: 400;
   font-style: normal;
 }
+
+.load-font {
+  color: white;
+  font-family: "Berlingske Serif Stencil";
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
