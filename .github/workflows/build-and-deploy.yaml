@@ -23,16 +23,16 @@ jobs:
         with:
           node-version: 22
 
-      - name: Change Directory
-        run: cd website
-
       - name: Install Yarn
+        working-directory: ./website
         run: npm install -g yarn
 
       - name: Install dependencies
+        working-directory: ./website
         run: yarn install --frozen-lockfile
 
       - name: Build
+        working-directory: ./website
         run: yarn build
 
       - name: Configure AWS Credentials
@@ -42,6 +42,7 @@ jobs:
           aws-region: ca-central-1
 
       - name: Deploy to S3
+        working-directory: ./website
         run: aws s3 sync ./out s3://sketchbook.ameliemaia.art
 
       - name: Invalidate CloudFront Cache
