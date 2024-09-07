@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "storybook build -o ./out",
     "start": "next start",
     "lint": "next lint",
     "lint-staged": "npm run lint && lint-staged",
