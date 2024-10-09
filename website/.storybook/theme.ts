@@ -7,7 +7,7 @@ export default create({
   base: "dark",
   brandTitle: "IXIIIIIXI",
   brandUrl: "https://ameliemaia.art/",
-  brandImage: "./identity.png",
+  brandImage: "./identity.svg",
   brandTarget: "_self",
 
   //
