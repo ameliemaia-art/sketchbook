@@ -7,11 +7,11 @@ export default create({
   base: "dark",
   brandTitle: "IXIIIIIXI",
   brandUrl: "https://ameliemaia.art/",
-  brandImage: "./identity.svg",
+  brandImage: "./assets/images/identity.svg",
   brandTarget: "_self",
 
   //
-  colorPrimary: "#ff0000",
+  colorPrimary: "#ffffff",
   colorSecondary: "#000000",
 
   // UI
