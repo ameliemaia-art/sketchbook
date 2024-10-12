@@ -1,5 +1,11 @@
 import type { Preview } from "@storybook/react";
 
+export const globals = {
+  backgrounds: {
+    grid: true, //enable grid by default
+  },
+};
+
 const preview: Preview = {
   parameters: {
     options: {
