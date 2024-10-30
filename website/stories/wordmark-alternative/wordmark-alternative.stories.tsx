@@ -9,7 +9,7 @@ import "../global.css";
 
 import { Pane } from "tweakpane";
 
-export default { title: "Sketchbook/Wordmark Alternative" };
+export default { title: "Sketchbook/Identity/Wordmark Alternative" };
 
 export const WordmarkAlternative = () => {
   const rootRef = useRef<HTMLDivElement>(null);

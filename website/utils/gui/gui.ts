@@ -1,10 +1,23 @@
 import { BindingApi } from "@tweakpane/core";
+import type { Object3D, PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import { EventDispatcher } from "three";
+import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { FolderApi, FolderParams, TabApi, TabPageApi } from "tweakpane";
 
 import store from "./gui-store";
 import { GUIType } from "./gui-types";
 
-export default class GUIController {
+class GUIState {
+  renderer!: WebGLRenderer;
+  scene!: Scene;
+  camera!: PerspectiveCamera;
+  controls!: OrbitControls;
+  activeObject!: Object3D;
+}
+
+export default class GUIController extends EventDispatcher {
+  static state = new GUIState();
+
   gui!: FolderApi | TabPageApi;
   folders: { [key: string]: FolderApi } = {};
   bindings: BindingApi[] = [];
@@ -14,6 +27,7 @@ export default class GUIController {
   api: { [key: string]: any } = {};
 
   constructor(gui: FolderApi | TabPageApi, _tabs?: TabApi) {
+    super();
     this.guiParent = gui;
     if (_tabs) this.tabs = _tabs;
 
@@ -53,6 +67,14 @@ export default class GUIController {
     });
     folder.expanded = this.getFolderState(folder) === "open";
     return folder;
+  }
+
+  save() {
+    // todo!
+  }
+
+  reset() {
+    // todo!
   }
 
   dispose() {

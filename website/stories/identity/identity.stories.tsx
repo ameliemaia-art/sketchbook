@@ -7,10 +7,10 @@ import "../global.css";
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Identity",
+  title: "Sketchbook/Identity/Logo",
 };
 
-export const Identity = () => {
+export const Logo = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
