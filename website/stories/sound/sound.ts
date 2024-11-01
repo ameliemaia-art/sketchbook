@@ -5,6 +5,9 @@ import { saveImage } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import soundAnalyzer, { GUISoundAnalyzer } from "@utils/sound/sound-analyzer";
 import Graph from "./graph/graph";
+import Visualizer from "./visualizer/brightness-visualizer";
+import BrightnessVisualizer from "./visualizer/brightness-visualizer";
+import EnergyVisualizer from "./visualizer/energy-visualizer";
 
 export default class Wordmark {
   settings = {
@@ -23,6 +26,12 @@ export default class Wordmark {
   kickGraph: Graph;
   snareGraph: Graph;
   beatGraph: Graph;
+  kickBightnessVisualizer: BrightnessVisualizer;
+  snareBightnessVisualizer: BrightnessVisualizer;
+  beatBrightnessVisualizer: BrightnessVisualizer;
+  kickEnergyVisualizer: EnergyVisualizer;
+  snareEnergyVisualizer: EnergyVisualizer;
+  beatEnergyVisualizer: EnergyVisualizer;
 
   constructor(
     public root: HTMLElement,
@@ -45,6 +54,14 @@ export default class Wordmark {
     this.kickGraph = new Graph(100, 300, size);
     this.snareGraph = new Graph(400, 300, size);
     this.beatGraph = new Graph(700, 300, size);
+
+    this.kickBightnessVisualizer = new BrightnessVisualizer(100, 100, 100);
+    this.snareBightnessVisualizer = new BrightnessVisualizer(400, 100, 100);
+    this.beatBrightnessVisualizer = new BrightnessVisualizer(700, 100, 100);
+
+    this.kickEnergyVisualizer = new EnergyVisualizer(200, 100, 100);
+    this.snareEnergyVisualizer = new EnergyVisualizer(500, 100, 100);
+    this.beatEnergyVisualizer = new EnergyVisualizer(800, 100, 100);
 
     this.draw();
     this.update();
@@ -73,39 +90,12 @@ export default class Wordmark {
     this.beatGraph.settings.frequencyEnd = soundAnalyzer.beatModel.range.max;
     this.beatGraph.draw(soundAnalyzer.beatModel.fftSlice!);
 
-    // const centerX = paper.view.center.x;
-    // const centerY = paper.view.center.x;
-    // const size = 100;
-    // const rect0 = new paper.Path.Rectangle({
-    //   x: centerX - size / 2 - size,
-    //   y: centerY - size / 2,
-    //   width: size,
-    //   height: size,
-    // });
-    // const rect1 = new paper.Path.Rectangle({
-    //   x: centerX - size / 2,
-    //   y: centerY - size / 2,
-    //   width: size,
-    //   height: size,
-    // });
-    // const rect2 = new paper.Path.Rectangle({
-    //   x: centerX - size / 2 + size,
-    //   y: centerY - size / 2,
-    //   width: size,
-    //   height: size,
-    // });
-    // const color0 = soundAnalyzer.beatDetected
-    //   ? "rgba(255, 255, 255, 1)"
-    //   : "rgba(255, 255, 255, 0.1)";
-    // const color1 = soundAnalyzer.kickDetected
-    //   ? "rgba(255, 255, 255, 1)"
-    //   : "rgba(255, 255, 255, 0.1)";
-    // const color2 = soundAnalyzer.snareDetected
-    //   ? "rgba(255, 255, 255, 1)"
-    //   : "rgba(255, 255, 255, 0.1)";
-    // rect0.style.fillColor = new paper.Color(color0);
-    // rect1.style.fillColor = new paper.Color(color1);
-    // rect2.style.fillColor = new paper.Color(color2);
+    this.kickBightnessVisualizer.draw(soundAnalyzer.kickModel.detected);
+    this.kickEnergyVisualizer.draw(soundAnalyzer.kickModel.detected);
+    this.snareBightnessVisualizer.draw(soundAnalyzer.snareModel.detected);
+    this.snareEnergyVisualizer.draw(soundAnalyzer.snareModel.detected);
+    this.beatBrightnessVisualizer.draw(soundAnalyzer.beatModel.detected);
+    this.beatEnergyVisualizer.draw(soundAnalyzer.beatModel.detected);
   };
 
   draw = () => {
@@ -120,21 +110,15 @@ export default class Wordmark {
 }
 
 export class SoundGUI extends GUIController {
-  gui: FolderApi;
-
   constructor(
     gui: FolderApi,
     public target: Wordmark,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Sound" });
 
     // this.gui.addButton({ title: "Draw" }).on("click", target.draw);
     // this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
 
-    this.controllers.soundAnalyzer = new GUISoundAnalyzer(
-      this.gui,
-      soundAnalyzer,
-    );
+    this.controllers.soundAnalyzer = new GUISoundAnalyzer(gui, soundAnalyzer);
   }
 }

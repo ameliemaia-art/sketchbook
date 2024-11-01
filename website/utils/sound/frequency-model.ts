@@ -12,7 +12,7 @@ export default class FrequencyModel {
   fftSlice?: Uint8Array | null;
 
   amplitude = 0;
-  prevAmplitude = 0;
+  maxFrequency = 0;
 
   detected = false;
 
@@ -22,35 +22,30 @@ export default class FrequencyModel {
     this.indices.start = Math.floor(this.range.min / binSize);
     this.indices.end = Math.ceil(this.range.max / binSize);
 
-    this.amplitude = this.calculateAverageAmplitude(
-      fft,
-      this.indices.start,
-      this.indices.end,
-    );
+    let sum = 0;
+    this.maxFrequency = 0;
+    for (let i = this.indices.start; i < this.indices.end; i++) {
+      sum += fft[i];
+      this.maxFrequency = Math.max(fft[i] / 255, this.maxFrequency);
+    }
+    this.amplitude = sum / (this.indices.end - this.indices.start) / 255;
 
     this.fftSlice = fft.slice(this.indices.start, this.indices.end);
 
-    if (this.amplitude >= this.threshold) {
+    if (this.maxFrequency >= this.threshold) {
       if (!this.detected) {
         this.detected = true;
       }
     } else {
       this.detected = false;
     }
-    this.prevAmplitude = this.amplitude;
   }
 
   calculateAverageAmplitude(
     frequencyData: Uint8Array,
     startIndex: number,
     endIndex: number,
-  ) {
-    let sum = 0;
-    for (let i = startIndex; i < endIndex; i++) {
-      sum += frequencyData[i];
-    }
-    return sum / (endIndex - startIndex) / 255;
-  }
+  ) {}
 }
 
 /// #if DEBUG

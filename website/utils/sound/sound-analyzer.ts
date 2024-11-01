@@ -22,8 +22,9 @@ class SoundAnalyzer extends EventDispatcher {
   analyzers: { [key: string]: AudioAnalyser } = {};
 
   progress = 0;
-  time = 0;
+  time = "00:00";
   binSize = 0;
+  seek = 0;
   started = false;
 
   data: SoundData = {
@@ -60,6 +61,7 @@ class SoundAnalyzer extends EventDispatcher {
     const audioBuffer = await new Promise<AudioBuffer>((resolve, reject) => {
       this.loader.load(fileUrl, resolve, undefined, reject);
     });
+
     this.audio = new Audio(this.listener);
     this.audio.setBuffer(audioBuffer);
     this.setSound(this.audio);
@@ -91,15 +93,39 @@ class SoundAnalyzer extends EventDispatcher {
       this.data.fft = this.analyser.getFrequencyData();
       this.data.amplitude = this.analyser.getAverageFrequency() / 255;
 
+      this.time = this.formatTime(this.audio.context.currentTime);
+
+      if (this.audio.buffer) {
+        this.progress =
+          this.audio.context.currentTime / this.audio.buffer?.duration;
+      } else {
+        this.progress = 0;
+      }
+
       this.kickModel.update(this.data.fft, this.binSize);
       this.snareModel.update(this.data.fft, this.binSize);
       this.beatModel.update(this.data.fft, this.binSize);
     }
   }
 
+  // Helper function to format time in hh:mm:ss
+  formatTime(seconds: number): string {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const formattedHrs = hrs > 0 ? `${hrs.toString().padStart(2, "0")}:` : "";
+    const formattedMins = `${mins.toString().padStart(2, "0")}:`;
+    const formattedSecs = secs.toString().padStart(2, "0");
+
+    return `${formattedHrs}${formattedMins}${formattedSecs}`;
+  }
+
   get isPlaying() {
     return this.audio ? this.audio.isPlaying : false;
   }
+
+  onSeek = () => {};
 }
 
 const soundAnalyzer = new SoundAnalyzer();
@@ -116,6 +142,9 @@ export class GUISoundAnalyzer extends GUIController {
 
     this.gui.addBinding(target, "time", { readonly: true });
     this.gui.addBinding(target, "progress", { min: 0, max: 1, readonly: true });
+    // this.gui
+    //   .addBinding(target, "seek", { min: 0, max: 1 })
+    //   .on("change", target.onSeek);
 
     this.controllers.kick = new GUIFrequencyModel(this.gui, target.kickModel);
     this.controllers.snare = new GUIFrequencyModel(this.gui, target.snareModel);

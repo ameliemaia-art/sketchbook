@@ -122,8 +122,6 @@ export default class Graph {
       }
     }
 
-    console.log(this.settings.threshold, maxFreq);
-
     const line = new paper.Path(segments);
     line.strokeColor = new paper.Color("rgba(255, 255, 255, 1)");
     line.strokeWidth = this.settings.width;
