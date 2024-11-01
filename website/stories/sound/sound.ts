@@ -4,6 +4,7 @@ import { FolderApi } from "tweakpane";
 import { saveImage } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import soundAnalyzer, { GUISoundAnalyzer } from "@utils/sound/sound-analyzer";
+import Graph from "./graph/graph";
 
 export default class Wordmark {
   settings = {
@@ -18,6 +19,8 @@ export default class Wordmark {
       enabled: false,
     },
   };
+
+  graph: Graph;
 
   constructor(
     public root: HTMLElement,
@@ -34,6 +37,11 @@ export default class Wordmark {
       .then(() => {
         console.log("loaded");
       });
+    const centerX = paper.view.center.x;
+    const centerY = paper.view.center.y;
+    const size = 300;
+
+    this.graph = new Graph(centerX, centerY, size);
 
     this.draw();
     this.update();
@@ -43,45 +51,43 @@ export default class Wordmark {
 
   update = () => {
     requestAnimationFrame(this.update);
-    soundAnalyzer.update();
-
+    // soundAnalyzer.update();
     paper.project.activeLayer.removeChildren();
+    this.graph.draw();
 
-    const centerX = paper.view.center.x;
-    const centerY = paper.view.center.x;
-    const size = 100;
-
-    const rect0 = new paper.Path.Rectangle({
-      x: centerX - size / 2 - size,
-      y: centerY - size / 2,
-      width: size,
-      height: size,
-    });
-    const rect1 = new paper.Path.Rectangle({
-      x: centerX - size / 2,
-      y: centerY - size / 2,
-      width: size,
-      height: size,
-    });
-    const rect2 = new paper.Path.Rectangle({
-      x: centerX - size / 2 + size,
-      y: centerY - size / 2,
-      width: size,
-      height: size,
-    });
-
-    const color0 = soundAnalyzer.beatDetected
-      ? "rgba(255, 255, 255, 1)"
-      : "rgba(255, 255, 255, 0.1)";
-    const color1 = soundAnalyzer.kickDetected
-      ? "rgba(255, 255, 255, 1)"
-      : "rgba(255, 255, 255, 0.1)";
-    const color2 = soundAnalyzer.snareDetected
-      ? "rgba(255, 255, 255, 1)"
-      : "rgba(255, 255, 255, 0.1)";
-    rect0.style.fillColor = new paper.Color(color0);
-    rect1.style.fillColor = new paper.Color(color1);
-    rect2.style.fillColor = new paper.Color(color2);
+    // const centerX = paper.view.center.x;
+    // const centerY = paper.view.center.x;
+    // const size = 100;
+    // const rect0 = new paper.Path.Rectangle({
+    //   x: centerX - size / 2 - size,
+    //   y: centerY - size / 2,
+    //   width: size,
+    //   height: size,
+    // });
+    // const rect1 = new paper.Path.Rectangle({
+    //   x: centerX - size / 2,
+    //   y: centerY - size / 2,
+    //   width: size,
+    //   height: size,
+    // });
+    // const rect2 = new paper.Path.Rectangle({
+    //   x: centerX - size / 2 + size,
+    //   y: centerY - size / 2,
+    //   width: size,
+    //   height: size,
+    // });
+    // const color0 = soundAnalyzer.beatDetected
+    //   ? "rgba(255, 255, 255, 1)"
+    //   : "rgba(255, 255, 255, 0.1)";
+    // const color1 = soundAnalyzer.kickDetected
+    //   ? "rgba(255, 255, 255, 1)"
+    //   : "rgba(255, 255, 255, 0.1)";
+    // const color2 = soundAnalyzer.snareDetected
+    //   ? "rgba(255, 255, 255, 1)"
+    //   : "rgba(255, 255, 255, 0.1)";
+    // rect0.style.fillColor = new paper.Color(color0);
+    // rect1.style.fillColor = new paper.Color(color1);
+    // rect2.style.fillColor = new paper.Color(color2);
   };
 
   draw = () => {
