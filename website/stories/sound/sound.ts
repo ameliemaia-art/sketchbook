@@ -20,7 +20,9 @@ export default class Wordmark {
     },
   };
 
-  graph: Graph;
+  kickGraph: Graph;
+  snareGraph: Graph;
+  beatGraph: Graph;
 
   constructor(
     public root: HTMLElement,
@@ -28,8 +30,8 @@ export default class Wordmark {
   ) {
     this.canvas = canvas;
 
-    canvas.width = 500;
-    canvas.height = 500;
+    canvas.width = 1000;
+    canvas.height = 600;
     paper.setup(canvas);
 
     soundAnalyzer
@@ -37,11 +39,12 @@ export default class Wordmark {
       .then(() => {
         console.log("loaded");
       });
-    const centerX = paper.view.center.x;
-    const centerY = paper.view.center.y;
-    const size = 300;
 
-    this.graph = new Graph(centerX, centerY, size);
+    const size = 200;
+
+    this.kickGraph = new Graph(100, 300, size);
+    this.snareGraph = new Graph(400, 300, size);
+    this.beatGraph = new Graph(700, 300, size);
 
     this.draw();
     this.update();
@@ -51,9 +54,24 @@ export default class Wordmark {
 
   update = () => {
     requestAnimationFrame(this.update);
-    // soundAnalyzer.update();
+    soundAnalyzer.update();
     paper.project.activeLayer.removeChildren();
-    this.graph.draw();
+
+    this.kickGraph.settings.threshold = soundAnalyzer.kickModel.threshold;
+    this.kickGraph.settings.frequencyStart = soundAnalyzer.kickModel.range.min;
+    this.kickGraph.settings.frequencyEnd = soundAnalyzer.kickModel.range.max;
+    this.kickGraph.draw(soundAnalyzer.kickModel.fftSlice!);
+
+    this.snareGraph.settings.threshold = soundAnalyzer.snareModel.threshold;
+    this.snareGraph.settings.frequencyStart =
+      soundAnalyzer.snareModel.range.min;
+    this.snareGraph.settings.frequencyEnd = soundAnalyzer.snareModel.range.max;
+    this.snareGraph.draw(soundAnalyzer.snareModel.fftSlice!);
+
+    this.beatGraph.settings.threshold = soundAnalyzer.beatModel.threshold;
+    this.beatGraph.settings.frequencyStart = soundAnalyzer.beatModel.range.min;
+    this.beatGraph.settings.frequencyEnd = soundAnalyzer.beatModel.range.max;
+    this.beatGraph.draw(soundAnalyzer.beatModel.fftSlice!);
 
     // const centerX = paper.view.center.x;
     // const centerY = paper.view.center.x;
