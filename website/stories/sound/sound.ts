@@ -45,9 +45,7 @@ export default class Wordmark {
 
     soundAnalyzer
       .loadAndPlayAudio("/assets/sounds/klangkuenstler-untergang.mp3")
-      .then(() => {
-        console.log("loaded");
-      });
+      .then(() => {});
 
     const size = 200;
 

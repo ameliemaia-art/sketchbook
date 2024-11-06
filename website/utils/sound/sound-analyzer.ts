@@ -62,6 +62,24 @@ class SoundAnalyzer extends EventDispatcher {
     this.htmlAudio = new Audio(fileUrl);
     this.htmlAudio.crossOrigin = "anonymous"; // Enable CORS if needed
     this.htmlAudio.controls = true;
+
+    const onLoaded = () => {
+      if (!this.htmlAudio) return;
+
+      // Create a Three.js Audio instance and link it with the HTML5 audio
+      const context = this.listener.context;
+      const source = context.createMediaElementSource(this.htmlAudio);
+
+      // Create the Three.js Audio object using the context and source
+      this.audio = new ThreeAudio(this.listener);
+      // @ts-ignore
+      this.audio.setNodeSource(source);
+
+      this.setSound(this.audio);
+    };
+
+    this.htmlAudio.addEventListener("canplaythrough", onLoaded);
+
     this.htmlAudio.load(); // Wait for audio to load if needed
     // Object.assign(this.htmlAudio.style, {
     //   position: "absolute",
@@ -70,17 +88,6 @@ class SoundAnalyzer extends EventDispatcher {
     //   zIndex: "100",
     // });
     // document.body.appendChild(this.htmlAudio);
-
-    // Create a Three.js Audio instance and link it with the HTML5 audio
-    const context = this.listener.context;
-    const source = context.createMediaElementSource(this.htmlAudio);
-
-    // Create the Three.js Audio object using the context and source
-    this.audio = new ThreeAudio(this.listener);
-    // @ts-ignore
-    this.audio.setNodeSource(source);
-
-    this.setSound(this.audio);
   }
 
   play = () => {
