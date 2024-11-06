@@ -29,12 +29,16 @@
   --tp-monitor-foreground-color: hsla(0, 0%, 48%, 1);
 }
 
+body {
+  background-color: rgba(0, 0, 0, 1);
+}
+
 .tp-dfwv {
-  width: 300px !important;
+  width: 320px !important;
 }
 
 .sb-show-main canvas {
-  outline: 1px solid rgba(255, 255, 255, 0.5);
+  /* outline: 1px solid rgba(255, 255, 255, 0.5); */
   /* box-sizing: border-box; */
 }
 

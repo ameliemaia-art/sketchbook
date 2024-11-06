@@ -1,11 +1,10 @@
 import {
-  Audio,
   AudioAnalyser,
   AudioListener,
   AudioLoader,
   EventDispatcher,
+  Audio as ThreeAudio,
 } from "three";
-import { threshold } from "three/webgpu";
 
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
@@ -17,7 +16,8 @@ export type SoundData = {
 };
 
 class SoundAnalyzer extends EventDispatcher {
-  audio?: Audio;
+  audio?: ThreeAudio;
+  htmlAudio?: HTMLAudioElement;
   analyser?: AudioAnalyser;
   analyzers: { [key: string]: AudioAnalyser } = {};
 
@@ -47,8 +47,8 @@ class SoundAnalyzer extends EventDispatcher {
     this.kickModel.range.max = 500;
 
     this.snareModel = new FrequencyModel("snare");
-    this.snareModel.threshold = 0.85;
-    this.snareModel.range.min = 1000;
+    this.snareModel.threshold = 0.8;
+    this.snareModel.range.min = 3000;
     this.snareModel.range.max = 4000;
 
     this.beatModel = new FrequencyModel("beat");
@@ -58,24 +58,40 @@ class SoundAnalyzer extends EventDispatcher {
   }
 
   async loadAndPlayAudio(fileUrl: string) {
-    const audioBuffer = await new Promise<AudioBuffer>((resolve, reject) => {
-      this.loader.load(fileUrl, resolve, undefined, reject);
-    });
+    // Create an HTML5 audio element and load the file
+    this.htmlAudio = new Audio(fileUrl);
+    this.htmlAudio.crossOrigin = "anonymous"; // Enable CORS if needed
+    this.htmlAudio.controls = true;
+    this.htmlAudio.load(); // Wait for audio to load if needed
+    // Object.assign(this.htmlAudio.style, {
+    //   position: "absolute",
+    //   top: "0",
+    //   left: "0",
+    //   zIndex: "100",
+    // });
+    // document.body.appendChild(this.htmlAudio);
 
-    this.audio = new Audio(this.listener);
-    this.audio.setBuffer(audioBuffer);
+    // Create a Three.js Audio instance and link it with the HTML5 audio
+    const context = this.listener.context;
+    const source = context.createMediaElementSource(this.htmlAudio);
+
+    // Create the Three.js Audio object using the context and source
+    this.audio = new ThreeAudio(this.listener);
+    // @ts-ignore
+    this.audio.setNodeSource(source);
+
     this.setSound(this.audio);
   }
 
   play = () => {
-    if (this.audio) this.audio.play();
+    if (this.htmlAudio) this.htmlAudio.play();
   };
 
   pause = () => {
-    if (this.audio) this.audio.pause();
+    if (this.htmlAudio) this.htmlAudio.pause();
   };
 
-  setSound(audio: Audio) {
+  setSound(audio: ThreeAudio) {
     this.audio = audio;
     if (!this.analyzers[audio.uuid]) {
       this.analyzers[audio.uuid] = new AudioAnalyser(audio, 512);
@@ -89,15 +105,14 @@ class SoundAnalyzer extends EventDispatcher {
   update() {
     if (!this.isPlaying) return;
 
-    if (this.analyser && this.audio) {
+    if (this.analyser && this.htmlAudio && this.audio) {
       this.data.fft = this.analyser.getFrequencyData();
       this.data.amplitude = this.analyser.getAverageFrequency() / 255;
 
-      this.time = this.formatTime(this.audio.context.currentTime);
+      this.time = `${this.formatTime(this.htmlAudio.currentTime)} / ${this.formatTime(this.htmlAudio.duration)}`;
 
-      if (this.audio.buffer) {
-        this.progress =
-          this.audio.context.currentTime / this.audio.buffer?.duration;
+      if (this.htmlAudio) {
+        this.progress = this.htmlAudio.currentTime / this.htmlAudio.duration;
       } else {
         this.progress = 0;
       }
@@ -122,10 +137,13 @@ class SoundAnalyzer extends EventDispatcher {
   }
 
   get isPlaying() {
-    return this.audio ? this.audio.isPlaying : false;
+    return this.htmlAudio ? !this.htmlAudio.paused : false;
   }
 
-  onSeek = () => {};
+  onSeek = () => {
+    if (!this.htmlAudio) return;
+    this.htmlAudio.currentTime = this.seek * this.htmlAudio.duration;
+  };
 }
 
 const soundAnalyzer = new SoundAnalyzer();
@@ -142,9 +160,9 @@ export class GUISoundAnalyzer extends GUIController {
 
     this.gui.addBinding(target, "time", { readonly: true });
     this.gui.addBinding(target, "progress", { min: 0, max: 1, readonly: true });
-    // this.gui
-    //   .addBinding(target, "seek", { min: 0, max: 1 })
-    //   .on("change", target.onSeek);
+    this.gui
+      .addBinding(target, "seek", { min: 0, max: 1 })
+      .on("change", target.onSeek);
 
     this.controllers.kick = new GUIFrequencyModel(this.gui, target.kickModel);
     this.controllers.snare = new GUIFrequencyModel(this.gui, target.snareModel);

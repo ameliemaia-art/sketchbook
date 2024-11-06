@@ -63,15 +63,13 @@ export default class Wordmark {
     this.snareEnergyVisualizer = new EnergyVisualizer(500, 100, 100);
     this.beatEnergyVisualizer = new EnergyVisualizer(800, 100, 100);
 
-    this.draw();
     this.update();
   }
-
-  onBeat = () => {};
 
   update = () => {
     requestAnimationFrame(this.update);
     soundAnalyzer.update();
+
     paper.project.activeLayer.removeChildren();
 
     this.kickGraph.settings.threshold = soundAnalyzer.kickModel.threshold;
@@ -96,10 +94,6 @@ export default class Wordmark {
     this.snareEnergyVisualizer.draw(soundAnalyzer.snareModel.detected);
     this.beatBrightnessVisualizer.draw(soundAnalyzer.beatModel.detected);
     this.beatEnergyVisualizer.draw(soundAnalyzer.beatModel.detected);
-  };
-
-  draw = () => {
-    paper.project.activeLayer.removeChildren();
   };
 
   saveImage = () => {
