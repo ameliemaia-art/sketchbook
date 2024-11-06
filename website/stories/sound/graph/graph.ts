@@ -105,8 +105,6 @@ export default class Graph {
     let hit = false;
     let maxFreq = 0;
 
-    console.log("xyz");
-
     for (let i = 0; i < fft.length; i++) {
       const amplitude = fft[i] / 255;
       const x = MathUtils.lerp(
