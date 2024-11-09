@@ -1,15 +1,13 @@
+import { N8AOPass } from "n8ao";
 import {
   AxesHelper,
   CameraHelper,
   Clock,
-  Color,
   GridHelper,
-  Mesh,
   NeutralToneMapping,
   Object3D,
   PerspectiveCamera,
   Scene,
-  SphereGeometry,
   Vector2,
   Vector3,
   Vector4,
@@ -31,6 +29,7 @@ import GUIController from "@utils/gui/gui";
 import {
   bloomPassBinding,
   fxaaPassBinding,
+  n8AOPassBinding,
   vignettePassBinding,
 } from "@utils/gui/gui-post-processing-bindings";
 import { GUIType } from "@utils/gui/gui-types";
@@ -55,7 +54,7 @@ export default class WebGLApp {
   rafId = 0;
 
   settings = {
-    debugCamera: true,
+    debugCamera: false,
     stats: true,
     helpers: false,
   };
@@ -66,6 +65,7 @@ export default class WebGLApp {
   outputPass: OutputPass;
   vignettePass: ShaderPass;
   copyPass: ShaderPass;
+  aoPass: typeof N8AOPass;
   copyPassToRenderTarget: ShaderPass;
 
   // Scenes
@@ -97,11 +97,26 @@ export default class WebGLApp {
     this.vignettePass = new ShaderPass(VignetteShader);
     this.vignettePass.uniforms.offset.value = 0.8;
     this.vignettePass.uniforms.darkness.value = 1.5;
+    this.aoPass = new N8AOPass(
+      this.scene,
+      this.cameras.main,
+      this.renderSize.x,
+      this.renderSize.y,
+    );
+    this.aoPass.configuration.gammaCorrection = false;
+    this.aoPass.enabled = true;
+    this.aoPass.setQualityMode("High");
+    // this.aoPass.configuration.accumulate = true;
+    this.aoPass.configuration.aoRadius = 5;
+    this.aoPass.configuration.distanceFalloff = 5;
+    this.aoPass.configuration.intensity = 10;
+    // this.aoPass.setDisplayMode("AO"); // Or any other display mode
     this.copyPassToRenderTarget = new ShaderPass(CopyShader);
 
     this.postProcessing.addPass(this.renderPass);
-    this.postProcessing.addPass(this.fxaaPass);
+    this.postProcessing.addPass(this.aoPass);
     this.postProcessing.addPass(this.bloomPass);
+    this.postProcessing.addPass(this.fxaaPass);
     this.postProcessing.addPass(this.outputPass);
     this.postProcessing.addPass(this.vignettePass);
 
@@ -123,9 +138,10 @@ export default class WebGLApp {
     );
     this.helpers.add(
       new AxesHelper(),
-      new GridHelper(10, 10),
+      new GridHelper(50, 50),
       new CameraHelper(this.cameras.main),
     );
+    this.helpers.visible = this.settings.helpers;
 
     this.scene.add(this.helpers);
 
@@ -140,8 +156,6 @@ export default class WebGLApp {
     if (element) {
       element.style.padding = "0px";
     }
-
-    this.scene.add(new Mesh(new SphereGeometry(1, 32, 32)));
   }
 
   async loadAssets() {
@@ -156,7 +170,11 @@ export default class WebGLApp {
     await this.loadAssets();
 
     this.scene.add(this.cameras.main);
+
+    this.create();
   }
+
+  create() {}
 
   drawCanvasFromEffectComposer = () => {
     const camera = this.settings.debugCamera
@@ -219,6 +237,7 @@ export default class WebGLApp {
     this.renderer.setSize(this.renderSize.x, this.renderSize.y);
     this.postProcessing.setSize(this.renderSize.x, this.renderSize.y);
     this.bloomPass.setSize(this.renderSize.x, this.renderSize.y);
+    this.aoPass.setSize(this.renderSize.x, this.renderSize.y);
 
     this.viewport.debug.set(
       0,
@@ -239,12 +258,21 @@ export default class WebGLApp {
     this.fxaaPass.material.uniforms.resolution.value.y = 1 / renderBufferHeight;
   }
 
+  onUpdate(delta: number) {}
+
   update = () => {
     this.controls.update();
+
+    this.onUpdate(this.clock.getDelta());
 
     this.renderPass.camera = this.settings.debugCamera
       ? this.cameras.dev
       : this.cameras.main;
+
+    if (this.aoPass.enabled) {
+      this.aoPass.scene = this.scene;
+      this.aoPass.camera = this.renderPass.camera;
+    }
 
     this.renderer.setViewport(this.viewport.main);
     this.renderer.setScissor(this.viewport.main);
@@ -269,6 +297,12 @@ export class GUIWebGLApp extends GUIController {
       label: "helpers",
     });
 
+    this.folders.camera = this.addFolder(this.gui, { title: "Camera" });
+    this.folders.camera.addBinding(target.cameras.main.position, "z");
+    this.folders.camera.addBinding(target.cameras.main, "fov", {
+      min: 1,
+    });
+
     this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
 
     this.folders.fxaa = this.addFolder(this.folders.passes, { title: "FXAA" });
@@ -283,6 +317,11 @@ export class GUIWebGLApp extends GUIController {
       title: "Vignette",
     });
     vignettePassBinding(this.folders.vignette, target.vignettePass);
+
+    this.folders.ao = this.addFolder(this.folders.passes, {
+      title: "Ambient Occlusion",
+    });
+    n8AOPassBinding(this.folders.ao, target.aoPass);
 
     this.controllers.screenshot = new GUIScreenshot(gui, target.screenshot);
   }

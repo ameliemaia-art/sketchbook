@@ -3,7 +3,7 @@ import { Pane } from "tweakpane";
 
 import FormSketch, { GUITemplateSketch } from "./template";
 
-import "../global.css";
+import "../../global.css";
 
 export default { title: "Sketchbook/Forms/Template" };
 
@@ -23,7 +23,7 @@ export const Template = () => {
       });
 
     const gui = new Pane({
-      title: "Metaphysical Form",
+      title: "Metaphysical Form - Template",
     });
     new GUITemplateSketch(gui, app);
 
