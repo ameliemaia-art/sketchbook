@@ -6,6 +6,7 @@ import {
   GridHelper,
   NeutralToneMapping,
   Object3D,
+  OrthographicCamera,
   PerspectiveCamera,
   Scene,
   Vector2,
@@ -44,8 +45,10 @@ export default class WebGLApp {
     dev: new PerspectiveCamera(65, 1, 0.01, 10000),
     main: new PerspectiveCamera(65, 1, 0.01, 10000),
   };
+  orthographicCamera = new OrthographicCamera();
   controls: OrbitControls;
-  helpers = new Object3D();
+  helpersGroup = new Object3D();
+  helpers: { [key: string]: Object3D } = {};
   clock = new Clock();
 
   renderSize = new Vector2(1024, 1024);
@@ -55,8 +58,10 @@ export default class WebGLApp {
 
   settings = {
     debugCamera: false,
+    orthCamera: true,
     stats: true,
     helpers: false,
+    frustumSize: 25,
   };
 
   renderPass: RenderPass;
@@ -104,7 +109,7 @@ export default class WebGLApp {
       this.renderSize.y,
     );
     this.aoPass.configuration.gammaCorrection = false;
-    this.aoPass.enabled = true;
+    this.aoPass.enabled = false;
     this.aoPass.setQualityMode("High");
     // this.aoPass.configuration.accumulate = true;
     this.aoPass.configuration.aoRadius = 5;
@@ -136,17 +141,22 @@ export default class WebGLApp {
       this.cameras.dev,
       this.renderer.domElement,
     );
-    this.helpers.add(
-      new AxesHelper(),
-      new GridHelper(50, 50),
-      new CameraHelper(this.cameras.main),
-    );
-    this.helpers.visible = this.settings.helpers;
 
-    this.scene.add(this.helpers);
+    this.helpers.gridHelperX = new GridHelper(50, 50);
+    this.helpers.gridHelperY = new GridHelper(50, 50);
+    this.helpers.gridHelperZ = new GridHelper(50, 50);
+    this.helpers.gridHelperY.rotateX(Math.PI / 2);
+    this.helpers.gridHelperZ.rotateX(Math.PI / 2);
+    this.helpers.gridHelperZ.rotateZ(Math.PI / 2);
+    this.helpers.axes = new AxesHelper();
+    this.helpers.camera = new CameraHelper(this.cameras.main);
+    this.helpersGroup.add(...Object.values(this.helpers));
+
+    this.scene.add(this.helpersGroup);
 
     this.cameras.main.position.z = 5;
     this.cameras.main.lookAt(0, 0, 0);
+    this.orthographicCamera.position.z = 5;
 
     resetCamera(this.cameras.dev, 10, new Vector3(0, 0.5, 1));
 
@@ -246,10 +256,20 @@ export default class WebGLApp {
       this.renderSize.y * 0.25,
     );
     this.viewport.main.set(0, 0, this.renderSize.x, this.renderSize.y);
-    this.cameras.dev.aspect = this.renderSize.x / this.renderSize.y;
-    this.cameras.main.aspect = this.renderSize.x / this.renderSize.y;
+    const aspect = this.renderSize.x / this.renderSize.y;
+    this.cameras.dev.aspect = aspect;
+    this.cameras.main.aspect = aspect;
+
+    this.orthographicCamera.left = (this.settings.frustumSize * aspect) / -2;
+    this.orthographicCamera.right = (this.settings.frustumSize * aspect) / 2;
+    this.orthographicCamera.top = this.settings.frustumSize / 2;
+    this.orthographicCamera.bottom = this.settings.frustumSize / -2;
+    this.orthographicCamera.near = 1;
+    this.orthographicCamera.far = 1000;
+
     this.cameras.dev.updateProjectionMatrix();
     this.cameras.main.updateProjectionMatrix();
+    this.orthographicCamera.updateProjectionMatrix();
 
     // Update uniforms
     const { width: renderBufferWidth, height: renderBufferHeight } =
@@ -263,11 +283,17 @@ export default class WebGLApp {
   update = () => {
     this.controls.update();
 
+    this.helpers.visible = this.settings.helpers;
+
     this.onUpdate(this.clock.getDelta());
 
     this.renderPass.camera = this.settings.debugCamera
       ? this.cameras.dev
       : this.cameras.main;
+
+    if (this.settings.orthCamera) {
+      this.renderPass.camera = this.orthographicCamera;
+    }
 
     if (this.aoPass.enabled) {
       this.aoPass.scene = this.scene;
@@ -293,15 +319,29 @@ export class GUIWebGLApp extends GUIController {
 
     this.folders.settings = this.addFolder(this.gui, { title: "Settings" });
     this.folders.settings.addBinding(target.settings, "debugCamera");
-    this.folders.settings.addBinding(target.helpers, "visible", {
-      label: "helpers",
-    });
+    this.folders.settings.addBinding(target.settings, "orthCamera");
+    this.folders.settings.addBinding(target.settings, "helpers");
 
-    this.folders.camera = this.addFolder(this.gui, { title: "Camera" });
-    this.folders.camera.addBinding(target.cameras.main.position, "z");
-    this.folders.camera.addBinding(target.cameras.main, "fov", {
+    this.folders.cameras = this.addFolder(this.gui, { title: "Cameras" });
+    this.folders.mainCamera = this.addFolder(this.folders.cameras, {
+      title: "Main",
+    });
+    this.folders.mainCamera.addBinding(target.cameras.main.position, "z");
+    this.folders.mainCamera.addBinding(target.cameras.main, "fov", {
       min: 1,
     });
+    this.folders.orthCamera = this.addFolder(this.folders.cameras, {
+      title: "Orth",
+    });
+    this.folders.orthCamera.addBinding(target.orthographicCamera.position, "z");
+    this.folders.orthCamera
+      .addBinding(target.settings, "frustumSize", {
+        min: 1,
+      })
+      .on(
+        "change",
+        target.resize.bind(target, window.innerWidth, window.innerHeight),
+      );
 
     this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
 
