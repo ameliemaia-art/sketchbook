@@ -9,13 +9,17 @@ const strokeScale = 1;
 
 export default class FlowerOfLife {
   settings = {
-    scale: 1,
+    scale: 0.85,
     opacity: 1,
-    width: 2 * strokeScale,
+    dimensions: 5,
+    width: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
-    debug: {
-      width: 1,
-      color: new paper.Color(1, 1, 1, 0),
+    layers: {
+      circles: true,
+      outline: true,
+      lines: false,
+      corners: false,
+      grid: false,
     },
   };
 
@@ -40,20 +44,40 @@ export default class FlowerOfLife {
     let group = new paper.Group();
     group.opacity = this.settings.opacity;
 
+    // create a rectangle to fill the background
+    // const background = new paper.Path.Rectangle(
+    //   paper.view.bounds.topLeft,
+    //   paper.view.bounds.bottomRight,
+    // );
+    // color the background black
+    // background.fillColor = new paper.Color(0, 0, 0);
+    // group.addChild(background);
+
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
 
     group.addChild(
-      flowerOfLife(center, radius, this.settings.color, this.settings.width),
+      flowerOfLife(
+        center,
+        radius,
+        this.settings.dimensions,
+        this.settings.color,
+        this.settings.width,
+        this.settings.layers.circles,
+        this.settings.layers.outline,
+        this.settings.layers.lines,
+        this.settings.layers.corners,
+        this.settings.layers.grid,
+      ),
     );
   };
 
   saveImage = () => {
-    saveImage(this.canvas, "identity");
+    saveImage(this.canvas, "flower-of-life");
   };
 
   saveSVG = () => {
-    saveSVG(paper.project, "identity");
+    saveSVG(paper.project, "flower-of-life");
   };
 }
 
@@ -66,5 +90,35 @@ export class GUIFlowerOfLife extends GUIController {
   ) {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Flower Of Life" });
+
+    this.gui
+      .addBinding(target.settings, "scale", { min: 0.1, max: 1 })
+      .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings, "opacity", { min: 0, max: 1 })
+      .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings, "dimensions", { min: 1, max: 10, step: 1 })
+      .on("change", target.draw);
+
+    this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
+    this.folders.layers
+      .addBinding(target.settings.layers, "circles")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "outline")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "lines")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "corners")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "grid")
+      .on("change", target.draw);
+
+    this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
+    this.gui.addButton({ title: "Save SVG" }).on("click", target.saveSVG);
   }
 }

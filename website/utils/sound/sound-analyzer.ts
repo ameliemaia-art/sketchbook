@@ -42,7 +42,7 @@ class SoundAnalyzer extends EventDispatcher {
   constructor() {
     super();
     this.kickModel = new FrequencyModel("kick");
-    this.kickModel.threshold = 0.97;
+    this.kickModel.threshold = 0.95;
     this.kickModel.range.min = 300;
     this.kickModel.range.max = 500;
 
