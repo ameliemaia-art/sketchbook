@@ -32,22 +32,27 @@ export default class BlueprintSketch extends WebGLApp {
 
   config = {
     globals: {
+      id: "globals",
       lineWidth: 0.025,
     },
     outline: {
+      id: "outline",
       radius: 5,
       visible: true,
     },
     rings: {
+      id: "rings",
       visible: true,
       count: 6,
       circleRadius: 5,
       radius: 2.5,
     },
     lines: {
+      id: "lines",
       visible: true,
     },
     icosahedron: {
+      id: "icosahedron",
       visible: true,
       radius: 5,
     },
@@ -90,6 +95,7 @@ export default class BlueprintSketch extends WebGLApp {
     });
 
     this.icoshaedron = new Mesh(geometry, material);
+    this.icoshaedron.name = "Icosahedron";
     this.scene.add(this.icoshaedron);
   }
 
@@ -106,6 +112,7 @@ export default class BlueprintSketch extends WebGLApp {
       new RingGeometry(innerRadius, outerRadius, 64),
       this.lineMaterial,
     );
+    this.outline.name = "outline";
     this.scene.add(this.outline);
   }
 
@@ -165,6 +172,7 @@ export default class BlueprintSketch extends WebGLApp {
     this.lines = new Line2(geometry, matLine);
     this.lines.computeLineDistances();
     this.lines.scale.set(1, 1, 1);
+    this.lines.name = "lines";
 
     this.scene.add(this.lines);
   }
