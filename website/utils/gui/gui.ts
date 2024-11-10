@@ -34,12 +34,12 @@ export default class GUIController extends EventDispatcher {
     if (this.tabs) {
       this.tabs.on("select", (event) => {
         if (typeof this.guiParent.title === "string") {
-          store.set(this.guiParent.title, event.index);
+          store.set("tabs", this.guiParent.title, event.index);
         }
       });
 
       if (typeof this.guiParent.title === "string") {
-        const index = store.get(this.guiParent.title);
+        const index = store.get("tabs", this.guiParent.title);
         if (typeof index === "number" && this.tabs.pages[index]) {
           this.tabs.pages[index].selected = true;
         }
@@ -49,13 +49,17 @@ export default class GUIController extends EventDispatcher {
 
   saveFolderState(folder: GUIType, expanded: boolean) {
     if (folder.title) {
-      store.set(`folder-${folder.title}`, expanded ? "open" : "closed");
+      store.set(
+        "folders",
+        `folder-${folder.title}`,
+        expanded ? "open" : "closed",
+      );
     }
   }
 
   getFolderState(folder: GUIType) {
     if (folder.title) {
-      return store.get(`folder-${folder.title}`);
+      return store.get("folders", `folder-${folder.title}`);
     }
     return "closed";
   }
@@ -67,6 +71,22 @@ export default class GUIController extends EventDispatcher {
     });
     folder.expanded = this.getFolderState(folder) === "open";
     return folder;
+  }
+
+  addBinding(gui: GUIType, object: any, key: string, params = {}) {
+    const api = gui.addBinding(object, key, params);
+    const path = `${object.id}-${key}`;
+
+    if (store.get("bindings", path) !== undefined) {
+      object[key] = store.get("bindings", path);
+      api.refresh();
+    }
+
+    api.on("change", (event) => {
+      store.set("bindings", path, event.value);
+    });
+
+    return api;
   }
 
   save() {

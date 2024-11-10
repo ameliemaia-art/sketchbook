@@ -57,6 +57,7 @@ export default class WebGLApp {
   rafId = 0;
 
   settings = {
+    id: "Settings",
     debugCamera: false,
     orthCamera: true,
     stats: true,
@@ -264,8 +265,8 @@ export default class WebGLApp {
     this.orthographicCamera.right = (this.settings.frustumSize * aspect) / 2;
     this.orthographicCamera.top = this.settings.frustumSize / 2;
     this.orthographicCamera.bottom = this.settings.frustumSize / -2;
-    this.orthographicCamera.near = 1;
-    this.orthographicCamera.far = 1000;
+    this.orthographicCamera.near = 0.01;
+    this.orthographicCamera.far = 10000;
 
     this.cameras.dev.updateProjectionMatrix();
     this.cameras.main.updateProjectionMatrix();
@@ -283,7 +284,7 @@ export default class WebGLApp {
   update = () => {
     this.controls.update();
 
-    this.helpers.visible = this.settings.helpers;
+    this.helpersGroup.visible = this.settings.helpers;
 
     this.onUpdate(this.clock.getDelta());
 
@@ -318,30 +319,34 @@ export class GUIWebGLApp extends GUIController {
     this.gui = gui;
 
     this.folders.settings = this.addFolder(this.gui, { title: "Settings" });
-    this.folders.settings.addBinding(target.settings, "debugCamera");
-    this.folders.settings.addBinding(target.settings, "orthCamera");
-    this.folders.settings.addBinding(target.settings, "helpers");
+    this.addBinding(this.folders.settings, target.settings, "debugCamera");
+    this.addBinding(this.folders.settings, target.settings, "orthCamera");
+    this.addBinding(this.folders.settings, target.settings, "helpers");
 
     this.folders.cameras = this.addFolder(this.gui, { title: "Cameras" });
     this.folders.mainCamera = this.addFolder(this.folders.cameras, {
       title: "Main",
     });
-    this.folders.mainCamera.addBinding(target.cameras.main.position, "z");
-    this.folders.mainCamera.addBinding(target.cameras.main, "fov", {
+
+    this.addBinding(this.folders.mainCamera, target.cameras.main.position, "z");
+    this.addBinding(this.folders.mainCamera, target.cameras.main, "fov", {
       min: 1,
     });
+
     this.folders.orthCamera = this.addFolder(this.folders.cameras, {
       title: "Orth",
     });
-    this.folders.orthCamera.addBinding(target.orthographicCamera.position, "z");
-    this.folders.orthCamera
-      .addBinding(target.settings, "frustumSize", {
-        min: 1,
-      })
-      .on(
-        "change",
-        target.resize.bind(target, window.innerWidth, window.innerHeight),
-      );
+    this.addBinding(
+      this.folders.orthCamera,
+      target.orthographicCamera.position,
+      "z",
+    );
+    this.addBinding(this.folders.orthCamera, target.settings, "frustumSize", {
+      min: 1,
+    }).on(
+      "change",
+      target.resize.bind(target, window.innerWidth, window.innerHeight),
+    );
 
     this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
 
