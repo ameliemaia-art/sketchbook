@@ -36,6 +36,12 @@ export function flowerOfLife(
     circle.strokeWidth = strokeWidth;
     group.addChild(circle);
   };
+  const createLine = (p0, p1) => {
+    const line = new paper.Path([p0, p1]);
+    line.strokeColor = strokeColor;
+    line.strokeWidth = strokeWidth;
+    group.addChild(line);
+  };
 
   // Line from center
   let total = 6;
@@ -52,15 +58,9 @@ export function flowerOfLife(
   }
 
   // draw line between points
-  // const line = new paper.Path([...points, points[0]]);
-  // line.strokeColor = strokeColor;
-  // line.strokeWidth = strokeWidth;
-
-  // Left 3
-  for (let i = 0; i < 3; i++) {
-    const point = lerp(points[3], points[4], i / 2);
-    createCircle(point, innerRadius, strokeColor);
-  }
+  const line = new paper.Path([...points, points[0]]);
+  line.strokeColor = strokeColor;
+  line.strokeWidth = strokeWidth;
 
   // dot(points[0], new paper.Color(1, 0, 0, 1));
   // dot(points[1], new paper.Color(0, 1, 0, 1));
@@ -68,36 +68,33 @@ export function flowerOfLife(
   // dot(points[3], new paper.Color(0, 1, 1, 1));
   // dot(points[4], new paper.Color(1, 0, 1, 1));
   // dot(points[5], new paper.Color(1, 1, 0, 1));
-  // Left 4
-  for (let i = 0; i < 4; i++) {
-    const point = lerp(
-      lerp(points[2], points[3], 0.5),
-      lerp(points[4], points[5], 0.5),
-      i / 3,
-    );
-    createCircle(point, innerRadius, strokeColor);
-  }
+  // dot(center, new paper.Color(1, 1, 0, 1));
 
-  // Center 5
-  for (let i = 0; i < 5; i++) {
-    const point = lerp(points[2], points[5], i / 4);
-    createCircle(point, innerRadius, strokeColor);
-  }
+  // Front lines of cube
+  createLine(points[0], center);
+  createLine(center, points[2]);
+  createLine(center, points[4]);
 
-  // Right 4
-  for (let i = 0; i < 4; i++) {
-    const point = lerp(
-      lerp(points[1], points[2], 0.5),
-      lerp(points[5], points[0], 0.5),
-      i / 3,
-    );
-    createCircle(point, innerRadius, strokeColor);
-  }
+  // Back lines of cube
+  createLine(points[5], center);
+  createLine(points[1], center);
+  createLine(points[3], center);
 
-  // Right 3
-  for (let i = 0; i < 3; i++) {
-    const point = lerp(points[0], points[1], i / 2);
-    createCircle(point, innerRadius, strokeColor);
+  // Create layer
+
+  // Bottom left corner
+  const layers = 4;
+  for (let i = 0; i < layers; i++) {
+    for (let j = 0; j < layers; j++) {
+      const x = lerp(points[3], points[2], i / (layers - 1));
+
+      const y1 = lerp(points[3], points[4], j / (layers - 1));
+      const y2 = lerp(points[2], center, j / (layers - 1));
+
+      x.y = MathUtils.lerp(y1.y, y2.y, i / (layers - 1));
+
+      dot(x, new paper.Color(1, 1, 1, 1));
+    }
   }
 
   return group;
