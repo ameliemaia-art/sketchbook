@@ -15,6 +15,7 @@ export default class FlowerOfLife {
     width: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
     layers: {
+      background: false,
       circles: true,
       outline: true,
       lines: false,
@@ -45,13 +46,14 @@ export default class FlowerOfLife {
     group.opacity = this.settings.opacity;
 
     // create a rectangle to fill the background
-    // const background = new paper.Path.Rectangle(
-    //   paper.view.bounds.topLeft,
-    //   paper.view.bounds.bottomRight,
-    // );
-    // color the background black
-    // background.fillColor = new paper.Color(0, 0, 0);
-    // group.addChild(background);
+    if (this.settings.layers.background) {
+      const background = new paper.Path.Rectangle(
+        paper.view.bounds.topLeft,
+        paper.view.bounds.bottomRight,
+      );
+      background.fillColor = new paper.Color(0, 0, 0);
+      group.addChild(background);
+    }
 
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
@@ -102,6 +104,9 @@ export class GUIFlowerOfLife extends GUIController {
       .on("change", target.draw);
 
     this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
+    this.folders.layers
+      .addBinding(target.settings.layers, "background")
+      .on("change", target.draw);
     this.folders.layers
       .addBinding(target.settings.layers, "circles")
       .on("change", target.draw);
