@@ -203,7 +203,7 @@ export function flowerOfLife(
       createLine(points[3], center, strokeColor, strokeWidth, group);
     }
 
-    // filter duplicate points
+    // Draw dots at corners of cube
     if (cornersVisible) {
       dot(points[0], dotRadius, group);
       dot(points[1], dotRadius, group);

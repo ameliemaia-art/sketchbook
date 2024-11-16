@@ -3,7 +3,7 @@ import { FolderApi } from "tweakpane";
 
 import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
-import { flowerOfLife } from "../sacred-geometry";
+import { flowerOfLife } from "./flower-of-life-geometry";
 
 const strokeScale = 1;
 
