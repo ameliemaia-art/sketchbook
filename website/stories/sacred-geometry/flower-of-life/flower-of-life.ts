@@ -11,16 +11,15 @@ export default class FlowerOfLife {
   settings = {
     scale: 0.85,
     opacity: 1,
-    dimensions: 5,
+    dimensions: 3,
     width: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
     layers: {
       background: false,
       circles: true,
-      outline: true,
+      outline: false,
       lines: false,
       corners: false,
-      grid: false,
     },
   };
 
@@ -69,7 +68,6 @@ export default class FlowerOfLife {
         this.settings.layers.outline,
         this.settings.layers.lines,
         this.settings.layers.corners,
-        this.settings.layers.grid,
       ),
     );
   };
@@ -118,9 +116,6 @@ export class GUIFlowerOfLife extends GUIController {
       .on("change", target.draw);
     this.folders.layers
       .addBinding(target.settings.layers, "corners")
-      .on("change", target.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "grid")
       .on("change", target.draw);
 
     this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
