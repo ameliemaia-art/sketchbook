@@ -10,7 +10,6 @@ function dot(
   color?: paper.Color,
 ) {
   const path = new paper.Path.Circle(position, radius);
-  // path.fillColor = new paper.Color(1, 0, 0, 1);
   path.fillColor = color ? color : new paper.Color(1, 1, 1, 1);
   if (group) {
     group.addChild(path);
@@ -55,6 +54,69 @@ function lerp(p1: paper.Point, p2: paper.Point, t: number) {
   );
 }
 
+function createFlowerCircle(
+  center: paper.Point,
+  innerRadius: number,
+  startAngle: number,
+  strokeColor: paper.Color,
+  strokeWidth: number,
+) {
+  const group = new paper.Group();
+
+  const total = 6;
+  const points: paper.Point[] = [];
+  const outlineRadius = innerRadius;
+  for (let j = 0; j < total; j++) {
+    const theta = startAngle + (TWO_PI / total) * j;
+    const x = center.x + Math.cos(theta) * outlineRadius;
+    const y = center.y + Math.sin(theta) * outlineRadius;
+    points.push(new paper.Point(x, y));
+  }
+
+  // const line = new paper.Path([...points, points[0]]);
+  // line.strokeColor = strokeColor;
+  // line.strokeWidth = strokeWidth;
+
+  const c0 = new paper.Path.Circle(
+    new paper.Point(points[0].x, lerp(points[0], points[1], 0.5).y),
+    innerRadius,
+  );
+  c0.strokeColor = strokeColor;
+  c0.strokeWidth = strokeWidth;
+  const c1 = new paper.Path.Circle(
+    new paper.Point(points[3].x, lerp(points[3], points[4], 0.5).y),
+    innerRadius,
+  );
+  c1.strokeColor = strokeColor;
+  c1.strokeWidth = strokeWidth;
+
+  // Intersection path of the petal
+  const petal = c0.intersect(c1);
+
+  c0.remove();
+  c1.remove();
+
+  for (let i = 0; i < total; i++) {
+    // Center petals
+    let angle = 360 / total;
+    const centerPetal = petal.clone();
+    centerPetal.position.y = points[4].y;
+    centerPetal.rotate(angle * i, center);
+
+    // Edge petals
+    const p0 = points[i];
+    const p1 = points[i === total - 1 ? 0 : i + 1];
+    const middle = lerp(p0, p1, 0.5);
+    const sidePetal = petal.clone();
+    sidePetal.position = middle;
+    sidePetal.rotate(angle * i, middle);
+    group.addChild(centerPetal);
+    group.addChild(sidePetal);
+  }
+  petal.remove();
+  return group;
+}
+
 export function flowerOfLife(
   center: paper.Point,
   radius: number,
@@ -62,6 +124,7 @@ export function flowerOfLife(
   strokeColor: paper.Color,
   strokeWidth: number,
   circlesVisible = false,
+  petals = false,
   outlineVisible = false,
   linesVisible = false,
   cornersVisible = false,
@@ -73,7 +136,7 @@ export function flowerOfLife(
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = strokeColor;
     path.strokeWidth = strokeWidth;
-    // group.addChild(path);
+    group.addChild(path);
   }
 
   // Line from center
@@ -85,6 +148,14 @@ export function flowerOfLife(
   }
 
   const startAngle = -Math.PI / 6;
+
+  const flowerCircle = createFlowerCircle(
+    center,
+    innerRadius,
+    startAngle,
+    strokeColor,
+    strokeWidth,
+  );
 
   for (let i = 0; i < dimensions - 1; i++) {
     const points: paper.Point[] = [];
@@ -106,7 +177,13 @@ export function flowerOfLife(
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
         if (circlesVisible) {
-          createCircle(p, innerRadius, strokeColor, strokeWidth, group);
+          if (petals) {
+            const petal = flowerCircle.clone();
+            petal.position = p;
+            group.addChild(petal);
+          } else {
+            createCircle(p, innerRadius, strokeColor, strokeWidth, group);
+          }
         }
       }
     }
@@ -137,6 +214,8 @@ export function flowerOfLife(
       // dot(center, dotRadius, group);
     }
   }
+
+  flowerCircle.remove();
 
   return group;
 }

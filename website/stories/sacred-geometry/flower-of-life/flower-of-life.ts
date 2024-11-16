@@ -9,13 +9,14 @@ const strokeScale = 1;
 
 export default class FlowerOfLife {
   settings = {
-    scale: 0.85,
+    scale: 1,
     opacity: 1,
     dimensions: 3,
-    width: 1 * strokeScale,
+    strokeWidth: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
     layers: {
       background: false,
+      petals: true,
       circles: true,
       outline: false,
       lines: false,
@@ -63,8 +64,9 @@ export default class FlowerOfLife {
         radius,
         this.settings.dimensions,
         this.settings.color,
-        this.settings.width,
+        this.settings.strokeWidth,
         this.settings.layers.circles,
+        this.settings.layers.petals,
         this.settings.layers.outline,
         this.settings.layers.lines,
         this.settings.layers.corners,
@@ -92,13 +94,16 @@ export class GUIFlowerOfLife extends GUIController {
     this.gui = this.addFolder(gui, { title: "Flower Of Life" });
 
     this.gui
+      .addBinding(target.settings, "strokeWidth", { min: 0.1 })
+      .on("change", target.draw);
+    this.gui
       .addBinding(target.settings, "scale", { min: 0.1, max: 1 })
       .on("change", target.draw);
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", target.draw);
     this.gui
-      .addBinding(target.settings, "dimensions", { min: 1, max: 10, step: 1 })
+      .addBinding(target.settings, "dimensions", { min: 1, max: 20, step: 1 })
       .on("change", target.draw);
 
     this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
@@ -107,6 +112,9 @@ export class GUIFlowerOfLife extends GUIController {
       .on("change", target.draw);
     this.folders.layers
       .addBinding(target.settings.layers, "circles")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "petals")
       .on("change", target.draw);
     this.folders.layers
       .addBinding(target.settings.layers, "outline")
