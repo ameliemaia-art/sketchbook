@@ -143,13 +143,13 @@ export function flowerOfLife(
       line.strokeColor = strokeColor;
       line.strokeWidth = strokeWidth;
       // Front lines of cube
-      createLine(points[0], center, strokeColor, strokeWidth, group);
-      createLine(center, points[2], strokeColor, strokeWidth, group);
-      createLine(center, points[4], strokeColor, strokeWidth, group);
+      createLine([points[0], center], strokeColor, strokeWidth, group);
+      createLine([center, points[2]], strokeColor, strokeWidth, group);
+      createLine([center, points[4]], strokeColor, strokeWidth, group);
       // Back lines of cube
-      createLine(points[5], center, strokeColor, strokeWidth, group);
-      createLine(points[1], center, strokeColor, strokeWidth, group);
-      createLine(points[3], center, strokeColor, strokeWidth, group);
+      createLine([points[5], center], strokeColor, strokeWidth, group);
+      createLine([points[1], center], strokeColor, strokeWidth, group);
+      createLine([points[3], center], strokeColor, strokeWidth, group);
     }
 
     // Draw dots at corners of cube

@@ -31,13 +31,12 @@ export function createCircle(
 }
 
 export const createLine = (
-  p0: paper.Point,
-  p1: paper.Point,
+  points: paper.Point[],
   strokeColor: paper.Color,
   strokeWidth: number,
   group?: paper.Group,
 ) => {
-  const line = new paper.Path([p0, p1]);
+  const line = new paper.Path(points);
   line.strokeColor = strokeColor;
   line.strokeWidth = strokeWidth;
   if (group) {
