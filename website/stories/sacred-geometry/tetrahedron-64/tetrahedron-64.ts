@@ -17,6 +17,14 @@ export default class Tetrahedron64 {
       background: false,
       outline: false,
       circles: false,
+      triangles: true,
+      hexagon: true,
+      layer0: true,
+      layer1: true,
+      layer2: true,
+      layer3: true,
+      layer4: true,
+      layer5: true,
     },
   };
 
@@ -62,10 +70,14 @@ export default class Tetrahedron64 {
         this.settings.strokeWidth,
         this.settings.layers.outline,
         this.settings.layers.circles,
-        // this.settings.layers.masculinity,
-        // this.settings.layers.femininity,
-        // this.settings.layers.unity,
-        // this.settings.layers.interconnectedness,
+        this.settings.layers.triangles,
+        this.settings.layers.hexagon,
+        this.settings.layers.layer0,
+        this.settings.layers.layer1,
+        this.settings.layers.layer2,
+        this.settings.layers.layer3,
+        this.settings.layers.layer4,
+        this.settings.layers.layer5,
       ),
     );
   };
@@ -110,6 +122,30 @@ export class GUITetrahedron64 extends GUIController {
 
     this.folders.layers
       .addBinding(target.settings.layers, "circles")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "triangles")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "hexagon")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "layer0")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "layer1")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "layer2")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "layer3")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "layer4")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "layer5")
       .on("change", target.draw);
 
     this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);

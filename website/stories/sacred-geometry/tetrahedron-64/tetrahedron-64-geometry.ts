@@ -8,12 +8,20 @@ export function tetrahedron64(
   radius: number,
   strokeColor: paper.Color,
   strokeWidth: number,
-  outlineVisible = false,
-  circlesVisible = false,
+  outline = false,
+  circles = false,
+  triangles = true,
+  hexagon = true,
+  layer0 = true,
+  layer1 = true,
+  layer2 = true,
+  layer3 = true,
+  layer4 = true,
+  layer5 = true,
 ) {
   const group = new paper.Group();
 
-  if (outlineVisible) {
+  if (outline) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = strokeColor;
     path.strokeWidth = strokeWidth;
@@ -26,7 +34,7 @@ export function tetrahedron64(
   let innerRadius = radius / dimensions;
   const startAngle = -Math.PI / 6;
 
-  if (circlesVisible) {
+  if (circles) {
     createCircle(center, innerRadius, strokeColor, strokeWidth, group);
   }
 
@@ -50,7 +58,7 @@ export function tetrahedron64(
       for (let l = 0; l < circlesPerDimension; l++) {
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
-        if (circlesVisible) {
+        if (circles) {
           createCircle(p, innerRadius, strokeColor, strokeWidth, group);
         }
       }
@@ -66,13 +74,14 @@ export function tetrahedron64(
     const y = center.y + Math.sin(theta) * radius;
     trianglePointsOuter.push(new paper.Point(x, y));
   }
-
-  createLine(
-    [...trianglePointsOuter, trianglePointsOuter[0]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
+  if (triangles) {
+    createLine(
+      [...trianglePointsOuter, trianglePointsOuter[0]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+  }
 
   // Draw inner triangle
   let trianglePointsInner: paper.Point[] = [];
@@ -84,12 +93,14 @@ export function tetrahedron64(
     trianglePointsInner.push(new paper.Point(x, y));
   }
 
-  createLine(
-    [...trianglePointsInner, trianglePointsInner[0]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
+  if (triangles) {
+    createLine(
+      [...trianglePointsInner, trianglePointsInner[0]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+  }
 
   // Draw hexagon
   let hexagonPoints: paper.Point[] = [];
@@ -108,425 +119,440 @@ export function tetrahedron64(
   //   group,
   // );
 
-  // Bottom hexagon line
-  createLine(
-    [
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 5 / 6),
-      lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
-      lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 1 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Left hexagon line
-  createLine(
-    [
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 1 / 6),
-      lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
-      lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 5 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Right hexagon line
-  createLine(
-    [
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 1 / 6),
-      lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
-      lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 5 / 6),
-      //
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Middle left and right corners of hexagon
-  createLine(
-    [
-      lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 4 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [
-      lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 2 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Top left and right corners of hexagon
-  createLine(
-    [
-      lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 2 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [
-      lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 4 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Bottom left and right corners of hexagon
-  createLine(
-    [
-      lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 2 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [
-      lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 4 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Top corners of hexagon to tip of smaller triangle
-  createLine(
-    [lerp(hexagonPoints[4], hexagonPoints[5], 0.5), trianglePointsInner[2]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [lerp(hexagonPoints[3], hexagonPoints[4], 0.5), trianglePointsInner[2]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Middle left and right corners
-  createLine(
-    [lerp(hexagonPoints[5], hexagonPoints[0], 0.5), trianglePointsInner[0]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [lerp(hexagonPoints[2], hexagonPoints[3], 0.5), trianglePointsInner[1]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  // Bottom left and right corners
-  createLine(
-    [lerp(hexagonPoints[0], hexagonPoints[1], 0.5), trianglePointsInner[0]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [lerp(hexagonPoints[1], hexagonPoints[2], 0.5), trianglePointsInner[1]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Connect top corners of outer triangle
-  createLine(
-    [
-      lerp(
-        lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
-        trianglePointsInner[2],
-        0.5,
-      ),
-      lerp(
-        lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
-        trianglePointsInner[2],
-        0.5,
-      ),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Left corners of outer triangle
-  createLine(
-    [
-      lerp(
-        lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
-        trianglePointsInner[0],
-        0.5,
-      ),
-      lerp(
-        lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
-        trianglePointsInner[0],
-        0.5,
-      ),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [
-      lerp(
-        lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
-        trianglePointsInner[1],
-        0.5,
-      ),
-      lerp(
+  if (hexagon) {
+    // Bottom hexagon line
+    createLine(
+      [
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 5 / 6),
         lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
-        trianglePointsInner[1],
-        0.5,
-      ),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
+        lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 1 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
 
-  createLine(
-    [
-      lerp(
-        lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
-        trianglePointsInner[0],
-        0.5,
-      ),
-      lerp(trianglePointsInner[2], trianglePointsInner[0], 5 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [
-      lerp(
-        lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
-        trianglePointsInner[1],
-        0.5,
-      ),
-      lerp(trianglePointsInner[1], trianglePointsInner[2], 1 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 5 / 6 - 1 / 6 / 2),
-      lerp(trianglePointsInner[1], trianglePointsInner[2], 5 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 1 / 6 + 1 / 6 / 2),
-      lerp(trianglePointsInner[2], trianglePointsInner[0], 1 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 1 / 6 + 1 / 6 / 2),
-      lerp(trianglePointsInner[0], trianglePointsInner[1], 1 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 5 / 6 - 1 / 6 / 2),
-      lerp(trianglePointsInner[0], trianglePointsInner[1], 5 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Inverted triangle in the middle
-  createLine(
-    [
-      lerp(trianglePointsInner[2], trianglePointsInner[0], 0.5),
-      lerp(trianglePointsInner[0], trianglePointsInner[1], 0.5),
-      lerp(trianglePointsInner[1], trianglePointsInner[2], 0.5),
-      lerp(trianglePointsInner[2], trianglePointsInner[0], 0.5),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Inverted triangle on the sides
-  createLine(
-    [
-      lerp(trianglePointsInner[2], trianglePointsInner[0], 4 / 6),
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 0.5),
-      lerp(trianglePointsInner[2], trianglePointsInner[0], 2 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [
-      lerp(trianglePointsInner[1], trianglePointsInner[2], 2 / 6),
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 0.5),
-      lerp(trianglePointsInner[1], trianglePointsInner[2], 4 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Inverted triangle on the bottom
-  createLine(
-    [
-      lerp(trianglePointsInner[0], trianglePointsInner[1], 2 / 6),
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 0.5),
-      lerp(trianglePointsInner[0], trianglePointsInner[1], 4 / 6),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  // Next layer of inverted triangles
-  createLine(
-    [
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 3 / 6 + 1 / 6 / 2),
-      lerp(
-        lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
-        lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
-        0.5,
-      ),
-      lerp(trianglePointsOuter[2], trianglePointsOuter[0], 2 / 6 + 1 / 6 / 2),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 2 / 6 + 1 / 6 / 2),
-      lerp(
+    // Left hexagon line
+    createLine(
+      [
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 1 / 6),
         lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
         lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
-        0.5,
-      ),
-      lerp(trianglePointsOuter[1], trianglePointsOuter[2], 3 / 6 + 1 / 6 / 2),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-  createLine(
-    [
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 2 / 6 + 1 / 6 / 2),
-      lerp(
-        lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
-        lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
-        0.5,
-      ),
-      lerp(trianglePointsOuter[0], trianglePointsOuter[1], 3 / 6 + 1 / 6 / 2),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 5 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
 
-  // Inverted triangle underneath
-  createLine(
-    [
-      lerp(
+    // Right hexagon line
+    createLine(
+      [
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 1 / 6),
         lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
         lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
-        4 / 6,
-      ),
-      hexagonPoints[5],
-      lerp(
-        lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 5 / 6),
+        //
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    // Middle left and right corners of hexagon
+  }
+
+  if (layer0) {
+    createLine(
+      [
         lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
-        2 / 6,
-      ),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [
-      lerp(
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 4 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [
         lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
-        lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
-        2 / 6,
-      ),
-      hexagonPoints[3],
-      lerp(
-        lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
-        lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
-        4 / 6,
-      ),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 2 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
 
-  createLine(
-    [
-      lerp(
-        lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
-        lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
-        2 / 6,
-      ),
-      hexagonPoints[1],
-      lerp(
-        lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
-        lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
-        4 / 6,
-      ),
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
+    // Top left and right corners of hexagon
+    createLine(
+      [
+        lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 2 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [
+        lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 4 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
 
-  // Lines
-  createLine([center, hexagonPoints[5]], strokeColor, strokeWidth, group);
-  createLine([center, hexagonPoints[1]], strokeColor, strokeWidth, group);
-  createLine([center, hexagonPoints[3]], strokeColor, strokeWidth, group);
+    // Bottom left and right corners of hexagon
+    createLine(
+      [
+        lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 2 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [
+        lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 4 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+  }
+
+  if (layer1) {
+    // Top corners of hexagon to tip of smaller triangle
+    createLine(
+      [lerp(hexagonPoints[4], hexagonPoints[5], 0.5), trianglePointsInner[2]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [lerp(hexagonPoints[3], hexagonPoints[4], 0.5), trianglePointsInner[2]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    // Middle left and right corners
+    createLine(
+      [lerp(hexagonPoints[5], hexagonPoints[0], 0.5), trianglePointsInner[0]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [lerp(hexagonPoints[2], hexagonPoints[3], 0.5), trianglePointsInner[1]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    // Bottom left and right corners
+    createLine(
+      [lerp(hexagonPoints[0], hexagonPoints[1], 0.5), trianglePointsInner[0]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [lerp(hexagonPoints[1], hexagonPoints[2], 0.5), trianglePointsInner[1]],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+  }
+
+  if (layer2) {
+    // Connect top corners of outer triangle
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
+          trianglePointsInner[2],
+          0.5,
+        ),
+        lerp(
+          lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
+          trianglePointsInner[2],
+          0.5,
+        ),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    // Left corners of outer triangle
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
+          trianglePointsInner[0],
+          0.5,
+        ),
+        lerp(
+          lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
+          trianglePointsInner[0],
+          0.5,
+        ),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
+          trianglePointsInner[1],
+          0.5,
+        ),
+        lerp(
+          lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
+          trianglePointsInner[1],
+          0.5,
+        ),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
+          trianglePointsInner[0],
+          0.5,
+        ),
+        lerp(trianglePointsInner[2], trianglePointsInner[0], 5 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
+          trianglePointsInner[1],
+          0.5,
+        ),
+        lerp(trianglePointsInner[1], trianglePointsInner[2], 1 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 5 / 6 - 1 / 6 / 2),
+        lerp(trianglePointsInner[1], trianglePointsInner[2], 5 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 1 / 6 + 1 / 6 / 2),
+        lerp(trianglePointsInner[2], trianglePointsInner[0], 1 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 1 / 6 + 1 / 6 / 2),
+        lerp(trianglePointsInner[0], trianglePointsInner[1], 1 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 5 / 6 - 1 / 6 / 2),
+        lerp(trianglePointsInner[0], trianglePointsInner[1], 5 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+  }
+
+  if (layer3) {
+    // Inverted triangle in the middle
+    createLine(
+      [
+        lerp(trianglePointsInner[2], trianglePointsInner[0], 0.5),
+        lerp(trianglePointsInner[0], trianglePointsInner[1], 0.5),
+        lerp(trianglePointsInner[1], trianglePointsInner[2], 0.5),
+        lerp(trianglePointsInner[2], trianglePointsInner[0], 0.5),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    // Inverted triangle on the sides
+    createLine(
+      [
+        lerp(trianglePointsInner[2], trianglePointsInner[0], 4 / 6),
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 0.5),
+        lerp(trianglePointsInner[2], trianglePointsInner[0], 2 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [
+        lerp(trianglePointsInner[1], trianglePointsInner[2], 2 / 6),
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 0.5),
+        lerp(trianglePointsInner[1], trianglePointsInner[2], 4 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+  }
+
+  if (layer4) {
+    // Inverted triangle on the bottom
+    createLine(
+      [
+        lerp(trianglePointsInner[0], trianglePointsInner[1], 2 / 6),
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 0.5),
+        lerp(trianglePointsInner[0], trianglePointsInner[1], 4 / 6),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    // Next layer of inverted triangles
+    createLine(
+      [
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 3 / 6 + 1 / 6 / 2),
+        lerp(
+          lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
+          lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
+          0.5,
+        ),
+        lerp(trianglePointsOuter[2], trianglePointsOuter[0], 2 / 6 + 1 / 6 / 2),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 2 / 6 + 1 / 6 / 2),
+        lerp(
+          lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
+          lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
+          0.5,
+        ),
+        lerp(trianglePointsOuter[1], trianglePointsOuter[2], 3 / 6 + 1 / 6 / 2),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+    createLine(
+      [
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 2 / 6 + 1 / 6 / 2),
+        lerp(
+          lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
+          lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
+          0.5,
+        ),
+        lerp(trianglePointsOuter[0], trianglePointsOuter[1], 3 / 6 + 1 / 6 / 2),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    // Inverted triangle underneath
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
+          lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
+          4 / 6,
+        ),
+        hexagonPoints[5],
+        lerp(
+          lerp(hexagonPoints[4], hexagonPoints[5], 0.5),
+          lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
+          2 / 6,
+        ),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
+          lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
+          2 / 6,
+        ),
+        hexagonPoints[3],
+        lerp(
+          lerp(hexagonPoints[2], hexagonPoints[3], 0.5),
+          lerp(hexagonPoints[3], hexagonPoints[4], 0.5),
+          4 / 6,
+        ),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+
+    createLine(
+      [
+        lerp(
+          lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
+          lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
+          2 / 6,
+        ),
+        hexagonPoints[1],
+        lerp(
+          lerp(hexagonPoints[0], hexagonPoints[1], 0.5),
+          lerp(hexagonPoints[1], hexagonPoints[2], 0.5),
+          4 / 6,
+        ),
+      ],
+      strokeColor,
+      strokeWidth,
+      group,
+    );
+  }
+
+  if (layer5) {
+    // Lines
+    createLine([center, hexagonPoints[5]], strokeColor, strokeWidth, group);
+    createLine([center, hexagonPoints[1]], strokeColor, strokeWidth, group);
+    createLine([center, hexagonPoints[3]], strokeColor, strokeWidth, group);
+  }
 
   return group;
 }
