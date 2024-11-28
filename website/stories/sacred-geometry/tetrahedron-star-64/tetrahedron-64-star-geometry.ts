@@ -13,12 +13,6 @@ function createMidPoints(points: paper.Point[]) {
   return midPoints;
 }
 
-function debugPoints(points: paper.Point[], color: paper.Color) {
-  points.forEach((point) => {
-    createCircle(point, 10, color, 1);
-  });
-}
-
 export function tetrahedron64Star(
   center: paper.Point,
   radius: number,

@@ -50,3 +50,9 @@ export function lerp(p1: paper.Point, p2: paper.Point, t: number) {
     MathUtils.lerp(p1.y, p2.y, t),
   );
 }
+
+export function debugPoints(points: paper.Point[], color: paper.Color) {
+  points.forEach((point) => {
+    createCircle(point, 10, color, 1);
+  });
+}

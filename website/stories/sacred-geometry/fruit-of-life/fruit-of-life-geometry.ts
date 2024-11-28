@@ -30,8 +30,8 @@ export function fruitOfLife(
   const dimensions = 2;
   for (let i = 0; i < dimensions; i++) {
     const outlineRadius = innerRadius * 2 * (i + 1);
-    for (let i = 0; i < total; i++) {
-      const theta = startAngle + (TWO_PI / total) * i;
+    for (let j = 0; j < total; j++) {
+      const theta = startAngle + (TWO_PI / total) * j;
       const x = center.x + Math.cos(theta) * outlineRadius;
       const y = center.y + Math.sin(theta) * outlineRadius;
       createCircle(
