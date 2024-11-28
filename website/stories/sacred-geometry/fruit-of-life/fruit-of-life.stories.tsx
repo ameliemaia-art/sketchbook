@@ -8,7 +8,7 @@ import "./fruit-of-life.css";
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Sacred Geometry/Fruit Of Life",
+  title: "Sketchbook/Sacred/Fruit Of Life",
 };
 
 export const FruitOfLife = () => {

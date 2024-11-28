@@ -8,7 +8,7 @@ import "./metatrons-cube.css";
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Sacred Geometry/Metatrons Cube",
+  title: "Sketchbook/Sacred/Metatrons Cube",
 };
 
 export const MetatronsCube = () => {

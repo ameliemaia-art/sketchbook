@@ -8,7 +8,7 @@ import "./tetrahedron-64.css";
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Sacred Geometry/Tetrahedron 64",
+  title: "Sketchbook/Sacred/Tetrahedron 64",
 };
 
 export const Tetrahedron64 = () => {

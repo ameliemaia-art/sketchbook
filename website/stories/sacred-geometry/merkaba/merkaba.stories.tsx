@@ -8,7 +8,7 @@ import "./merkaba.css";
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Sacred Geometry/Merkaba",
+  title: "Sketchbook/Sacred/Merkaba",
 };
 
 export const Merkaba = () => {

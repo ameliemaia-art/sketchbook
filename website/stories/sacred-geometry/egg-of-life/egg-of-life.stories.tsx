@@ -8,7 +8,7 @@ import "./egg-of-life.css";
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Sacred Geometry/Egg Of Life",
+  title: "Sketchbook/Sacred/Egg Of Life",
 };
 
 export const EggOfLife = () => {
