@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import FlowerOfLifeSketch, { GUIFlowerOfLife } from "./flower-of-life";
 
 import "../../global.css";
-import "./flower-of-life.css";
 
 import { Pane } from "tweakpane";
 

@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import MetatronsCubeSketch, { GUIMetatronsCube } from "./metatrons-cube";
 
 import "../../global.css";
-import "./metatrons-cube.css";
 
 import { Pane } from "tweakpane";
 

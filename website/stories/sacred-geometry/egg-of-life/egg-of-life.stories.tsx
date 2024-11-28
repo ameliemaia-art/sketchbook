@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import EggOfLifeSketch, { GUIEggOfLife } from "./egg-of-life";
 
 import "../../global.css";
-import "./egg-of-life.css";
 
 import { Pane } from "tweakpane";
 

@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import Tetrahedron64Sketch, { GUITetrahedron64 } from "./tetrahedron-64";
 
 import "../../global.css";
-import "./tetrahedron-64.css";
 
 import { Pane } from "tweakpane";
 

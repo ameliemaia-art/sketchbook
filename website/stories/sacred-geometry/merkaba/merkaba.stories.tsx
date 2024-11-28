@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import MerkabaSketch, { GUIMerkaba } from "./merkaba";
 
 import "../../global.css";
-import "./merkaba.css";
 
 import { Pane } from "tweakpane";
 
