@@ -3,13 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "storybook build -o ./out",
-    "start": "next start",
+    "dev": "storybook dev -p 6006",
     "lint": "next lint",
     "lint-staged": "npm run lint && lint-staged",
     "prettier": "prettier --write './**/*.{ts,tsx}'",
-    "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "publish-storybook": "npm run build-storybook && touch ./storybook-static/.nojekyll && gh-pages -d storybook-static -t true"
   },
