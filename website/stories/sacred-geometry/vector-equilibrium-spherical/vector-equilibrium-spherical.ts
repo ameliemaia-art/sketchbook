@@ -5,7 +5,7 @@ import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { vectorEquilibriumSpherical } from "./vector-equilibrium-spherical-geometry";
 
-const strokeScale = 4;
+const strokeScale = 1;
 
 export default class VectorEquilibriumSpherical {
   settings = {
@@ -33,8 +33,8 @@ export default class VectorEquilibriumSpherical {
     this.canvas = canvas;
 
     if (setup) {
-      canvas.width = 2000;
-      canvas.height = 2000;
+      canvas.width = 500;
+      canvas.height = 500;
       paper.setup(canvas);
     }
 
