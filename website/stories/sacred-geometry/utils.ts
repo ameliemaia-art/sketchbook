@@ -28,6 +28,7 @@ export function createCircle(
   if (group) {
     group.addChild(circle);
   }
+  return circle;
 }
 
 export const createLine = (
@@ -42,6 +43,7 @@ export const createLine = (
   if (group) {
     group.addChild(line);
   }
+  return line;
 };
 
 export function lerp(p1: paper.Point, p2: paper.Point, t: number) {
@@ -52,7 +54,14 @@ export function lerp(p1: paper.Point, p2: paper.Point, t: number) {
 }
 
 export function debugPoints(points: paper.Point[], color: paper.Color) {
-  points.forEach((point) => {
-    createCircle(point, 10, color, 1);
+  points.forEach((point, i) => {
+    createCircle(point, 5, color, 1);
+
+    // Draw text next to point
+    const text = new paper.PointText(point);
+    text.content = `${i}`;
+    text.style.fontSize = 10;
+    text.fillColor = new paper.Color(1, 1, 0, 1);
+    text.position = new paper.Point(point.x + 10, point.y + 20);
   });
 }
