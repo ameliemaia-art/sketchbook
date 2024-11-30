@@ -9,11 +9,11 @@ const strokeScale = 4;
 
 export default class SriYantra {
   settings = {
-    scale: 1,
+    scale: 0.85,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
-    debugStrokeColor: new paper.Color(1, 1, 1, 0.5),
+    debugStrokeColor: new paper.Color(1, 1, 1, 0.25),
     layers: {
       background: false,
       outline: false,
@@ -45,6 +45,7 @@ export default class SriYantra {
       guide25: false,
       guide26: false,
       guide27: false,
+      guide28: false,
       step0: false,
       step1: false,
       step2: false,
@@ -128,6 +129,7 @@ export default class SriYantra {
         this.settings.layers.guide25,
         this.settings.layers.guide26,
         this.settings.layers.guide27,
+        this.settings.layers.guide28,
         this.settings.layers.step0,
         this.settings.layers.step1,
         this.settings.layers.step2,
@@ -187,7 +189,7 @@ export class GUISriYantra extends GUIController {
       .addBinding(target.settings.layers, "outline")
       .on("change", target.draw);
 
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 29; i++) {
       this.folders.layers
         .addBinding(target.settings.layers, `guide${i}`)
         .on("change", target.draw);

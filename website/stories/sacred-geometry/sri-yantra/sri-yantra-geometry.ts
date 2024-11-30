@@ -63,6 +63,7 @@ export function sriYantra(
   guide25 = false,
   guide26 = false,
   guide27 = false,
+  guide28 = false,
   step0 = false,
   step1 = false,
   step2 = false,
@@ -106,7 +107,7 @@ export function sriYantra(
       createCircle(
         new paper.Point(x, y),
         innerRadius,
-        guide0 ? debugStrokeColor : transparentColor,
+        guide1 ? debugStrokeColor : transparentColor,
         strokeWidth,
         group,
       ),
@@ -119,7 +120,7 @@ export function sriYantra(
       new paper.Point(center.x, center.y - radius),
       new paper.Point(center.x, center.y + radius),
     ],
-    guide1 ? debugStrokeColor : transparentColor,
+    guide2 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -129,7 +130,7 @@ export function sriYantra(
       new paper.Point(center.x - radius, center.y),
       new paper.Point(center.x + radius, center.y),
     ],
-    guide1 ? debugStrokeColor : transparentColor,
+    guide2 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -155,13 +156,13 @@ export function sriYantra(
   // createLine([points[4], points[2]], debugStrokeColor, strokeWidth, group);
   const line2 = createLine(
     [points[6], points[5]],
-    guide2 ? debugStrokeColor : transparentColor,
+    guide3 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line3 = createLine(
     [points[7], points[4]],
-    guide2 ? debugStrokeColor : transparentColor,
+    guide3 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -195,13 +196,13 @@ export function sriYantra(
 
   const line4 = createLine(
     [points[9], points[0]],
-    guide3 ? debugStrokeColor : transparentColor,
+    guide4 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line5 = createLine(
     [points[8], points[2]],
-    guide3 ? debugStrokeColor : transparentColor,
+    guide4 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -212,14 +213,14 @@ export function sriYantra(
   const innerRightCircle = createCircle(
     points[0],
     innerSideRadius,
-    guide4 ? debugStrokeColor : transparentColor,
+    guide5 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const innerLeftCircle = createCircle(
     points[2],
     innerSideRadius,
-    guide4 ? debugStrokeColor : transparentColor,
+    guide5 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -231,7 +232,7 @@ export function sriYantra(
 
   const line6 = createLine(
     [points[18], points[14]],
-    guide5 ? debugStrokeColor : transparentColor,
+    guide6 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -283,46 +284,46 @@ export function sriYantra(
 
   line7 = createLine(
     [points[1], points[25]],
-    guide6 ? debugStrokeColor : transparentColor,
+    guide7 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   line8 = createLine(
     [points[1], points[26]],
-    guide6 ? debugStrokeColor : transparentColor,
+    guide7 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line9 = createLine(
     [points[25], points[26]],
-    guide7 ? debugStrokeColor : transparentColor,
+    guide8 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line10 = createLine(
     [points[10], points[3]],
-    guide8 ? debugStrokeColor : transparentColor,
+    guide9 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line11 = createLine(
     [points[3], points[11]],
-    guide8 ? debugStrokeColor : transparentColor,
+    guide9 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line12 = createLine(
     [points[23], points[8]],
-    guide9 ? debugStrokeColor : transparentColor,
+    guide10 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line13 = createLine(
     [points[24], points[9]],
-    guide9 ? debugStrokeColor : transparentColor,
+    guide10 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -360,14 +361,14 @@ export function sriYantra(
 
   line14 = createLine(
     [points[30], points[29]],
-    guide10 ? debugStrokeColor : transparentColor,
+    guide11 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line15 = createLine(
     [points[3], points[1]],
-    guide10 ? debugStrokeColor : transparentColor,
+    guide11 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -397,7 +398,7 @@ export function sriYantra(
   line16.remove();
   line16 = createLine(
     [points[31], points[34]],
-    guide11 ? debugStrokeColor : transparentColor,
+    guide12 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -418,20 +419,20 @@ export function sriYantra(
   line17.remove();
   line17 = createLine(
     [points[31], points[35]],
-    guide11 ? debugStrokeColor : transparentColor,
+    guide12 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line18 = createLine(
     [points[0], points[1]],
-    guide12 ? debugStrokeColor : transparentColor,
+    guide13 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line19 = createLine(
     [points[2], points[1]],
-    guide12 ? debugStrokeColor : transparentColor,
+    guide13 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -444,13 +445,13 @@ export function sriYantra(
 
   const line20 = createLine(
     [points[36], points[0]],
-    guide13 ? debugStrokeColor : transparentColor,
+    guide14 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line21 = createLine(
     [points[37], points[2]],
-    guide13 ? debugStrokeColor : transparentColor,
+    guide14 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -475,20 +476,20 @@ export function sriYantra(
   line22.remove();
   line22 = createLine(
     [points[40], points[41]],
-    guide14 ? debugStrokeColor : transparentColor,
+    guide15 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line23 = createLine(
     [points[22], points[3]],
-    guide15 ? debugStrokeColor : transparentColor,
+    guide16 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line24 = createLine(
     [points[21], points[3]],
-    guide15 ? debugStrokeColor : transparentColor,
+    guide16 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -519,7 +520,7 @@ export function sriYantra(
   line25.remove();
   line25 = createLine(
     [points[44], points[45]],
-    guide16 ? debugStrokeColor : transparentColor,
+    guide17 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -540,7 +541,7 @@ export function sriYantra(
   line26.remove();
   line26 = createLine(
     [points[44], points[46]],
-    guide16 ? debugStrokeColor : transparentColor,
+    guide17 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -551,13 +552,13 @@ export function sriYantra(
 
   const line27 = createLine(
     [points[47], points[37]],
-    guide17 ? debugStrokeColor : transparentColor,
+    guide18 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line28 = createLine(
     [points[47], points[36]],
-    guide17 ? debugStrokeColor : transparentColor,
+    guide18 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -583,7 +584,7 @@ export function sriYantra(
   line29.remove();
   line29 = createLine(
     [points[50], points[51]],
-    guide18 ? debugStrokeColor : transparentColor,
+    guide19 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -640,7 +641,7 @@ export function sriYantra(
   line30.remove();
   line30 = createLine(
     [points[54], points[55]],
-    guide19 ? debugStrokeColor : transparentColor,
+    guide20 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -674,7 +675,7 @@ export function sriYantra(
   line31.remove();
   line31 = createLine(
     [points[56], points[59]],
-    guide20 ? debugStrokeColor : transparentColor,
+    guide21 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -699,14 +700,14 @@ export function sriYantra(
   line33.remove();
   line33 = createLine(
     [points[56], points[60]],
-    guide20 ? debugStrokeColor : transparentColor,
+    guide21 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line34 = createLine(
     [points[10], points[11]],
-    guide21 ? debugStrokeColor : transparentColor,
+    guide22 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -732,7 +733,7 @@ export function sriYantra(
   line35.remove();
   line35 = createLine(
     [points[61], points[62]],
-    guide22 ? debugStrokeColor : transparentColor,
+    guide23 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -755,7 +756,7 @@ export function sriYantra(
   line36.remove();
   line36 = createLine(
     [points[61], points[63]],
-    guide22 ? debugStrokeColor : transparentColor,
+    guide23 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -784,7 +785,7 @@ export function sriYantra(
   line37.remove();
   line37 = createLine(
     [points[66], points[67]],
-    guide23 ? debugStrokeColor : transparentColor,
+    guide24 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -812,7 +813,7 @@ export function sriYantra(
   line38.remove();
   line38 = createLine(
     [points[69], points[70]],
-    guide24 ? debugStrokeColor : transparentColor,
+    guide25 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -837,7 +838,7 @@ export function sriYantra(
   line39.remove();
   line39 = createLine(
     [points[69], points[72]],
-    guide24 ? debugStrokeColor : transparentColor,
+    guide25 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -864,7 +865,7 @@ export function sriYantra(
   line40.remove();
   line40 = createLine(
     [points[75], points[76]],
-    guide25 ? debugStrokeColor : transparentColor,
+    guide26 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -877,26 +878,26 @@ export function sriYantra(
 
   const line41 = createLine(
     [points[77], points[12]],
-    guide26 ? debugStrokeColor : transparentColor,
+    guide27 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line42 = createLine(
     [points[78], points[12]],
-    guide26 ? debugStrokeColor : transparentColor,
+    guide27 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line43 = createLine(
     [points[9], points[23]],
-    guide27 ? debugStrokeColor : transparentColor,
+    guide28 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line44 = createLine(
     [points[8], points[24]],
-    guide27 ? debugStrokeColor : transparentColor,
+    guide28 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
