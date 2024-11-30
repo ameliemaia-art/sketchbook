@@ -32,9 +32,47 @@ export function sriYantra(
   center: paper.Point,
   radius: number,
   strokeColor: paper.Color,
-  strokeDebugColor: paper.Color,
+  debugStrokeColor: paper.Color,
   strokeWidth: number,
   outlineVisible = false,
+  guide0 = false,
+  guide1 = false,
+  guide2 = false,
+  guide3 = false,
+  guide4 = false,
+  guide5 = false,
+  guide6 = false,
+  guide7 = false,
+  guide8 = false,
+  guide9 = false,
+  guide10 = false,
+  guide11 = false,
+  guide12 = false,
+  guide13 = false,
+  guide14 = false,
+  guide15 = false,
+  guide16 = false,
+  guide17 = false,
+  guide18 = false,
+  guide19 = false,
+  guide20 = false,
+  guide21 = false,
+  guide22 = false,
+  guide23 = false,
+  guide24 = false,
+  guide25 = false,
+  guide26 = false,
+  guide27 = false,
+  step0 = false,
+  step1 = false,
+  step2 = false,
+  step3 = false,
+  step4 = false,
+  step5 = false,
+  step6 = false,
+  step7 = false,
+  step8 = false,
+  step9 = false,
 ) {
   const group = new paper.Group();
 
@@ -47,12 +85,13 @@ export function sriYantra(
 
   // Line from center
   let innerRadius = radius / 2;
-  const transparentColor = new paper.Color(1, 1, 1, 0);
+
+  const transparentColor = new paper.Color(0, 0, 0, 0);
 
   const centerCircle = createCircle(
     center,
     innerRadius,
-    strokeDebugColor,
+    guide0 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -67,7 +106,7 @@ export function sriYantra(
       createCircle(
         new paper.Point(x, y),
         innerRadius,
-        strokeDebugColor,
+        guide0 ? debugStrokeColor : transparentColor,
         strokeWidth,
         group,
       ),
@@ -80,7 +119,7 @@ export function sriYantra(
       new paper.Point(center.x, center.y - radius),
       new paper.Point(center.x, center.y + radius),
     ],
-    transparentColor,
+    guide1 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -90,7 +129,7 @@ export function sriYantra(
       new paper.Point(center.x - radius, center.y),
       new paper.Point(center.x + radius, center.y),
     ],
-    transparentColor,
+    guide1 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -111,18 +150,18 @@ export function sriYantra(
     points.push(new paper.Point(x, y));
   }
 
-  // const strokeDebugColor = new paper.Color(1, 0, 0, 1);
-  // createLine([points[5], points[0]], strokeDebugColor, strokeWidth, group);
-  // createLine([points[4], points[2]], strokeDebugColor, strokeWidth, group);
+  // const debugStrokeColor = new paper.Color(1, 0, 0, 1);
+  // createLine([points[5], points[0]], debugStrokeColor, strokeWidth, group);
+  // createLine([points[4], points[2]], debugStrokeColor, strokeWidth, group);
   const line2 = createLine(
     [points[6], points[5]],
-    strokeDebugColor,
+    guide2 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line3 = createLine(
     [points[7], points[4]],
-    transparentColor,
+    guide2 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -149,37 +188,38 @@ export function sriYantra(
     innerRadius,
   );
   points.push(p0, p1, p2, p3);
-  // createCircle(p0, 10, strokeDebugColor, strokeWidth, group);
-  // createCircle(p1, 10, strokeDebugColor, strokeWidth, group);
-  // createCircle(p2, 10, strokeDebugColor, strokeWidth, group);
-  // createCircle(p3, 10, strokeDebugColor, strokeWidth, group);
+  // createCircle(p0, 10, debugStrokeColor, strokeWidth, group);
+  // createCircle(p1, 10, debugStrokeColor, strokeWidth, group);
+  // createCircle(p2, 10, debugStrokeColor, strokeWidth, group);
+  // createCircle(p3, 10, debugStrokeColor, strokeWidth, group);
 
   const line4 = createLine(
     [points[9], points[0]],
-    strokeDebugColor,
+    guide3 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line5 = createLine(
     [points[8], points[2]],
-    strokeDebugColor,
+    guide3 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
+
   const intersection = line4.getIntersections(line5)[0].point;
   const innerSideRadius = intersection.getDistance(center);
   points.push(intersection);
   const innerRightCircle = createCircle(
     points[0],
     innerSideRadius,
-    strokeDebugColor,
+    guide4 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const innerLeftCircle = createCircle(
     points[2],
     innerSideRadius,
-    strokeDebugColor,
+    guide4 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -187,11 +227,11 @@ export function sriYantra(
   createCircleCornerPoints(points[0], innerSideRadius, points);
   createCircleCornerPoints(points[2], innerSideRadius, points);
 
-  // createCircle(midPoint2To4, 10, strokeDebugColor, strokeWidth, group);
+  // createCircle(midPoint2To4, 10, debugStrokeColor, strokeWidth, group);
 
   const line6 = createLine(
     [points[18], points[14]],
-    strokeDebugColor,
+    guide5 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -216,7 +256,7 @@ export function sriYantra(
       points[1],
       points[17].add(new paper.Point(direction.x, direction.y).multiply(dist)),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -232,7 +272,7 @@ export function sriYantra(
       points[1],
       points[15].add(new paper.Point(direction.x, direction.y).multiply(dist)),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -243,46 +283,46 @@ export function sriYantra(
 
   line7 = createLine(
     [points[1], points[25]],
-    strokeDebugColor,
+    guide6 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   line8 = createLine(
     [points[1], points[26]],
-    strokeDebugColor,
+    guide6 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line9 = createLine(
     [points[25], points[26]],
-    strokeDebugColor,
+    guide7 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line10 = createLine(
     [points[10], points[3]],
-    strokeDebugColor,
+    guide8 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line11 = createLine(
     [points[3], points[11]],
-    strokeDebugColor,
+    guide8 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line12 = createLine(
     [points[23], points[8]],
-    strokeDebugColor,
+    guide9 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line13 = createLine(
     [points[24], points[9]],
-    strokeDebugColor,
+    guide9 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -296,7 +336,7 @@ export function sriYantra(
 
   let line14 = createLine(
     [points[27], points[28]],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -307,7 +347,7 @@ export function sriYantra(
       new paper.Point(center.x - direction.x * innerRadius, points[27].y),
       new paper.Point(center.x + direction.x * innerRadius, points[27].y),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -315,19 +355,19 @@ export function sriYantra(
   const intersection11 = line14.getIntersections(centerCircle);
   points.push(intersection11[0].point, intersection11[1].point);
   line14.remove();
-  // createCircle(intersection2, 10, strokeDebugColor, strokeWidth, group);
-  // createCircle(intersection3, 10, strokeDebugColor, strokeWidth, group);
+  // createCircle(intersection2, 10, debugStrokeColor, strokeWidth, group);
+  // createCircle(intersection3, 10, debugStrokeColor, strokeWidth, group);
 
   line14 = createLine(
     [points[30], points[29]],
-    strokeDebugColor,
+    guide10 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line15 = createLine(
     [points[3], points[1]],
-    strokeDebugColor,
+    guide10 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -348,7 +388,7 @@ export function sriYantra(
       points[31],
       points[32].add(new paper.Point(direction.x, direction.y).multiply(dist)),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -357,7 +397,7 @@ export function sriYantra(
   line16.remove();
   line16 = createLine(
     [points[31], points[34]],
-    strokeDebugColor,
+    guide11 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -369,7 +409,7 @@ export function sriYantra(
       points[31],
       points[33].add(new paper.Point(direction.x, direction.y).multiply(dist)),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -378,20 +418,20 @@ export function sriYantra(
   line17.remove();
   line17 = createLine(
     [points[31], points[35]],
-    strokeDebugColor,
+    guide11 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line18 = createLine(
     [points[0], points[1]],
-    strokeDebugColor,
+    guide12 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line19 = createLine(
     [points[2], points[1]],
-    strokeDebugColor,
+    guide12 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -404,13 +444,13 @@ export function sriYantra(
 
   const line20 = createLine(
     [points[36], points[0]],
-    strokeDebugColor,
+    guide13 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line21 = createLine(
     [points[37], points[2]],
-    strokeDebugColor,
+    guide13 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -426,7 +466,7 @@ export function sriYantra(
       new paper.Point(center.x - direction.x * innerRadius, points[38].y),
       new paper.Point(center.x + direction.x * innerRadius, points[39].y),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -435,20 +475,20 @@ export function sriYantra(
   line22.remove();
   line22 = createLine(
     [points[40], points[41]],
-    strokeDebugColor,
+    guide14 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line23 = createLine(
     [points[22], points[3]],
-    strokeDebugColor,
+    guide15 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line24 = createLine(
     [points[21], points[3]],
-    strokeDebugColor,
+    guide15 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -470,7 +510,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(innerRadius),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -479,7 +519,7 @@ export function sriYantra(
   line25.remove();
   line25 = createLine(
     [points[44], points[45]],
-    strokeDebugColor,
+    guide16 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -491,7 +531,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(innerRadius),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -500,7 +540,7 @@ export function sriYantra(
   line26.remove();
   line26 = createLine(
     [points[44], points[46]],
-    strokeDebugColor,
+    guide16 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -511,13 +551,13 @@ export function sriYantra(
 
   const line27 = createLine(
     [points[47], points[37]],
-    strokeDebugColor,
+    guide17 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line28 = createLine(
     [points[47], points[36]],
-    strokeDebugColor,
+    guide17 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -534,7 +574,7 @@ export function sriYantra(
       new paper.Point(center.x - direction.x * innerRadius, points[49].y),
       new paper.Point(center.x + direction.x * innerRadius, points[48].y),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -543,7 +583,7 @@ export function sriYantra(
   line29.remove();
   line29 = createLine(
     [points[50], points[51]],
-    strokeDebugColor,
+    guide18 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -552,28 +592,28 @@ export function sriYantra(
   const cornerCircle0 = createCircle(
     points[24],
     innerRadius,
-    new paper.Color(1, 1, 1, 0.5),
+    guide0 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const cornerCircle1 = createCircle(
     points[23],
     innerRadius,
-    new paper.Color(1, 1, 1, 0.5),
+    guide0 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const cornerCircle2 = createCircle(
     points[37],
     innerRadius,
-    new paper.Color(1, 1, 1, 0.5),
+    guide0 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const cornerCircle3 = createCircle(
     points[36],
     innerRadius,
-    new paper.Color(1, 1, 1, 0.5),
+    guide0 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -590,16 +630,17 @@ export function sriYantra(
       new paper.Point(center.x - direction.x * innerRadius, points[52].y),
       new paper.Point(center.x + direction.x * innerRadius, points[53].y),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
+
   const intersection33 = line30.getIntersections(centerCircle);
   points.push(intersection33[0].point, intersection33[1].point);
   line30.remove();
   line30 = createLine(
     [points[54], points[55]],
-    strokeDebugColor,
+    guide19 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -623,7 +664,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(innerRadius),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -633,7 +674,7 @@ export function sriYantra(
   line31.remove();
   line31 = createLine(
     [points[56], points[59]],
-    strokeDebugColor,
+    guide20 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -648,7 +689,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(innerRadius),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -658,14 +699,14 @@ export function sriYantra(
   line33.remove();
   line33 = createLine(
     [points[56], points[60]],
-    strokeDebugColor,
+    guide20 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line34 = createLine(
     [points[10], points[11]],
-    strokeDebugColor,
+    guide21 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -682,7 +723,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(dist * 2),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -691,7 +732,7 @@ export function sriYantra(
   line35.remove();
   line35 = createLine(
     [points[61], points[62]],
-    strokeDebugColor,
+    guide22 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -705,7 +746,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(dist * 2),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -714,7 +755,7 @@ export function sriYantra(
   line36.remove();
   line36 = createLine(
     [points[61], points[63]],
-    strokeDebugColor,
+    guide22 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -734,7 +775,7 @@ export function sriYantra(
       new paper.Point(center.x - direction.x * radius * 1.5, points[64].y),
       new paper.Point(center.x + direction.x * radius * 1.5, points[64].y),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -743,7 +784,7 @@ export function sriYantra(
   line37.remove();
   line37 = createLine(
     [points[66], points[67]],
-    strokeDebugColor,
+    guide23 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -762,7 +803,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(innerRadius),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -771,7 +812,7 @@ export function sriYantra(
   line38.remove();
   line38 = createLine(
     [points[69], points[70]],
-    strokeDebugColor,
+    guide24 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -787,7 +828,7 @@ export function sriYantra(
         new paper.Point(direction.x, direction.y).multiply(innerRadius),
       ),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -796,7 +837,7 @@ export function sriYantra(
   line39.remove();
   line39 = createLine(
     [points[69], points[72]],
-    strokeDebugColor,
+    guide24 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -813,7 +854,7 @@ export function sriYantra(
       new paper.Point(center.x - direction.x * innerRadius, points[73].y),
       new paper.Point(center.x + direction.x * innerRadius, points[74].y),
     ],
-    strokeDebugColor,
+    debugStrokeColor,
     strokeWidth,
     group,
   );
@@ -823,7 +864,7 @@ export function sriYantra(
   line40.remove();
   line40 = createLine(
     [points[75], points[76]],
-    strokeDebugColor,
+    guide25 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -836,26 +877,26 @@ export function sriYantra(
 
   const line41 = createLine(
     [points[77], points[12]],
-    strokeDebugColor,
+    guide26 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line42 = createLine(
     [points[78], points[12]],
-    strokeDebugColor,
+    guide26 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line43 = createLine(
     [points[9], points[23]],
-    strokeDebugColor,
+    guide27 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
   const line44 = createLine(
     [points[8], points[24]],
-    strokeDebugColor,
+    guide27 ? debugStrokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -886,67 +927,68 @@ export function sriYantra(
   const intersection62 = line14.getIntersections(line43);
   points.push(intersection62[0].point);
 
-  // debugPoints(points, strokeDebugColor);
+  // debugPoints(points, debugStrokeColor);
 
   // Triangles
   const line45 = createLine(
     [points[25], points[26], points[1], points[25]],
-    strokeColor,
+    step0 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
+
   const line46 = createLine(
     [points[22], points[21], points[3], points[22]],
-    strokeColor,
+    step1 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line47 = createLine(
     [points[44], points[80], points[79], points[44]],
-    strokeColor,
+    step2 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line48 = createLine(
     [points[31], points[81], points[82], points[31]],
-    strokeColor,
+    step3 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line49 = createLine(
     [points[61], points[52], points[53], points[61]],
-    strokeColor,
+    step4 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line50 = createLine(
     [points[69], points[68], points[71], points[69]],
-    strokeColor,
+    step5 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line51 = createLine(
     [points[47], points[83], points[84], points[47]],
-    strokeColor,
+    step6 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line52 = createLine(
     [points[12], points[77], points[78], points[12]],
-    strokeColor,
+    step7 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
 
   const line53 = createLine(
     [points[56], points[85], points[86], points[56]],
-    strokeColor,
+    step8 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
@@ -954,11 +996,11 @@ export function sriYantra(
   const bindu = createCircle(
     center,
     innerRadius * 0.01,
-    strokeColor,
+    step9 ? strokeColor : transparentColor,
     strokeWidth,
     group,
   );
-  bindu.fillColor = strokeColor;
+  bindu.fillColor = step9 ? strokeColor : transparentColor;
 
   return group;
 }

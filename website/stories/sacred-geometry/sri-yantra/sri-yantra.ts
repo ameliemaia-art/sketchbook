@@ -5,18 +5,56 @@ import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { sriYantra } from "./sri-yantra-geometry";
 
-const strokeScale = 1;
+const strokeScale = 4;
 
 export default class SriYantra {
   settings = {
     scale: 1,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
-    debugColor: new paper.Color(1, 1, 1, 0.25),
     color: new paper.Color(1, 1, 1, 1),
+    debugStrokeColor: new paper.Color(1, 1, 1, 0.5),
     layers: {
       background: false,
       outline: false,
+      guide0: false,
+      guide1: false,
+      guide2: false,
+      guide3: false,
+      guide4: false,
+      guide5: false,
+      guide6: false,
+      guide7: false,
+      guide8: false,
+      guide9: false,
+      guide10: false,
+      guide11: false,
+      guide12: false,
+      guide13: false,
+      guide14: false,
+      guide15: false,
+      guide16: false,
+      guide17: false,
+      guide18: false,
+      guide19: false,
+      guide20: false,
+      guide21: false,
+      guide22: false,
+      guide23: false,
+      guide24: false,
+      guide25: false,
+      guide26: false,
+      guide27: false,
+      step0: false,
+      step1: false,
+      step2: false,
+      step3: false,
+      step4: false,
+      step5: false,
+      step6: false,
+      step7: false,
+      step8: false,
+      step9: false,
     },
   };
 
@@ -27,8 +65,8 @@ export default class SriYantra {
     this.canvas = canvas;
 
     if (setup) {
-      canvas.width = 1250;
-      canvas.height = 1250;
+      canvas.width = 2000;
+      canvas.height = 2000;
       paper.setup(canvas);
     }
 
@@ -59,9 +97,47 @@ export default class SriYantra {
         center,
         radius,
         this.settings.color,
-        this.settings.debugColor,
+        this.settings.debugStrokeColor,
         this.settings.strokeWidth,
         this.settings.layers.outline,
+        this.settings.layers.guide0,
+        this.settings.layers.guide1,
+        this.settings.layers.guide2,
+        this.settings.layers.guide3,
+        this.settings.layers.guide4,
+        this.settings.layers.guide5,
+        this.settings.layers.guide6,
+        this.settings.layers.guide7,
+        this.settings.layers.guide8,
+        this.settings.layers.guide9,
+        this.settings.layers.guide10,
+        this.settings.layers.guide11,
+        this.settings.layers.guide12,
+        this.settings.layers.guide13,
+        this.settings.layers.guide14,
+        this.settings.layers.guide15,
+        this.settings.layers.guide16,
+        this.settings.layers.guide17,
+        this.settings.layers.guide18,
+        this.settings.layers.guide19,
+        this.settings.layers.guide20,
+        this.settings.layers.guide21,
+        this.settings.layers.guide22,
+        this.settings.layers.guide23,
+        this.settings.layers.guide24,
+        this.settings.layers.guide25,
+        this.settings.layers.guide26,
+        this.settings.layers.guide27,
+        this.settings.layers.step0,
+        this.settings.layers.step1,
+        this.settings.layers.step2,
+        this.settings.layers.step3,
+        this.settings.layers.step4,
+        this.settings.layers.step5,
+        this.settings.layers.step6,
+        this.settings.layers.step7,
+        this.settings.layers.step8,
+        this.settings.layers.step9,
       ),
     );
   };
@@ -94,6 +170,13 @@ export class GUISriYantra extends GUIController {
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings.debugStrokeColor, "alpha", {
+        min: 0,
+        max: 1,
+        label: "guide",
+      })
+      .on("change", target.draw);
 
     this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
     this.folders.layers
@@ -103,6 +186,17 @@ export class GUISriYantra extends GUIController {
     this.folders.layers
       .addBinding(target.settings.layers, "outline")
       .on("change", target.draw);
+
+    for (let i = 0; i < 28; i++) {
+      this.folders.layers
+        .addBinding(target.settings.layers, `guide${i}`)
+        .on("change", target.draw);
+    }
+    for (let i = 0; i < 10; i++) {
+      this.folders.layers
+        .addBinding(target.settings.layers, `step${i}`)
+        .on("change", target.draw);
+    }
 
     this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
     this.gui.addButton({ title: "Save SVG" }).on("click", target.saveSVG);
