@@ -12,6 +12,7 @@ export default class SriYantra {
     scale: 1,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
+    debugColor: new paper.Color(1, 1, 1, 0.25),
     color: new paper.Color(1, 1, 1, 1),
     layers: {
       background: false,
@@ -26,8 +27,8 @@ export default class SriYantra {
     this.canvas = canvas;
 
     if (setup) {
-      canvas.width = 1000;
-      canvas.height = 1000;
+      canvas.width = 1250;
+      canvas.height = 1250;
       paper.setup(canvas);
     }
 
@@ -58,6 +59,7 @@ export default class SriYantra {
         center,
         radius,
         this.settings.color,
+        this.settings.debugColor,
         this.settings.strokeWidth,
         this.settings.layers.outline,
       ),

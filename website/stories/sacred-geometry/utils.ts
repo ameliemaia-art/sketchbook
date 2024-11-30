@@ -58,10 +58,10 @@ export function debugPoints(points: paper.Point[], color: paper.Color) {
     createCircle(point, 5, color, 1);
 
     // Draw text next to point
-    const text = new paper.PointText(point);
-    text.content = `${i}`;
-    text.style.fontSize = 10;
-    text.fillColor = new paper.Color(1, 1, 0, 1);
-    text.position = new paper.Point(point.x + 10, point.y + 20);
+    // const text = new paper.PointText(point);
+    // text.content = `${i}`;
+    // text.style.fontSize = 10;
+    // text.fillColor = new paper.Color(1, 1, 0, 1);
+    // text.position = new paper.Point(point.x + 10, point.y + 20);
   });
 }
