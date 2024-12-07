@@ -5,11 +5,11 @@ import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { sriYantra } from "./sri-yantra-geometry";
 
-const strokeScale = 4;
+const strokeScale = 1;
 
 export default class SriYantra {
   settings = {
-    scale: 0.85,
+    scale: 1,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
@@ -46,16 +46,16 @@ export default class SriYantra {
       guide26: false,
       guide27: false,
       guide28: false,
-      step0: false,
-      step1: false,
-      step2: false,
-      step3: false,
-      step4: false,
-      step5: false,
-      step6: false,
-      step7: false,
-      step8: false,
-      step9: false,
+      step0: true,
+      step1: true,
+      step2: true,
+      step3: true,
+      step4: true,
+      step5: true,
+      step6: true,
+      step7: true,
+      step8: true,
+      step9: true,
     },
   };
 
@@ -66,8 +66,8 @@ export default class SriYantra {
     this.canvas = canvas;
 
     if (setup) {
-      canvas.width = 2000;
-      canvas.height = 2000;
+      canvas.width = 500;
+      canvas.height = 500;
       paper.setup(canvas);
     }
 
@@ -189,13 +189,20 @@ export class GUISriYantra extends GUIController {
       .addBinding(target.settings.layers, "outline")
       .on("change", target.draw);
 
+    this.folders.guide = this.addFolder(this.folders.layers, {
+      title: "Guides",
+    });
+    this.folders.steps = this.addFolder(this.folders.layers, {
+      title: "Steps",
+    });
+
     for (let i = 0; i < 29; i++) {
-      this.folders.layers
+      this.folders.guide
         .addBinding(target.settings.layers, `guide${i}`)
         .on("change", target.draw);
     }
     for (let i = 0; i < 10; i++) {
-      this.folders.layers
+      this.folders.steps
         .addBinding(target.settings.layers, `step${i}`)
         .on("change", target.draw);
     }

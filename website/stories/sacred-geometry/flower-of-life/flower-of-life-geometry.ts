@@ -3,7 +3,7 @@ import paper from "paper";
 import { TWO_PI } from "@utils/three/math";
 import { createCircle, createLine, dot, lerp } from "../utils";
 
-function createFlowerCircle(
+export function createFlowerCircle(
   center: paper.Point,
   innerRadius: number,
   startAngle: number,
