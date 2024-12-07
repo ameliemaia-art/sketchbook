@@ -55,7 +55,7 @@ export function lerp(p1: paper.Point, p2: paper.Point, t: number) {
 
 export function debugPoints(points: paper.Point[], color: paper.Color) {
   points.forEach((point, i) => {
-    createCircle(point, 5, color, 1);
+    createCircle(point, 10, color, 1);
 
     // Draw text next to point
     const text = new paper.PointText(point);
