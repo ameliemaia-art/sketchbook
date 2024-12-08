@@ -35,6 +35,7 @@ body {
 
 .tp-dfwv {
   width: 320px !important;
+  position: fixed !important;
 }
 
 .sb-show-main canvas {

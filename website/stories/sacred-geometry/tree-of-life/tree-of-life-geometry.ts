@@ -7,13 +7,49 @@ function getIntersections(
   circle: paper.Path.Circle,
   points: paper.Point[][],
   result: paper.Point[],
+  smallCircleRadius: number,
 ) {
   const intersections: paper.CurveLocation[] = [];
+  const circleIntersections: paper.CurveLocation[] = [];
 
   points.forEach((set) => {
     const line = new paper.Path.Line(set[0], set[1]);
     intersections.push(...circle.getIntersections(line));
     line.remove();
+  });
+
+  // Spawn circle on intersection points
+  intersections.forEach((intersection) => {
+    const circle2 = createCircle(
+      intersection.point,
+      smallCircleRadius,
+      new paper.Color(1, 0, 0, 1),
+      1,
+    );
+    circleIntersections.push(...circle.getIntersections(circle2));
+    circle2.remove();
+  });
+
+  result.push(...circleIntersections.map((intersection) => intersection.point));
+}
+
+function getLineIntersections(
+  lines1: paper.Point[][],
+  lines2: paper.Point[][],
+  result: paper.Point[],
+) {
+  const intersections: paper.CurveLocation[] = [];
+
+  lines1.forEach((set1) => {
+    const line1 = new paper.Path.Line(set1[0], set1[1]);
+    line1.strokeColor = new paper.Color(1, 0, 0, 0.25);
+    lines2.forEach((set2) => {
+      const line2 = new paper.Path.Line(set2[0], set2[1]);
+      line2.strokeColor = new paper.Color(1, 0, 0, 0.25);
+      intersections.push(...line1.getIntersections(line2));
+      line2.remove();
+    });
+    line1.remove();
   });
 
   result.push(...intersections.map((intersection) => intersection.point));
@@ -112,7 +148,7 @@ export function treeOfLife(
         createCircle(
           p,
           innerRadius,
-          new paper.Color(1, 1, 1, 0),
+          new paper.Color(1, 1, 1, 0.25),
           strokeWidth,
           group,
         );
@@ -159,6 +195,8 @@ export function treeOfLife(
 
   const points: paper.Point[] = [];
 
+  const smallCircleRadius = r / 4;
+
   getIntersections(
     circles[0],
     [
@@ -167,6 +205,7 @@ export function treeOfLife(
       [treeOfLifePoints[0], treeOfLifePoints[4]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[1],
@@ -177,6 +216,7 @@ export function treeOfLife(
       [treeOfLifePoints[1], treeOfLifePoints[5]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[4],
@@ -187,6 +227,7 @@ export function treeOfLife(
       [treeOfLifePoints[4], treeOfLifePoints[5]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[2],
@@ -197,6 +238,7 @@ export function treeOfLife(
       [treeOfLifePoints[2], treeOfLifePoints[7]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[3],
@@ -207,6 +249,7 @@ export function treeOfLife(
       [treeOfLifePoints[3], treeOfLifePoints[6]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[5],
@@ -221,6 +264,7 @@ export function treeOfLife(
       [treeOfLifePoints[5], treeOfLifePoints[4]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[7],
@@ -232,6 +276,7 @@ export function treeOfLife(
       [treeOfLifePoints[7], treeOfLifePoints[9]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[6],
@@ -243,6 +288,7 @@ export function treeOfLife(
       [treeOfLifePoints[6], treeOfLifePoints[9]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[8],
@@ -253,6 +299,7 @@ export function treeOfLife(
       [treeOfLifePoints[8], treeOfLifePoints[9]],
     ],
     points,
+    smallCircleRadius,
   );
   getIntersections(
     circles[9],
@@ -262,49 +309,149 @@ export function treeOfLife(
       [treeOfLifePoints[9], treeOfLifePoints[6]],
     ],
     points,
+    smallCircleRadius,
+  );
+
+  getLineIntersections(
+    [
+      [points[2], points[39]],
+      [points[3], points[38]],
+    ],
+    [
+      [points[9], points[17]],
+      [points[8], points[16]],
+      [points[24], points[32]],
+      [points[25], points[33]],
+    ],
+    points,
+  );
+  getLineIntersections(
+    [
+      [points[13], points[50]],
+      [points[12], points[51]],
+    ],
+    [
+      [points[24], points[32]],
+      [points[25], points[33]],
+    ],
+    points,
+  );
+  getLineIntersections(
+    [
+      [points[20], points[53]],
+      [points[21], points[52]],
+    ],
+    [
+      [points[24], points[32]],
+      [points[25], points[33]],
+    ],
+    points,
+  );
+  getLineIntersections(
+    [
+      [points[48], points[77]],
+      [points[49], points[76]],
+    ],
+    [
+      [points[58], points[68]],
+      [points[59], points[69]],
+    ],
+    points,
   );
 
   // const test = lerp(treeOfLifePoints[5], treeOfLifePoints[6], 0.5);
   // createCircle(test, r, new paper.Color(1, 0, 0, 1), 1, group);
   // debugPoints(points, strokeColor);
 
+  // for (let i = 0; i < 4; i++) {
+  //   const min = circles[0].position.clone();
+  //   min.y -= r - smallCircleRadius;
+  //   const max = circles[0].position.clone();
+  //   max.y += r - smallCircleRadius;
+  //   const pos = lerp(min, max, i / 3);
+  //   createCircle(pos, smallCircleRadius, strokeColor, 1, group);
+  // }
+
+  // createCircle(points[2], smallCircleRadius, strokeColor, 1, group);
+  // createCircle(points[0], smallCircleRadius, strokeColor, 1, group);
+  //
+
+  // points.forEach((point) => {
+  //   createCircle(point, smallCircleRadius, strokeColor, 1, group);
+  // });
+
   // Circle 0
-  createLine([points[0], points[3]], strokeColor, strokeWidth, group);
-  createLine([points[1], points[19]], strokeColor, strokeWidth, group);
-  createLine([points[2], points[7]], strokeColor, strokeWidth, group);
+  createLine([points[0], points[7]], strokeColor, strokeWidth, group);
+  createLine([points[1], points[6]], strokeColor, strokeWidth, group);
+  createLine([points[2], points[89]], strokeColor, strokeWidth, group);
+  createLine([points[3], points[93]], strokeColor, strokeWidth, group);
+  createLine([points[4], points[15]], strokeColor, strokeWidth, group);
+  createLine([points[5], points[14]], strokeColor, strokeWidth, group);
+  createLine([points[88], points[90]], strokeColor, strokeWidth, group);
+  createLine([points[92], points[94]], strokeColor, strokeWidth, group);
+  createLine([points[91], points[39]], strokeColor, strokeWidth, group);
+  createLine([points[95], points[38]], strokeColor, strokeWidth, group);
 
   // Circle 1
-  createLine([points[4], points[8]], strokeColor, strokeWidth, group);
-  createLine([points[6], points[25]], strokeColor, strokeWidth, group);
-  createLine([points[5], points[11]], strokeColor, strokeWidth, group);
+  createLine([points[8], points[16]], strokeColor, strokeWidth, group);
+  createLine([points[9], points[17]], strokeColor, strokeWidth, group);
+  createLine([points[12], points[98]], strokeColor, strokeWidth, group);
+  createLine([points[13], points[96]], strokeColor, strokeWidth, group);
+  createLine([points[99], points[51]], strokeColor, strokeWidth, group);
+  createLine([points[97], points[50]], strokeColor, strokeWidth, group);
+  createLine([points[10], points[23]], strokeColor, strokeWidth, group);
+  createLine([points[11], points[22]], strokeColor, strokeWidth, group);
 
   // Circle 4
-  createLine([points[9], points[15]], strokeColor, strokeWidth, group);
-  createLine([points[10], points[26]], strokeColor, strokeWidth, group);
+  createLine([points[20], points[100]], strokeColor, strokeWidth, group);
+  createLine([points[21], points[102]], strokeColor, strokeWidth, group);
+  createLine([points[101], points[53]], strokeColor, strokeWidth, group);
+  createLine([points[103], points[52]], strokeColor, strokeWidth, group);
+  createLine([points[18], points[31]], strokeColor, strokeWidth, group);
+  createLine([points[19], points[30]], strokeColor, strokeWidth, group);
 
   // Circle 2
-  createLine([points[12], points[16]], strokeColor, strokeWidth, group);
-  createLine([points[13], points[20]], strokeColor, strokeWidth, group);
-  createLine([points[14], points[27]], strokeColor, strokeWidth, group);
+  createLine([points[24], points[32]], strokeColor, strokeWidth, group);
+  createLine([points[25], points[33]], strokeColor, strokeWidth, group);
+  createLine([points[27], points[40]], strokeColor, strokeWidth, group);
+  createLine([points[26], points[41]], strokeColor, strokeWidth, group);
+  createLine([points[28], points[55]], strokeColor, strokeWidth, group);
+  createLine([points[29], points[54]], strokeColor, strokeWidth, group);
 
   // Circle 3
-  createLine([points[18], points[32]], strokeColor, strokeWidth, group);
-  createLine([points[17], points[21]], strokeColor, strokeWidth, group);
+  createLine([points[34], points[43]], strokeColor, strokeWidth, group);
+  createLine([points[35], points[42]], strokeColor, strokeWidth, group);
+  createLine([points[36], points[65]], strokeColor, strokeWidth, group);
+  createLine([points[37], points[64]], strokeColor, strokeWidth, group);
 
   // Circle 7
-  createLine([points[28], points[22]], strokeColor, strokeWidth, group);
-  createLine([points[29], points[34]], strokeColor, strokeWidth, group);
-  createLine([points[30], points[37]], strokeColor, strokeWidth, group);
-  createLine([points[31], points[41]], strokeColor, strokeWidth, group);
+  createLine([points[57], points[44]], strokeColor, strokeWidth, group);
+  createLine([points[56], points[45]], strokeColor, strokeWidth, group);
+  createLine([points[58], points[68]], strokeColor, strokeWidth, group);
+  createLine([points[59], points[69]], strokeColor, strokeWidth, group);
+  createLine([points[61], points[74]], strokeColor, strokeWidth, group);
+  createLine([points[60], points[75]], strokeColor, strokeWidth, group);
+  createLine([points[60], points[75]], strokeColor, strokeWidth, group);
+  createLine([points[63], points[82]], strokeColor, strokeWidth, group);
+  createLine([points[62], points[83]], strokeColor, strokeWidth, group);
 
   // Circle 6
-  createLine([points[33], points[23]], strokeColor, strokeWidth, group);
-  createLine([points[35], points[39]], strokeColor, strokeWidth, group);
-  createLine([points[36], points[43]], strokeColor, strokeWidth, group);
+  createLine([points[66], points[47]], strokeColor, strokeWidth, group);
+  createLine([points[67], points[46]], strokeColor, strokeWidth, group);
+  createLine([points[70], points[79]], strokeColor, strokeWidth, group);
+  createLine([points[71], points[78]], strokeColor, strokeWidth, group);
+  createLine([points[72], points[87]], strokeColor, strokeWidth, group);
+  createLine([points[73], points[86]], strokeColor, strokeWidth, group);
 
   // Circle 8
-  createLine([points[38], points[24]], strokeColor, strokeWidth, group);
-  createLine([points[40], points[42]], strokeColor, strokeWidth, group);
+  createLine([points[77], points[105]], strokeColor, strokeWidth, group);
+  createLine([points[104], points[48]], strokeColor, strokeWidth, group);
+  createLine([points[76], points[107]], strokeColor, strokeWidth, group);
+  createLine([points[106], points[49]], strokeColor, strokeWidth, group);
+
+  // Circle 9
+  createLine([points[85], points[80]], strokeColor, strokeWidth, group);
+  createLine([points[84], points[81]], strokeColor, strokeWidth, group);
 
   return group;
 }
