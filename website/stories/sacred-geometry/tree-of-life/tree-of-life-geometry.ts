@@ -148,7 +148,7 @@ export function treeOfLife(
         createCircle(
           p,
           innerRadius,
-          new paper.Color(1, 1, 1, 0.25),
+          new paper.Color(1, 1, 1, 0),
           strokeWidth,
           group,
         );
