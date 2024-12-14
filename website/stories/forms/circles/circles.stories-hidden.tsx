@@ -5,7 +5,7 @@ import CirclesSketch, { GUICirclesSketch } from "./circles";
 
 import "../../global.css";
 
-export default { title: "Sketchbook/Forms/Circles" };
+// export default { title: "Sketchbook/Forms/Circles", tags: ["!dev"] };
 
 export const Circles = () => {
   const rootRef = useRef<HTMLDivElement>(null);

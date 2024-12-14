@@ -1,20 +1,20 @@
 import { useEffect, useRef } from "react";
 import { Pane } from "tweakpane";
 
-import FormSketch, { GUITemplateSketch } from "./template";
+import BlueprintSketch, { GUIBlueprintSketch } from "./blueprint";
 
 import "../../global.css";
 
-export default { title: "Sketchbook/Forms/Template" };
+// export default { title: "Sketchbook/Forms/Blueprint", tags: ["!dev"] };
 
-export const Template = () => {
+export const Blueprint = () => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!rootRef.current) return () => {};
     const root = rootRef.current;
 
-    const app = new FormSketch();
+    const app = new BlueprintSketch();
     app
       .setup(root)
       .then(() => {})
@@ -23,9 +23,9 @@ export const Template = () => {
       });
 
     const gui = new Pane({
-      title: "Metaphysical Form - Template",
+      title: "Metaphysical Form - Blueprint",
     });
-    new GUITemplateSketch(gui, app);
+    new GUIBlueprintSketch(gui, app);
 
     const resize = () => {
       app.resize(window.innerWidth, window.innerHeight);
