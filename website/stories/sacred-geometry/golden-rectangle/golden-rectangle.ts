@@ -5,17 +5,21 @@ import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { goldenRectangle } from "./golden-rectangle-geometry";
 
-const strokeScale = 1;
+const strokeScale = 4;
 
 export default class GoldenRectangle {
   settings = {
-    scale: 1,
+    scale: 0.85,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
+    divisions: 9,
     layers: {
       background: false,
-      outline: true,
+      outline: false,
+      rectangle: false,
+      subdivisions: false,
+      spiral: true,
     },
   };
 
@@ -26,8 +30,8 @@ export default class GoldenRectangle {
     this.canvas = canvas;
 
     if (setup) {
-      canvas.width = 500;
-      canvas.height = 500;
+      canvas.width = 2000;
+      canvas.height = 2000;
       paper.setup(canvas);
     }
 
@@ -59,7 +63,11 @@ export default class GoldenRectangle {
         radius,
         this.settings.color,
         this.settings.strokeWidth,
+        this.settings.divisions,
         this.settings.layers.outline,
+        this.settings.layers.rectangle,
+        this.settings.layers.subdivisions,
+        this.settings.layers.spiral,
       ),
     );
   };
@@ -92,6 +100,9 @@ export class GUIGoldenRectangle extends GUIController {
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings, "divisions", { min: 0, max: 10, step: 1 })
+      .on("change", target.draw);
 
     this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
     this.folders.layers
@@ -100,6 +111,15 @@ export class GUIGoldenRectangle extends GUIController {
 
     this.folders.layers
       .addBinding(target.settings.layers, "outline")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "rectangle")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "subdivisions")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "spiral")
       .on("change", target.draw);
 
     this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);

@@ -1,3 +1,4 @@
+import { create } from "domain";
 import paper from "paper";
 import { MathUtils } from "three";
 
@@ -8,15 +9,21 @@ export function goldenRectangle(
   radius: number,
   strokeColor: paper.Color,
   strokeWidth: number,
-  outlineVisible = false,
+  divisions = 9,
+  outline = false,
+  rectangle = true,
+  subdivisions = true,
+  spiral = true,
 ) {
   const group = new paper.Group();
+
+  const transparentColor = new paper.Color(0, 0, 0, 0);
 
   // Draw the outline circle
   const outlinePath = new paper.Path.Circle(center, radius);
   outlinePath.strokeColor = strokeColor;
   outlinePath.strokeWidth = strokeWidth;
-  if (!outlineVisible) outlinePath.visible = false;
+  if (!outline) outlinePath.visible = false;
   group.addChild(outlinePath);
 
   // Golden ratio
@@ -30,145 +37,170 @@ export function goldenRectangle(
   const height = width / goldenRatio;
 
   // Create the rectangle centered on the circle
-  const rectangle = new paper.Path.Rectangle(
+  const golden = new paper.Path.Rectangle(
     new paper.Point(center.x - width / 2, center.y - height / 2),
     new paper.Point(center.x + width / 2, center.y + height / 2),
   );
-  rectangle.strokeColor = new paper.Color(1, 1, 1, 0.25);
-  rectangle.strokeWidth = strokeWidth;
+  golden.strokeColor = rectangle ? strokeColor : transparentColor;
+  golden.strokeWidth = strokeWidth;
 
   // Add the rectangle to the group
-  group.addChild(rectangle);
+  group.addChild(golden);
 
   // Division
-  let parent = rectangle;
-  const clockwise = [0, 90, 180, 270];
+  const rotations = [0, 90, 180, 270];
+  let parent = golden;
   let index = 0;
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < divisions; i++) {
     const x = parent.bounds.left;
     const y = parent.bounds.top;
 
-    const clockwiseIndex = clockwise[index % clockwise.length];
+    const rotation = rotations[index % rotations.length];
 
-    const topLeftPoint = new paper.Point(0, 0);
-    const bottomLeftPoint = new paper.Point(0, 0);
-    const topRightPoint = new paper.Point(0, 0);
-    const bottomRightPoint = new paper.Point(0, 0);
+    const corners = {
+      tl: new paper.Point(0, 0),
+      tr: new paper.Point(0, 0),
+      bl: new paper.Point(0, 0),
+      br: new paper.Point(0, 0),
+    };
+
     const parentWidth = Math.max(parent.bounds.width, parent.bounds.height);
     const parentHeight = Math.min(parent.bounds.width, parent.bounds.height);
-    let leftPosition = new paper.Point(0, 0);
-    let leftSize = new paper.Size(0, 0);
-    let rightPosition = new paper.Point(0, 0);
-    let rightSize = new paper.Size(0, 0);
 
-    switch (clockwiseIndex) {
+    const left = {
+      position: new paper.Point(0, 0),
+      size: new paper.Size(0, 0),
+    };
+
+    const right = {
+      position: new paper.Point(0, 0),
+      size: new paper.Size(0, 0),
+    };
+
+    const circle = {
+      position: new paper.Point(0, 0),
+      radius: 0,
+    };
+
+    switch (rotation) {
       case 0: {
-        topLeftPoint.x = x;
-        topLeftPoint.y = y;
-        bottomLeftPoint.x = x;
-        bottomLeftPoint.y = y + parentHeight;
-        topRightPoint.x = x + parentWidth;
-        topRightPoint.y = y;
-        bottomRightPoint.x = x + parentWidth;
-        bottomRightPoint.y = y + parentHeight;
-        leftPosition = topLeftPoint;
-        leftSize = new paper.Size(
-          MathUtils.lerp(0, parentWidth, 1 / goldenRatio),
-          parentHeight,
-        );
-        rightPosition = new paper.Point(
-          leftPosition.x + leftSize.width,
-          topLeftPoint.y,
-        );
-        rightSize = new paper.Size(parentWidth - leftSize.width, parentHeight);
+        corners.tl.x = x;
+        corners.tl.y = y;
+        corners.bl.x = x;
+        corners.bl.y = y + parentHeight;
+        corners.tr.x = x + parentWidth;
+        corners.tr.y = y;
+        corners.br.x = x + parentWidth;
+        corners.br.y = y + parentHeight;
+        left.position = corners.tl;
+        left.size.width = parentWidth * (1 / goldenRatio);
+        left.size.height = parentHeight;
+        right.position.x = left.position.x + left.size.width;
+        right.position.y = corners.tl.y;
+        right.size.width = parentWidth - left.size.width;
+        right.size.height = parentHeight;
+        circle.position = right.position;
+        circle.radius = left.size.width;
         break;
       }
       case 90: {
-        topLeftPoint.x = x;
-        topLeftPoint.y = y + parentWidth;
-        bottomLeftPoint.x = x + parentHeight;
-        bottomLeftPoint.y = y + parentWidth;
-        topRightPoint.x = x;
-        topRightPoint.y = y;
-        bottomRightPoint.x = x + parentHeight;
-        bottomRightPoint.y = y;
-        leftPosition = new paper.Point(
-          topLeftPoint.x,
-          topLeftPoint.y - parentWidth / goldenRatio,
-        );
-        leftSize = new paper.Size(
-          MathUtils.lerp(0, parentWidth, 1 / goldenRatio),
-          parentHeight,
-        );
-        rightPosition = new paper.Point(leftPosition.x, topRightPoint.y);
-        rightSize = new paper.Size(
-          parentWidth / goldenRatio,
-          parentHeight / goldenRatio,
-        );
+        corners.tl.x = x;
+        corners.tl.y = y + parentWidth;
+        corners.bl.x = x + parentHeight;
+        corners.bl.y = y + parentWidth;
+        corners.tr.x = x;
+        corners.tr.y = y;
+        corners.br.x = x + parentHeight;
+        corners.br.y = y;
+        left.position.x = corners.tl.x;
+        left.position.y = corners.tl.y - parentWidth / goldenRatio;
+        left.size.width = parentWidth * (1 / goldenRatio);
+        left.size.height = parentHeight;
+        right.position.x = corners.tl.x;
+        right.position.y = corners.tr.y;
+        right.size.width = parentWidth / goldenRatio;
+        right.size.height = parentHeight / goldenRatio;
+        circle.position = left.position;
+        circle.radius = right.size.width;
         break;
       }
       case 180: {
-        topLeftPoint.x = x + parentWidth;
-        topLeftPoint.y = y + parentHeight;
-        bottomLeftPoint.x = x + parentWidth;
-        bottomLeftPoint.y = y;
-        bottomRightPoint.x = x;
-        bottomRightPoint.y = y;
-        topRightPoint.x = x;
-        topRightPoint.y = y + parentHeight;
-        leftPosition = new paper.Point(
-          topLeftPoint.x - parentWidth / goldenRatio,
-          topLeftPoint.y - parentWidth / goldenRatio,
-        );
-        leftSize = new paper.Size(parentWidth / goldenRatio, parentHeight);
-        rightPosition = new paper.Point(
-          topRightPoint.x,
-          topRightPoint.y - parentHeight,
-        );
-        rightSize = new paper.Size(
-          parentWidth - parentWidth / goldenRatio,
-          parentHeight,
-        );
+        corners.tl.x = x + parentWidth;
+        corners.tl.y = y + parentHeight;
+        corners.bl.x = x + parentWidth;
+        corners.bl.y = y;
+        corners.br.x = x;
+        corners.br.y = y;
+        corners.tr.x = x;
+        corners.tr.y = y + parentHeight;
+        left.position.x = corners.tl.x - parentWidth / goldenRatio;
+        left.position.y = corners.tl.y - parentWidth / goldenRatio;
+        left.size.width = parentWidth / goldenRatio;
+        left.size.height = parentHeight;
+        right.position.x = corners.tr.x;
+        right.position.y = corners.tr.y - parentHeight;
+        right.size.width = parentWidth - parentWidth / goldenRatio;
+        right.size.height = parentHeight;
+
+        circle.position = left.position.clone();
+        circle.position.y += left.size.width;
+        circle.radius = left.size.width;
         break;
       }
       case 270: {
-        topLeftPoint.x = x + parentHeight;
-        topLeftPoint.y = y;
-        bottomRightPoint.x = x;
-        bottomRightPoint.y = y + parentWidth;
-        bottomLeftPoint.x = x;
-        bottomLeftPoint.y = y;
-        topRightPoint.x = x + parentHeight;
-        topRightPoint.y = y + parentWidth;
-        leftPosition = new paper.Point(
-          topLeftPoint.x - parentHeight,
-          topLeftPoint.y,
-        );
-        leftSize = new paper.Size(parentWidth / goldenRatio, parentHeight);
-        rightPosition = new paper.Point(
-          bottomLeftPoint.x,
-          topLeftPoint.y + parentHeight,
-        );
-        rightSize = new paper.Size(parentHeight, parentHeight / goldenRatio);
+        corners.tl.x = x + parentHeight;
+        corners.tl.y = y;
+        corners.br.x = x;
+        corners.br.y = y + parentWidth;
+        corners.bl.x = x;
+        corners.bl.y = y;
+        corners.tr.x = x + parentHeight;
+        corners.tr.y = y + parentWidth;
+        left.position.x = corners.tl.x - parentHeight;
+        left.position.y = corners.tl.y;
+        left.size.width = parentWidth / goldenRatio;
+        left.size.height = parentHeight;
+        right.position.x = corners.bl.x;
+        right.position.y = corners.tl.y + parentHeight;
+        right.size.width = parentHeight;
+        right.size.height = parentHeight / goldenRatio;
+
+        circle.position = left.position.clone();
+        circle.position.y += left.size.width;
+        circle.position.x += left.size.width;
+        circle.radius = left.size.width;
         break;
       }
     }
 
-    // Split the rectangle
-    const left = new paper.Path.Rectangle(leftPosition, leftSize);
-    const right = new paper.Path.Rectangle(rightPosition, rightSize);
+    const leftPath = new paper.Path.Rectangle(left.position, left.size);
+    const rightPath = new paper.Path.Rectangle(right.position, right.size);
 
-    left.strokeColor = strokeColor;
-    right.strokeColor = strokeColor;
+    leftPath.strokeColor = subdivisions ? strokeColor : transparentColor;
+    rightPath.strokeColor = subdivisions ? strokeColor : transparentColor;
+    leftPath.strokeWidth = strokeWidth;
+    rightPath.strokeWidth = strokeWidth;
+
+    if (spiral) {
+      const circlePath = createCircle(
+        circle.position,
+        circle.radius,
+        strokeColor,
+        strokeWidth,
+      );
+      const intersection = leftPath.intersect(circlePath);
+      intersection.strokeWidth = strokeWidth;
+      circlePath.remove();
+    }
 
     // if (i === 3) {
-    //   createCircle(topLeftPoint, 2, colors[i], 5);
-    //   createCircle(bottomLeftPoint, 2, colors[i], 5);
-    //   createCircle(bottomRightPoint, 2, colors[i], 5);
-    //   createCircle(topRightPoint, 2, colors[i], 5);
+    //   createCircle(corners.tl, 2, new paper.Color(1, 0, 0, 1), 5);
+    //   createCircle(corners.bl, 2, new paper.Color(0, 1, 0, 1), 5);
+    //   createCircle(corners.br, 2, new paper.Color(0, 0, 1, 1), 5);
+    //   createCircle(corners.tr, 2, new paper.Color(1, 1, 0, 1), 5);
     // }
 
-    parent = right;
+    parent = rightPath;
     index++;
   }
 
