@@ -9,7 +9,7 @@ const strokeScale = 1;
 
 export default class SriYantra {
   settings = {
-    scale: 1,
+    scale: 1.7,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),
@@ -167,7 +167,7 @@ export class GUISriYantra extends GUIController {
       .addBinding(target.settings, "strokeWidth", { min: 0.1 })
       .on("change", target.draw);
     this.gui
-      .addBinding(target.settings, "scale", { min: 0.1, max: 1 })
+      .addBinding(target.settings, "scale", { min: 0.1, max: 2 })
       .on("change", target.draw);
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })

@@ -16,7 +16,7 @@ export default class TreeOfLife {
     color: new paper.Color(1, 1, 1, 1),
     layers: {
       darkness: false,
-      light: true,
+      light: false,
       guide0: false,
       guide1: false,
       guide2: false,

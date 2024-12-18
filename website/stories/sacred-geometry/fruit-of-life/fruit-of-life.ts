@@ -9,7 +9,7 @@ const strokeScale = 1;
 
 export default class FruitOfLife {
   settings = {
-    scale: 1,
+    scale: 0.85,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     color: new paper.Color(1, 1, 1, 1),

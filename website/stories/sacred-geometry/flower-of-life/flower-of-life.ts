@@ -9,7 +9,7 @@ const strokeScale = 1;
 
 export default class FlowerOfLife {
   settings = {
-    scale: 1,
+    scale: 0.85,
     opacity: 1,
     dimensions: 3,
     strokeWidth: 1 * strokeScale,

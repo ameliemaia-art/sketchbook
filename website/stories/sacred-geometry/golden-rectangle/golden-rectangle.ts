@@ -5,7 +5,7 @@ import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { goldenRectangle } from "./golden-rectangle-geometry";
 
-const strokeScale = 4;
+const strokeScale = 1;
 
 export default class GoldenRectangle {
   settings = {
@@ -17,8 +17,8 @@ export default class GoldenRectangle {
     layers: {
       background: false,
       outline: false,
-      rectangle: false,
-      subdivisions: false,
+      rectangle: true,
+      subdivisions: true,
       spiral: true,
     },
   };
@@ -30,8 +30,8 @@ export default class GoldenRectangle {
     this.canvas = canvas;
 
     if (setup) {
-      canvas.width = 2000;
-      canvas.height = 2000;
+      canvas.width = 500;
+      canvas.height = 500;
       paper.setup(canvas);
     }
 
