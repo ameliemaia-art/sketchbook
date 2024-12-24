@@ -6,7 +6,7 @@ import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import { dodecahedron } from "./dodecahedron-geometry";
 
-const strokeScale = 4;
+const strokeScale = 1;
 
 export default class Dodecahedron {
   settings = {
@@ -30,8 +30,8 @@ export default class Dodecahedron {
     this.canvas = canvas;
 
     if (setup) {
-      canvas.width = 2000;
-      canvas.height = 2000;
+      canvas.width = 500;
+      canvas.height = 500;
       paper.setup(canvas);
     }
 

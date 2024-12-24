@@ -1,4 +1,5 @@
 import paper from "paper";
+import { Vector3 } from "three";
 import { FolderApi } from "tweakpane";
 
 import { saveImage, saveSVG } from "@utils/common/file";
@@ -13,7 +14,9 @@ export default class Icosahedron {
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     strokeColor: new paper.Color(1, 1, 1, 1),
+    faceColor: new paper.Color(1, 1, 1, 0.5),
     guideColor: new paper.Color(1, 1, 1, 0.25),
+    lightDirection: new Vector3(0.65, 1, 0.15),
     layers: {
       background: false,
       outline: false,
@@ -61,6 +64,8 @@ export default class Icosahedron {
         this.settings.strokeColor,
         this.settings.strokeWidth,
         this.settings.guideColor,
+        this.settings.faceColor,
+        this.settings.lightDirection,
         this.settings.layers.outline,
       ),
     );
@@ -99,6 +104,30 @@ export class GUIIcosahedron extends GUIController {
         min: 0,
         max: 1,
         label: "guideColor",
+      })
+      .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings.faceColor, "alpha", {
+        min: 0,
+        max: 1,
+        label: "faceColor",
+      })
+      .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings, "lightDirection", {
+        x: {
+          min: -1,
+          max: 1,
+        },
+        y: {
+          min: -1,
+          max: 1,
+        },
+        z: {
+          min: -1,
+          max: 1,
+        },
+        label: "lightDirection",
       })
       .on("change", target.draw);
 

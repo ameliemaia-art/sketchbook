@@ -1,7 +1,13 @@
 import paper from "paper";
+import { MathUtils, Vector3 } from "three";
 
 import { TWO_PI } from "@utils/three/math";
-import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
+import {
+  createCircle,
+  createLine,
+  debugPoints,
+  lerp,
+} from "../../../utils/paper/utils";
 
 export function tetrahedron(
   center: paper.Point,
@@ -9,6 +15,8 @@ export function tetrahedron(
   strokeColor: paper.Color,
   strokeWidth: number,
   guideColor: paper.Color,
+  faceColor: paper.Color,
+  lightDirection: Vector3,
   outline = true,
 ) {
   const group = new paper.Group();
@@ -67,6 +75,47 @@ export function tetrahedron(
   //   30,
   //   new paper.Color(1, 0, 0, 1),
   // );
+
+  const faces = [
+    {
+      label: "left",
+      vertices: [points[16], points[0], points[12], points[16]],
+      normal: new Vector3(
+        -0.8164966106414795,
+        0.4714045226573944,
+        0.3333333432674408,
+      ),
+    },
+    {
+      label: "right",
+      vertices: [points[16], points[8], points[0], points[16]],
+      normal: new Vector3(
+        0.8164966106414795,
+        0.4714045226573944,
+        0.3333333432674408,
+      ),
+    },
+    {
+      label: "bottom",
+      vertices: [points[8], points[12], points[0], points[8]],
+      normal: new Vector3(0, -0.9428090453147888, 0.3333333432674408),
+    },
+  ];
+
+  for (const face of faces) {
+    const path = new paper.Path();
+    const intensity = MathUtils.clamp(face.normal.dot(lightDirection), 0, 1);
+
+    path.fillColor = new paper.Color(
+      faceColor.red * intensity,
+      faceColor.green * intensity,
+      faceColor.blue * intensity,
+      faceColor.alpha,
+    );
+    face.vertices.forEach((vertex) => path.add(vertex));
+    path.closed = true;
+    group.addChild(path);
+  }
 
   // Draw lines
   createLine(

@@ -1,4 +1,5 @@
 import paper from "paper";
+import { MathUtils, Vector3 } from "three";
 
 import { TWO_PI } from "@utils/three/math";
 import {
@@ -15,6 +16,8 @@ export function octahedron(
   strokeColor: paper.Color,
   strokeWidth: number,
   guideColor: paper.Color,
+  faceColor: paper.Color,
+  lightDirection: Vector3,
   outline = true,
 ) {
   const group = new paper.Group();
@@ -73,6 +76,44 @@ export function octahedron(
   //   30,
   //   new paper.Color(1, 0, 0, 1),
   // );
+
+  const faces = [
+    {
+      label: "front top",
+      vertices: [points[8], points[12], points[16], points[8]],
+      normal: new Vector3(-0, 0.5773502588272095, 0.8164966106414795),
+    },
+    {
+      label: "front bottom",
+      vertices: [points[8], points[10], points[12], points[8]],
+      normal: new Vector3(0, -0.5773502588272095, 0.8164966106414795),
+    },
+    {
+      label: "front top left",
+      vertices: [points[16], points[12], points[14], points[16]],
+      normal: new Vector3(-0.8164966106414795, 0.5773502588272095, 0),
+    },
+    {
+      label: "front top right",
+      vertices: [points[16], points[18], points[8], points[16]],
+      normal: new Vector3(0.8164966106414795, 0.5773502588272095, 0),
+    },
+  ];
+
+  for (const face of faces) {
+    const path = new paper.Path();
+    const intensity = MathUtils.clamp(face.normal.dot(lightDirection), 0, 1);
+
+    path.fillColor = new paper.Color(
+      faceColor.red * intensity,
+      faceColor.green * intensity,
+      faceColor.blue * intensity,
+      faceColor.alpha,
+    );
+    face.vertices.forEach((vertex) => path.add(vertex));
+    path.closed = true;
+    group.addChild(path);
+  }
 
   createLine(
     [

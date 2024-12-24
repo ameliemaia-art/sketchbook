@@ -1,10 +1,12 @@
 import {
   Color,
-  DodecahedronGeometry,
   Float32BufferAttribute,
+  IcosahedronGeometry,
   MathUtils,
   Mesh,
   MeshBasicMaterial,
+  OctahedronGeometry,
+  TetrahedronGeometry,
   Vector3,
 } from "three";
 
@@ -13,12 +15,15 @@ import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 
 export default class PlatonicSketch extends WebGLApp {
   create() {
-    // Create a dodecahedron geometry (non-indexed by default)
-    const geometry = new DodecahedronGeometry(1);
-    geometry.rotateX(MathUtils.degToRad(-30));
+    // Create an icosahedron geometry (non-indexed by default)
+    const geometry = new TetrahedronGeometry(1);
+    // Rotate around the X-axis to make it flat on the XZ plane
+    // const angleX = Math.acos(-1 / 3); // Approximately 109.47 degrees
+    geometry.rotateZ(MathUtils.degToRad(-45));
+    geometry.rotateX(Math.acos(-1 / Math.sqrt(3)));
     geometry.computeVertexNormals();
 
-    // Prepare face colors (12 faces for a dodecahedron)
+    // Prepare face colors (20 faces for an icosahedron)
     const faceColors = [
       0xff0000, // Face 0: Red
       0x00ff00, // Face 1: Green
@@ -32,19 +37,29 @@ export default class PlatonicSketch extends WebGLApp {
       0x008800, // Face 9: Dark Green
       0x000088, // Face 10: Dark Blue
       0x888800, // Face 11: Olive
+      0xff8800, // Face 12: Orange
+      0xff0088, // Face 13: Pink
+      0x88ff00, // Face 14: Lime
+      0x0088ff, // Face 15: Light Blue
+      0x8800ff, // Face 16: Purple
+      0x8888ff, // Face 17: Lavender
+      0xff8888, // Face 18: Light Red
+      0x88ffff, // Face 19: Light Cyan
     ];
 
     // Add vertex colors for the geometry
     const colors = [];
     const color = new Color();
 
-    // Each face has 5 vertices (pentagon) split into 3 triangles (9 vertices per face)
-    const verticesPerFace = 9; // 3 vertices x 3 triangles
-    for (let faceIndex = 0; faceIndex < 12; faceIndex++) {
-      // Set the color for this face
-      color.setHex(faceColors[faceIndex]);
+    // Each face is a triangle with 3 vertices
+    const verticesPerFace = 3; // 1 triangle x 3 vertices
+    const totalFaces = 4; // Icosahedron has 20 faces
 
-      // Assign this color to all 9 vertices of the face
+    for (let faceIndex = 0; faceIndex < totalFaces; faceIndex++) {
+      // Set the color for this face
+      color.setHex(faceColors[faceIndex % faceColors.length]);
+
+      // Assign this color to all 3 vertices of the face
       for (let i = 0; i < verticesPerFace; i++) {
         colors.push(color.r, color.g, color.b);
       }
@@ -57,10 +72,10 @@ export default class PlatonicSketch extends WebGLApp {
     const positions = geometry.attributes.position;
     const normals = geometry.attributes.normal;
 
-    for (let faceIndex = 0; faceIndex < 12; faceIndex++) {
+    for (let faceIndex = 0; faceIndex < totalFaces; faceIndex++) {
       console.log(`Face ${faceIndex}:`);
 
-      // Get the normal vector for the first triangle of the face
+      // Get the normal vector for the first vertex of the face
       const normal = new Vector3(
         normals.getX(faceIndex * verticesPerFace),
         normals.getY(faceIndex * verticesPerFace),
@@ -69,13 +84,13 @@ export default class PlatonicSketch extends WebGLApp {
       console.log(`  Normal:`, normal);
 
       // Get the vertex positions for this face
-      for (let i = 0; i < verticesPerFace; i += 3) {
+      for (let i = 0; i < verticesPerFace; i++) {
         const vertex = new Vector3(
           positions.getX(faceIndex * verticesPerFace + i),
           positions.getY(faceIndex * verticesPerFace + i),
           positions.getZ(faceIndex * verticesPerFace + i),
         );
-        console.log(`  Vertex ${i / 3}:`, vertex);
+        console.log(`  Vertex ${i}:`, vertex);
       }
     }
 
@@ -84,8 +99,8 @@ export default class PlatonicSketch extends WebGLApp {
       vertexColors: true,
       wireframe: false,
     });
-    const dodecahedron = new Mesh(geometry, material);
-    this.scene.add(dodecahedron);
+    const icosahedron = new Mesh(geometry, material);
+    this.scene.add(icosahedron);
   }
 }
 
