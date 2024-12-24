@@ -1,7 +1,7 @@
 import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
-import { lerp } from "../utils";
+import { lerp } from "../../../utils/paper/utils";
 
 export function createFlowerCircle(
   center: paper.Point,

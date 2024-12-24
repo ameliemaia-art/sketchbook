@@ -2,7 +2,12 @@ import paper from "paper";
 import { MathUtils } from "three";
 
 import { TWO_PI } from "@utils/three/math";
-import { createCircle, createLine, debugPoints, lerp } from "../utils";
+import {
+  createCircle,
+  createLine,
+  debugPoints,
+  lerp,
+} from "../../../utils/paper/utils";
 
 function createCircleCornerPoints(
   center: paper.Point,

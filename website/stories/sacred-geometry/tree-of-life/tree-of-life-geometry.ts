@@ -1,7 +1,12 @@
 import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
-import { createCircle, createLine, debugPoints, lerp } from "../utils";
+import {
+  createCircle,
+  createLine,
+  debugPoints,
+  lerp,
+} from "../../../utils/paper/utils";
 
 function getCircleIntersections(
   circle: paper.Path.Circle,

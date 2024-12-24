@@ -1,6 +1,6 @@
 import paper from "paper";
 
-import { createCircle } from "../utils";
+import { createCircle } from "../../../utils/paper/utils";
 
 export function vesciaPiscis(
   center: paper.Point,

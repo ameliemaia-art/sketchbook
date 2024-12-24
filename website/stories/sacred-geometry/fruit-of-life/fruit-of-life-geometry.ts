@@ -1,7 +1,7 @@
 import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
-import { createCircle } from "../utils";
+import { createCircle } from "../../../utils/paper/utils";
 
 export function fruitOfLife(
   center: paper.Point,

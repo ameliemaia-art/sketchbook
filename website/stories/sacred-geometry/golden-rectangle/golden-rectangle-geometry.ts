@@ -2,7 +2,7 @@ import { create } from "domain";
 import paper from "paper";
 import { MathUtils } from "three";
 
-import { createCircle, debugPoints, lerp } from "../utils";
+import { createCircle, debugPoints, lerp } from "../../../utils/paper/utils";
 
 export function goldenRectangle(
   center: paper.Point,

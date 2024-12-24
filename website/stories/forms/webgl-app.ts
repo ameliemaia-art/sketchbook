@@ -58,8 +58,8 @@ export default class WebGLApp {
 
   settings = {
     id: "Settings",
-    debugCamera: false,
-    orthCamera: true,
+    debugCamera: true,
+    orthCamera: false,
     stats: true,
     helpers: false,
     frustumSize: 25,
@@ -149,7 +149,7 @@ export default class WebGLApp {
     this.helpers.gridHelperY.rotateX(Math.PI / 2);
     this.helpers.gridHelperZ.rotateX(Math.PI / 2);
     this.helpers.gridHelperZ.rotateZ(Math.PI / 2);
-    this.helpers.axes = new AxesHelper();
+    this.helpers.axes = new AxesHelper(5);
     this.helpers.camera = new CameraHelper(this.cameras.main);
     this.helpersGroup.add(...Object.values(this.helpers));
 

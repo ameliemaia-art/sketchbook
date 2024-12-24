@@ -1,7 +1,7 @@
 import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
-import { createCircle, createLine, lerp } from "../utils";
+import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
 
 export function merkaba(
   center: paper.Point,

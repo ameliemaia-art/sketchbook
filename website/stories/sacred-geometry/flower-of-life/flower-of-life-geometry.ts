@@ -1,7 +1,12 @@
 import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
-import { createCircle, createLine, dot, lerp } from "../utils";
+import {
+  createCircle,
+  createLine,
+  dot,
+  lerp,
+} from "../../../utils/paper/utils";
 
 export function createFlowerCircle(
   center: paper.Point,
