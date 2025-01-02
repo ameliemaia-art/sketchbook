@@ -4,21 +4,33 @@ import { FolderApi } from "tweakpane";
 
 import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
-import { dodecahedron } from "./dodecahedron-geometry";
+import { dodecahedron, SketchSettings } from "./dodecahedron-geometry";
 
 const strokeScale = 1;
 
 export default class Dodecahedron {
-  settings = {
+  settings: SketchSettings = {
     scale: 0.85,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     strokeColor: new paper.Color(1, 1, 1, 1),
-    faceColor: new paper.Color(1, 1, 1, 0.5),
-    guideColor: new paper.Color(1, 1, 1, 0.25),
-    lightDirection: new Vector3(0.65, 1, 0.15),
+    strokeDepthColor: new paper.Color(1, 1, 1, 0.35),
+    grid: {
+      divisions: 25,
+      strokeWidth: 1 * strokeScale,
+      strokeColor: new paper.Color(1, 1, 1, 0.1),
+    },
+    guide: {
+      strokeColor: new paper.Color(1, 1, 1, 0),
+      strokeWidth: 1 * strokeScale,
+    },
+    light: {
+      direction: new Vector3(0.65, 1, 0.15),
+      intensity: 0.5,
+      enabled: false,
+    },
     layers: {
-      background: false,
+      background: true,
       outline: false,
     },
   };
@@ -58,16 +70,7 @@ export default class Dodecahedron {
     const center = paper.view.bounds.center;
 
     group.addChild(
-      dodecahedron(
-        center,
-        radius,
-        this.settings.strokeColor,
-        this.settings.strokeWidth,
-        this.settings.guideColor,
-        this.settings.faceColor,
-        this.settings.lightDirection,
-        this.settings.layers.outline,
-      ),
+      dodecahedron(center, paper.view.size, radius, this.settings),
     );
   };
 
@@ -91,30 +94,64 @@ export class GUIDodecahedron extends GUIController {
     this.gui = this.addFolder(gui, { title: "Dodecahedron" });
 
     this.gui
-      .addBinding(target.settings, "strokeWidth", { min: 0.1 })
-      .on("change", target.draw);
-    this.gui
       .addBinding(target.settings, "scale", { min: 0.1, max: 1 })
       .on("change", target.draw);
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", target.draw);
+
     this.gui
-      .addBinding(target.settings.guideColor, "alpha", {
+      .addBinding(target.settings, "strokeWidth", { min: 0.1 })
+      .on("change", target.draw);
+
+    this.gui
+      .addBinding(target.settings.strokeColor, "alpha", {
+        label: "strokeColor",
         min: 0,
         max: 1,
-        label: "guideColor",
       })
       .on("change", target.draw);
     this.gui
-      .addBinding(target.settings.faceColor, "alpha", {
+      .addBinding(target.settings.strokeDepthColor, "alpha", {
+        label: "strokeDepthColor",
         min: 0,
         max: 1,
-        label: "faceColor",
       })
       .on("change", target.draw);
-    this.gui
-      .addBinding(target.settings, "lightDirection", {
+
+    this.folders.grid = this.addFolder(this.gui, { title: "Grid" });
+    this.folders.grid
+      .addBinding(target.settings.grid, "strokeWidth", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", target.draw);
+    this.folders.grid
+      .addBinding(target.settings.grid.strokeColor, "alpha", {
+        min: 0,
+        max: 1,
+        label: "strokeColor",
+      })
+      .on("change", target.draw);
+
+    this.folders.guide = this.addFolder(this.gui, { title: "Guide" });
+    this.folders.guide
+      .addBinding(target.settings.guide, "strokeWidth", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", target.draw);
+    this.folders.guide
+      .addBinding(target.settings.guide.strokeColor, "alpha", {
+        min: 0,
+        max: 1,
+        label: "strokeColor",
+      })
+      .on("change", target.draw);
+
+    this.folders.light = this.addFolder(this.gui, { title: "Light" });
+    this.folders.light
+      .addBinding(target.settings.light, "direction", {
         x: {
           min: -1,
           max: 1,
@@ -127,8 +164,13 @@ export class GUIDodecahedron extends GUIController {
           min: -1,
           max: 1,
         },
-        label: "lightDirection",
       })
+      .on("change", target.draw);
+    this.folders.light
+      .addBinding(target.settings.light, "enabled")
+      .on("change", target.draw);
+    this.folders.light
+      .addBinding(target.settings.light, "intensity", { min: 0, max: 1 })
       .on("change", target.draw);
 
     this.folders.layers = this.addFolder(this.gui, { title: "Layers" });

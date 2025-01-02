@@ -4,11 +4,38 @@ import { MathUtils, Vector3 } from "three";
 import { TWO_PI } from "@utils/three/math";
 import {
   createCircle,
+  createGrid,
   createLine,
   debugPoints,
   filterIntersectionPositions,
   lerp,
 } from "../../../utils/paper/utils";
+
+export type SketchSettings = {
+  scale: number;
+  opacity: number;
+  strokeWidth: number;
+  strokeColor: paper.Color;
+  strokeDepthColor: paper.Color;
+  grid: {
+    divisions: number;
+    strokeWidth: number;
+    strokeColor: paper.Color;
+  };
+  guide: {
+    strokeColor: paper.Color;
+    trokeWidth: number;
+  };
+  light: {
+    enabled: boolean;
+    direction: Vector3;
+    intensity: number;
+  };
+  layers: {
+    background: boolean;
+    outline: boolean;
+  };
+};
 
 function getLineIntersections(
   line: paper.Path.Line,
@@ -30,20 +57,33 @@ function getLineIntersections(
 
 export function dodecahedron(
   center: paper.Point,
+  size: paper.Size,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  guideColor: paper.Color,
-  faceColor: paper.Color,
-  lightDirection: Vector3,
-  outline = true,
+  settings: SketchSettings,
 ) {
   const group = new paper.Group();
 
-  if (outline) {
+  createGrid(
+    center,
+    size,
+    settings.grid.strokeColor,
+    settings.grid.strokeWidth,
+    settings.grid.divisions,
+    group,
+  );
+  createGrid(
+    center,
+    size,
+    settings.grid.strokeColor,
+    settings.grid.strokeWidth,
+    5,
+    group,
+  );
+
+  if (settings.layers.outline) {
     const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
     group.addChild(path);
   }
 
@@ -78,7 +118,13 @@ export function dodecahedron(
         if (l > 0) {
           const t = l / (circlesPerDimension - 1);
           const p = lerp(p0, p1, t);
-          createCircle(p, innerRadius, guideColor, strokeWidth, group);
+          createCircle(
+            p,
+            innerRadius,
+            settings.guide.strokeColor,
+            settings.strokeWidth,
+            group,
+          );
           points.push(p);
         }
       }
@@ -88,7 +134,7 @@ export function dodecahedron(
   // debugPoints(
   //   points,
   //   new paper.Color(0, 1, 0, 1),
-  //   strokeWidth,
+  //   settings.strokeWidth,
   //   20,
   //   true,
   //   30,
@@ -100,31 +146,103 @@ export function dodecahedron(
   // Draw lines
   createLine(
     [points[56], points[40], points[48], points[56]],
-    guideColor,
-    strokeWidth,
+    settings.guide.strokeColor,
+    settings.strokeWidth,
     group,
     lines,
   );
   createLine(
     [points[44], points[52], points[60], points[44]],
-    guideColor,
-    strokeWidth,
+    settings.guide.strokeColor,
+    settings.strokeWidth,
     group,
     lines,
   );
 
-  createLine([points[56], points[8]], guideColor, strokeWidth, group, lines);
-  createLine([points[56], points[12]], guideColor, strokeWidth, group, lines);
-  createLine([points[60], points[14]], guideColor, strokeWidth, group, lines);
-  createLine([points[52], points[18]], guideColor, strokeWidth, group, lines);
-  createLine([points[60], points[10]], guideColor, strokeWidth, group, lines);
-  createLine([points[52], points[10]], guideColor, strokeWidth, group, lines);
-  createLine([points[40], points[16]], guideColor, strokeWidth, group, lines);
-  createLine([points[48], points[16]], guideColor, strokeWidth, group, lines);
-  createLine([points[40], points[12]], guideColor, strokeWidth, group, lines);
-  createLine([points[48], points[8]], guideColor, strokeWidth, group, lines);
-  createLine([points[44], points[18]], guideColor, strokeWidth, group, lines);
-  createLine([points[44], points[14]], guideColor, strokeWidth, group, lines);
+  createLine(
+    [points[56], points[8]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[56], points[12]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[60], points[14]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[52], points[18]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[60], points[10]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[52], points[10]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[40], points[16]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[48], points[16]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[40], points[12]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[48], points[8]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[44], points[18]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
+  createLine(
+    [points[44], points[14]],
+    settings.guide.strokeColor,
+    settings.strokeWidth,
+    group,
+    lines,
+  );
 
   let intersections: paper.Point[] = [];
 
@@ -137,7 +255,7 @@ export function dodecahedron(
   // debugPoints(
   //   intersections,
   //   new paper.Color(1, 0, 0, 1),
-  //   strokeWidth,
+  //   settings.strokeWidth,
   //   10,
   //   true,
   //   20,
@@ -238,119 +356,122 @@ export function dodecahedron(
       normal: new Vector3(0, 0.9995507597923279, 0.02997102402150631),
     },
   ];
+  if (settings.light.enabled) {
+    for (const face of faces) {
+      const path = new paper.Path();
+      const intensity =
+        MathUtils.clamp(face.normal.dot(settings.light.direction), 0, 1) *
+        settings.light.intensity;
 
-  for (const face of faces) {
-    const path = new paper.Path();
-    const intensity = MathUtils.clamp(face.normal.dot(lightDirection), 0, 1);
-
-    path.fillColor = new paper.Color(
-      faceColor.red * intensity,
-      faceColor.green * intensity,
-      faceColor.blue * intensity,
-      faceColor.alpha,
-    );
-    face.vertices.forEach((vertex) => path.add(vertex));
-    path.closed = true;
-    group.addChild(path);
+      path.fillColor = new paper.Color(intensity, intensity, intensity, 1);
+      face.vertices.forEach((vertex) => path.add(vertex));
+      path.closed = true;
+      group.addChild(path);
+    }
   }
 
   createLine(
     [intersections[21], intersections[18]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[7], intersections[11]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[25], intersections[27]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[16], intersections[17]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[28], intersections[26]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[13], intersections[10]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[18], intersections[7]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[11], intersections[25]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[27], intersections[16]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[17], intersections[28]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[26], intersections[13]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[10], intersections[21]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[13], intersections[52], intersections[17]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[11], intersections[48], intersections[16]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[10], intersections[40], intersections[7]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
   createLine(
     [intersections[52], center, intersections[48]],
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
     group,
   );
-  createLine([center, intersections[40]], strokeColor, strokeWidth, group);
+  createLine(
+    [center, intersections[40]],
+    settings.strokeColor,
+    settings.strokeWidth,
+    group,
+  );
 
   return group;
 }

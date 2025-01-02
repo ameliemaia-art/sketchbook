@@ -5,28 +5,69 @@ import { MathUtils } from "three/src/math/MathUtils.js";
 import { TWO_PI } from "@utils/three/math";
 import {
   createCircle,
+  createGrid,
   createLine,
   debugPoints,
   lerp,
 } from "../../../utils/paper/utils";
 
+export type SketchSettings = {
+  scale: number;
+  opacity: number;
+  strokeWidth: number;
+  strokeColor: paper.Color;
+  strokeDepthColor: paper.Color;
+  grid: {
+    divisions: number;
+    strokeWidth: number;
+    strokeColor: paper.Color;
+  };
+  guide: {
+    strokeColor: paper.Color;
+    strokeWidth: number;
+  };
+  light: {
+    enabled: boolean;
+    direction: Vector3;
+    intensity: number;
+  };
+  layers: {
+    background: boolean;
+    outline: boolean;
+  };
+};
+
 export function hexahedron(
   center: paper.Point,
+  size: paper.Size,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  guideColor: paper.Color,
-  lightDirection: Vector3,
-  outline = true,
+  settings: SketchSettings,
 ) {
   const group = new paper.Group();
 
-  if (outline) {
-    const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
-    group.addChild(path);
-  }
+  createGrid(
+    center,
+    size,
+    settings.grid.strokeColor,
+    settings.grid.strokeWidth,
+    settings.grid.divisions,
+    group,
+  );
+  createGrid(
+    center,
+    size,
+    settings.grid.strokeColor,
+    settings.grid.strokeWidth,
+    5,
+    group,
+  );
+
+  // if (outline) {
+  //   const path = new paper.Path.Circle(center, radius);
+  //   path.strokeColor = strokeColor;
+  //   path.strokeWidth = strokeWidth;
+  //   group.addChild(path);
+  // }
 
   const dimensions = 3;
   let total = 6;
@@ -59,7 +100,13 @@ export function hexahedron(
         if (l > 0) {
           const t = l / (circlesPerDimension - 1);
           const p = lerp(p0, p1, t);
-          createCircle(p, innerRadius, guideColor, strokeWidth, group);
+          createCircle(
+            p,
+            innerRadius,
+            settings.guide.strokeColor,
+            settings.guide.strokeWidth,
+            group,
+          );
           points.push(p);
         }
       }
@@ -75,32 +122,6 @@ export function hexahedron(
   //   30,
   //   new paper.Color(1, 0, 0, 1),
   // );
-
-  // Draw lines
-
-  createLine(
-    [
-      points[16],
-      points[18],
-      points[8],
-      points[10],
-      points[12],
-      points[14],
-      points[16],
-    ],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine(
-    [points[14], points[0], points[18]],
-    strokeColor,
-    strokeWidth,
-    group,
-  );
-
-  createLine([points[0], points[10]], strokeColor, strokeWidth, group);
 
   const faces = [
     {
@@ -120,20 +141,68 @@ export function hexahedron(
     },
   ];
 
-  for (const face of faces) {
-    const path = new paper.Path();
-    // path.strokeColor = strokeColor;
-    // path.strokeWidth = strokeWidth;
+  if (settings.light.enabled) {
+    for (const face of faces) {
+      const path = new paper.Path();
+      const intensity =
+        MathUtils.clamp(face.normal.dot(settings.light.direction), 0, 1) *
+        settings.light.intensity;
 
-    const intensity = MathUtils.clamp(face.normal.dot(lightDirection), 0, 1);
-
-    const faceColor = new paper.Color(intensity, intensity, intensity, 0.5);
-
-    path.fillColor = faceColor;
-    face.vertices.forEach((vertex) => path.add(vertex));
-    path.closed = true;
-    group.addChild(path);
+      path.fillColor = new paper.Color(intensity, intensity, intensity, 1);
+      face.vertices.forEach((vertex) => path.add(vertex));
+      path.closed = true;
+      group.addChild(path);
+    }
   }
+
+  // Draw lines
+  createLine(
+    [points[12], points[0]],
+    settings.strokeDepthColor,
+    settings.strokeWidth,
+    group,
+  );
+  createLine(
+    [points[8], points[0]],
+    settings.strokeDepthColor,
+    settings.strokeWidth,
+    group,
+  );
+  createLine(
+    [points[0], points[16]],
+    settings.strokeDepthColor,
+    settings.strokeWidth,
+    group,
+  );
+
+  createLine(
+    [
+      points[16],
+      points[18],
+      points[8],
+      points[10],
+      points[12],
+      points[14],
+      points[16],
+    ],
+    settings.strokeColor,
+    settings.strokeWidth,
+    group,
+  );
+
+  createLine(
+    [points[14], points[0], points[18]],
+    settings.strokeColor,
+    settings.strokeWidth,
+    group,
+  );
+
+  createLine(
+    [points[0], points[10]],
+    settings.strokeColor,
+    settings.strokeWidth,
+    group,
+  );
 
   return group;
 }

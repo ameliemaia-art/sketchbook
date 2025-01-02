@@ -95,3 +95,62 @@ export function filterIntersectionPositions(
     return true;
   });
 }
+
+export function createGrid(
+  center: paper.Point,
+  size: paper.Size,
+  strokeColor: paper.Color,
+  strokeWidth: number,
+  divisions: number,
+  group: paper.Group,
+  border = true,
+) {
+  const step = size.width / divisions; // Keep the original step size
+  const halfSize = size.width / 2;
+  const threshold = strokeWidth; // Distance from the border edge
+
+  // Create the grid lines
+  for (let i = 1; i < divisions; i++) {
+    const x = -halfSize + i * step;
+    const y = -halfSize + i * step;
+
+    // Create vertical line
+    const vertical = new paper.Path.Line(
+      new paper.Point(center.x + x, center.y - halfSize + threshold),
+      new paper.Point(center.x + x, center.y + halfSize - threshold),
+    );
+    vertical.strokeWidth = strokeWidth;
+    vertical.strokeColor = strokeColor;
+    group.addChild(vertical);
+
+    // Create horizontal line
+    const horizontal = new paper.Path.Line(
+      new paper.Point(center.x - halfSize + threshold, center.y + y),
+      new paper.Point(center.x + halfSize - threshold, center.y + y),
+    );
+    horizontal.strokeWidth = strokeWidth;
+    horizontal.strokeColor = strokeColor;
+    group.addChild(horizontal);
+  }
+
+  // Create a rectangle for the border
+  if (border) {
+    const outline = new paper.Path.Rectangle(
+      new paper.Point(
+        center.x - halfSize + strokeWidth / 2,
+        center.y - halfSize + strokeWidth / 2,
+      ),
+      new paper.Point(
+        center.x + halfSize - strokeWidth / 2,
+        center.y + halfSize - strokeWidth / 2,
+      ),
+    );
+    outline.strokeWidth = strokeWidth;
+    outline.strokeColor = strokeColor;
+    outline.strokeCap = "square";
+    outline.strokeJoin = "miter"; // Ensure clean corners
+    group.addChild(outline);
+  }
+
+  return group;
+}
