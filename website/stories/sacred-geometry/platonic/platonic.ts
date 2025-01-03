@@ -4,37 +4,36 @@ import { FolderApi } from "tweakpane";
 
 import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
-import { icosahedron, SketchSettings } from "./icosahedron-geometry";
+import { platonic, SketchSettings } from "./platonic-geometry";
 
 const strokeScale = 1;
 
-export default class Icosahedron {
+export default class Platonic {
   settings: SketchSettings = {
     scale: 0.85,
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     strokeColor: new paper.Color(1, 1, 1, 1),
-    strokeDepthColor: new paper.Color(1, 1, 1, 0.35),
+    strokeDepthColor: new paper.Color(1, 1, 1, 0.5),
     grid: {
       divisions: 25,
       strokeWidth: 1 * strokeScale,
       strokeColor: new paper.Color(1, 1, 1, 0.1),
     },
     guide: {
-      strokeColor: new paper.Color(1, 1, 1, 0),
+      strokeColor: new paper.Color(1, 1, 1, 0.25),
       strokeWidth: 1 * strokeScale,
-    },
-    light: {
-      direction: new Vector3(0.65, 1, 0.15),
-      intensity: 0.5,
-      enabled: false,
     },
     layers: {
       background: true,
       outline: false,
+      tetrahedron: false,
+      hexahedron: false,
+      octahedron: false,
+      icosahedron: false,
+      dodecahedron: true,
     },
   };
-
   constructor(
     public canvas: HTMLCanvasElement,
     setup = true,
@@ -69,27 +68,36 @@ export default class Icosahedron {
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
 
-    group.addChild(icosahedron(center, paper.view.size, radius, this.settings));
+    group.addChild(platonic(center, paper.view.size, radius, this.settings));
   };
 
+  get name() {
+    if (this.settings.layers.tetrahedron) return "tetrahedron";
+    if (this.settings.layers.hexahedron) return "hexahedron";
+    if (this.settings.layers.octahedron) return "octahedron";
+    if (this.settings.layers.icosahedron) return "icosahedron";
+    if (this.settings.layers.dodecahedron) return "dodecahedron";
+    return "platonic";
+  }
+
   saveImage = () => {
-    saveImage(this.canvas, "icoshaedron");
+    saveImage(this.canvas, this.name);
   };
 
   saveSVG = () => {
-    saveSVG(paper.project, "icoshaedron");
+    saveSVG(paper.project, this.name);
   };
 }
 
-export class GUIIcosahedron extends GUIController {
+export class GUIPlatonic extends GUIController {
   gui: FolderApi;
 
   constructor(
     gui: FolderApi,
-    public target: Icosahedron,
+    public target: Platonic,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Icosahedron" });
+    this.gui = this.addFolder(gui, { title: "Platonic" });
 
     this.gui
       .addBinding(target.settings, "scale", { min: 0.1, max: 1 })
@@ -147,36 +155,27 @@ export class GUIIcosahedron extends GUIController {
       })
       .on("change", target.draw);
 
-    this.folders.light = this.addFolder(this.gui, { title: "Light" });
-    this.folders.light
-      .addBinding(target.settings.light, "direction", {
-        x: {
-          min: -1,
-          max: 1,
-        },
-        y: {
-          min: -1,
-          max: 1,
-        },
-        z: {
-          min: -1,
-          max: 1,
-        },
-      })
-      .on("change", target.draw);
-    this.folders.light
-      .addBinding(target.settings.light, "enabled")
-      .on("change", target.draw);
-    this.folders.light
-      .addBinding(target.settings.light, "intensity", { min: 0, max: 1 })
-      .on("change", target.draw);
-
     this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
     this.folders.layers
       .addBinding(target.settings.layers, "background")
       .on("change", target.draw);
     this.folders.layers
       .addBinding(target.settings.layers, "outline")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "hexahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "icosahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "tetrahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "octahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "dodecahedron")
       .on("change", target.draw);
 
     this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);

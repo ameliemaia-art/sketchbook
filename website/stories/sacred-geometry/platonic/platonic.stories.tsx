@@ -1,22 +1,22 @@
 import { useEffect, useRef } from "react";
 
-import OctahedronSketch, { GUIOctahedron } from "./octahedron";
+import PlatonicSketch, { GUIPlatonic } from "./platonic";
 
 import "../../global.css";
 
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Platonic/Octahedron",
+  title: "Sketchbook/Sacred/Platonic",
 };
 
-export const Octahedron = () => {
+export const Platonic = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (rootRef.current) {
-      const sacred = new OctahedronSketch(rootRef.current);
-      new GUIOctahedron(new Pane({ title: "Sacred Geometry" }), sacred);
+      const sacred = new PlatonicSketch(rootRef.current);
+      new GUIPlatonic(new Pane({ title: "Sacred Geometry" }), sacred);
     }
 
     return () => {};

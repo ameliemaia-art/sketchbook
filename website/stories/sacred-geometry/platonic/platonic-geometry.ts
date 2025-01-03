@@ -27,11 +27,6 @@ export type SketchSettings = {
     strokeColor: paper.Color;
     strokeWidth: number;
   };
-  light: {
-    enabled: boolean;
-    direction: Vector3;
-    intensity: number;
-  };
   layers: {
     background: boolean;
     outline: boolean;
@@ -62,7 +57,7 @@ function getAllIntersections(paths: paper.Path[]): paper.Point[] {
   return intersections;
 }
 
-export function hexahedron(
+export function platonic(
   center: paper.Point,
   size: paper.Size,
   radius: number,
