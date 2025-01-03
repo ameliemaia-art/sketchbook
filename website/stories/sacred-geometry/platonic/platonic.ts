@@ -1,5 +1,4 @@
 import paper from "paper";
-import { Vector3 } from "three";
 import { FolderApi } from "tweakpane";
 
 import { saveImage, saveSVG } from "@utils/common/file";
