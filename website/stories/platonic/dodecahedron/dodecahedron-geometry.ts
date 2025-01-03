@@ -24,7 +24,7 @@ export type SketchSettings = {
   };
   guide: {
     strokeColor: paper.Color;
-    trokeWidth: number;
+    strokeWidth: number;
   };
   light: {
     enabled: boolean;
@@ -87,11 +87,49 @@ export function dodecahedron(
     group.addChild(path);
   }
 
-  const dimensions = 5;
-  let total = 6;
+  // Same setup as flowerOfLife
+  let dimensions = 3;
   let innerRadius = radius / dimensions;
+  let total = 6;
+  let startAngle = -Math.PI / 6;
+  // for (let i = 0; i < dimensions - 1; i++) {
+  //   const innerPoints: paper.Point[] = [];
+  //   const outlineRadius = innerRadius * (i + 1);
+  //   for (let j = 0; j < total; j++) {
+  //     const theta = startAngle + (TWO_PI / total) * j;
+  //     const x = center.x + Math.cos(theta) * outlineRadius;
+  //     const y = center.y + Math.sin(theta) * outlineRadius;
+  //     innerPoints.push(new paper.Point(x, y));
+  //   }
 
-  const startAngle = -Math.PI / 6;
+  //   const length = innerPoints.length;
+  //   for (let k = 0; k < length; k++) {
+  //     const p0 = innerPoints[k];
+  //     const p1 = innerPoints[k === length - 1 ? 0 : k + 1];
+
+  //     const circlesPerDimension = i + 2;
+  //     for (let l = 0; l < circlesPerDimension; l++) {
+  //       if (l > 0) {
+  //         const t = l / (circlesPerDimension - 1);
+  //         const p = lerp(p0, p1, t);
+  //         createCircle(
+  //           p,
+  //           innerRadius,
+  //           new paper.Color(1, 1, 1, 0.5),
+  //           settings.guide.strokeWidth,
+  //           group,
+  //         );
+  //       }
+  //     }
+  //   }
+  // }
+
+  dimensions = 5;
+  total = 6;
+  // innerRadius = radius / dimensions;
+  innerRadius = radius / 3;
+
+  startAngle = -Math.PI / 6;
 
   const points: paper.Point[] = [];
 

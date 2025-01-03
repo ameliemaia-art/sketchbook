@@ -4,7 +4,7 @@ import { FolderApi } from "tweakpane";
 
 import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
-import { hexahedron } from "./hexahedron-geometry";
+import { hexahedron, SketchSettings } from "./hexahedron-geometry";
 
 const strokeScale = 1;
 
@@ -14,14 +14,14 @@ export default class Hexahedron {
     opacity: 1,
     strokeWidth: 1 * strokeScale,
     strokeColor: new paper.Color(1, 1, 1, 1),
-    strokeDepthColor: new paper.Color(1, 1, 1, 0.35),
+    strokeDepthColor: new paper.Color(1, 1, 1, 0.5),
     grid: {
       divisions: 25,
       strokeWidth: 1 * strokeScale,
       strokeColor: new paper.Color(1, 1, 1, 0.1),
     },
     guide: {
-      strokeColor: new paper.Color(1, 1, 1, 0),
+      strokeColor: new paper.Color(1, 1, 1, 0.25),
       strokeWidth: 1 * strokeScale,
     },
     light: {
@@ -32,6 +32,11 @@ export default class Hexahedron {
     layers: {
       background: true,
       outline: false,
+      tetrahedron: false,
+      hexahedron: false,
+      octahedron: false,
+      icosahedron: false,
+      dodecahedron: true,
     },
   };
   constructor(
@@ -176,6 +181,21 @@ export class GUIHexahedron extends GUIController {
       .on("change", target.draw);
     this.folders.layers
       .addBinding(target.settings.layers, "outline")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "hexahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "icosahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "tetrahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "octahedron")
+      .on("change", target.draw);
+    this.folders.layers
+      .addBinding(target.settings.layers, "dodecahedron")
       .on("change", target.draw);
 
     this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
