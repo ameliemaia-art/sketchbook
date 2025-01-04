@@ -1,19 +1,16 @@
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
-import { saveImage, saveSVG } from "@utils/common/file";
-import GUIController from "@utils/gui/gui";
-import { sriYantra } from "./sri-yantra-geometry";
+import Sketch, {
+  GUISketch,
+  SketchSettings,
+  sketchSettings,
+} from "../sketch/sketch";
+import { sriYantra, SriYantraSettings } from "./sri-yantra-geometry";
 
-const strokeScale = 1;
-
-export default class SriYantra {
-  settings = {
-    scale: 1.7,
-    opacity: 1,
-    strokeWidth: 1 * strokeScale,
-    color: new paper.Color(1, 1, 1, 1),
-    debugStrokeColor: new paper.Color(1, 1, 1, 0.25),
+export default class SriYantra extends Sketch {
+  settings: SketchSettings & SriYantraSettings = {
+    ...sketchSettings,
     layers: {
       background: false,
       outline: false,
@@ -59,135 +56,24 @@ export default class SriYantra {
     },
   };
 
-  constructor(
-    public canvas: HTMLCanvasElement,
-    setup = true,
-  ) {
-    this.canvas = canvas;
-
-    if (setup) {
-      canvas.width = 500;
-      canvas.height = 500;
-      paper.setup(canvas);
-    }
-
-    this.draw();
-  }
-
-  draw = () => {
-    paper.project.activeLayer.removeChildren();
-
-    let group = new paper.Group();
-    group.opacity = this.settings.opacity;
-
-    // create a rectangle to fill the background
-    if (this.settings.layers.background) {
-      const background = new paper.Path.Rectangle(
-        paper.view.bounds.topLeft,
-        paper.view.bounds.bottomRight,
-      );
-      background.fillColor = new paper.Color(0, 0, 0);
-      group.addChild(background);
-    }
-
+  draw() {
+    super.draw();
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
+    this.group?.addChild(sriYantra(center, radius, this.settings));
+  }
 
-    group.addChild(
-      sriYantra(
-        center,
-        radius,
-        this.settings.color,
-        this.settings.debugStrokeColor,
-        this.settings.strokeWidth,
-        this.settings.layers.outline,
-        this.settings.layers.guide0,
-        this.settings.layers.guide1,
-        this.settings.layers.guide2,
-        this.settings.layers.guide3,
-        this.settings.layers.guide4,
-        this.settings.layers.guide5,
-        this.settings.layers.guide6,
-        this.settings.layers.guide7,
-        this.settings.layers.guide8,
-        this.settings.layers.guide9,
-        this.settings.layers.guide10,
-        this.settings.layers.guide11,
-        this.settings.layers.guide12,
-        this.settings.layers.guide13,
-        this.settings.layers.guide14,
-        this.settings.layers.guide15,
-        this.settings.layers.guide16,
-        this.settings.layers.guide17,
-        this.settings.layers.guide18,
-        this.settings.layers.guide19,
-        this.settings.layers.guide20,
-        this.settings.layers.guide21,
-        this.settings.layers.guide22,
-        this.settings.layers.guide23,
-        this.settings.layers.guide24,
-        this.settings.layers.guide25,
-        this.settings.layers.guide26,
-        this.settings.layers.guide27,
-        this.settings.layers.guide28,
-        this.settings.layers.step0,
-        this.settings.layers.step1,
-        this.settings.layers.step2,
-        this.settings.layers.step3,
-        this.settings.layers.step4,
-        this.settings.layers.step5,
-        this.settings.layers.step6,
-        this.settings.layers.step7,
-        this.settings.layers.step8,
-        this.settings.layers.step9,
-      ),
-    );
-  };
-
-  saveImage = () => {
-    saveImage(this.canvas, "sri-yantra");
-  };
-
-  saveSVG = () => {
-    saveSVG(paper.project, "sri-yantra");
-  };
+  name() {
+    return "Sri Yantra";
+  }
 }
 
-export class GUISriYantra extends GUIController {
-  gui: FolderApi;
-
+export class GUISriYantra extends GUISketch {
   constructor(
     gui: FolderApi,
     public target: SriYantra,
   ) {
-    super(gui);
-    this.gui = this.addFolder(gui, { title: "Sri Yantra" });
-
-    this.gui
-      .addBinding(target.settings, "strokeWidth", { min: 0.1 })
-      .on("change", target.draw);
-    this.gui
-      .addBinding(target.settings, "scale", { min: 0.1, max: 2 })
-      .on("change", target.draw);
-    this.gui
-      .addBinding(target.settings, "opacity", { min: 0, max: 1 })
-      .on("change", target.draw);
-    this.gui
-      .addBinding(target.settings.debugStrokeColor, "alpha", {
-        min: 0,
-        max: 1,
-        label: "guide",
-      })
-      .on("change", target.draw);
-
-    this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
-    this.folders.layers
-      .addBinding(target.settings.layers, "background")
-      .on("change", target.draw);
-
-    this.folders.layers
-      .addBinding(target.settings.layers, "outline")
-      .on("change", target.draw);
+    super(gui, target, target.name());
 
     this.folders.guide = this.addFolder(this.folders.layers, {
       title: "Guides",
@@ -199,15 +85,12 @@ export class GUISriYantra extends GUIController {
     for (let i = 0; i < 29; i++) {
       this.folders.guide
         .addBinding(target.settings.layers, `guide${i}`)
-        .on("change", target.draw);
+        .on("change", this.draw);
     }
     for (let i = 0; i < 10; i++) {
       this.folders.steps
         .addBinding(target.settings.layers, `step${i}`)
-        .on("change", target.draw);
+        .on("change", this.draw);
     }
-
-    this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
-    this.gui.addButton({ title: "Save SVG" }).on("click", target.saveSVG);
   }
 }

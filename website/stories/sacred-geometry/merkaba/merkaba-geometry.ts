@@ -2,25 +2,32 @@ import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
 import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
+
+export type MerkabaSettings = {
+  divisions: number;
+  layers: {
+    background: boolean;
+    outline: boolean;
+    circles: boolean;
+    masculinity: boolean;
+    femininity: boolean;
+    unity: boolean;
+    interconnectedness: boolean;
+  };
+};
 
 export function merkaba(
   center: paper.Point,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  outlineVisible = false,
-  circlesVisible = false,
-  masculinity = false,
-  femininity = false,
-  unity = false,
-  interconnectedness = false,
+  settings: SketchSettings & MerkabaSettings,
 ) {
   const group = new paper.Group();
 
-  if (outlineVisible) {
+  if (settings.layers.outline) {
     const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
     group.addChild(path);
   }
 
@@ -31,8 +38,14 @@ export function merkaba(
 
   const startAngle = -Math.PI / 6;
 
-  if (circlesVisible) {
-    createCircle(center, innerRadius, strokeColor, strokeWidth, group);
+  if (settings.layers.circles) {
+    createCircle(
+      center,
+      innerRadius,
+      settings.strokeColor,
+      settings.strokeWidth,
+      group,
+    );
   }
 
   const points: paper.Point[] = [];
@@ -41,65 +54,71 @@ export function merkaba(
     const x = center.x + Math.cos(theta) * outlineRadius;
     const y = center.y + Math.sin(theta) * outlineRadius;
     points.push(new paper.Point(x, y));
-    if (circlesVisible) {
-      createCircle(points[i], innerRadius, strokeColor, strokeWidth, group);
+    if (settings.layers.circles) {
+      createCircle(
+        points[i],
+        innerRadius,
+        settings.strokeColor,
+        settings.strokeWidth,
+        group,
+      );
     }
   }
 
-  if (femininity) {
+  if (settings.layers.femininity) {
     createLine(
       [points[0], points[2], points[4], points[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (masculinity) {
+  if (settings.layers.masculinity) {
     // Top
     createLine(
       [points[5], lerp(points[4], points[0], (1 / 3) * 2)],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [points[5], lerp(points[4], points[0], 1 / 3)],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     // Right
     createLine(
       [points[1], lerp(points[0], points[2], 1 / 3)],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [points[1], lerp(points[0], points[2], (1 / 3) * 2)],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     // Left
     createLine(
       [points[3], lerp(points[2], points[4], 1 / 3)],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [points[3], lerp(points[2], points[4], (1 / 3) * 2)],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (unity) {
+  if (settings.layers.unity) {
     // Middle
     createLine(
       [
@@ -108,17 +127,32 @@ export function merkaba(
         lerp(points[2], points[4], 0.5),
         lerp(points[4], points[0], 0.5),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
   // Lines
-  if (interconnectedness) {
-    createLine([points[5], center], strokeColor, strokeWidth, group);
-    createLine([points[1], center], strokeColor, strokeWidth, group);
-    createLine([points[3], center], strokeColor, strokeWidth, group);
+  if (settings.layers.interconnectedness) {
+    createLine(
+      [points[5], center],
+      settings.strokeColor,
+      settings.strokeWidth,
+      group,
+    );
+    createLine(
+      [points[1], center],
+      settings.strokeColor,
+      settings.strokeWidth,
+      group,
+    );
+    createLine(
+      [points[3], center],
+      settings.strokeColor,
+      settings.strokeWidth,
+      group,
+    );
   }
 
   return group;

@@ -2,8 +2,9 @@ import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
 import { lerp } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
 
-export function createFlowerCircle(
+function createFlowerCircle(
   center: paper.Point,
   innerRadius: number,
   startAngle: number,
@@ -11,10 +12,10 @@ export function createFlowerCircle(
   strokeWidth: number,
 ) {
   const group = new paper.Group();
-
   const total = 6;
   const points: paper.Point[] = [];
   const outlineRadius = innerRadius;
+
   for (let j = 0; j < total; j++) {
     const theta = startAngle + (TWO_PI / total) * j;
     const x = center.x + Math.cos(theta) * outlineRadius;
@@ -59,25 +60,26 @@ export function createFlowerCircle(
 export function germOfLife(
   center: paper.Point,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  universe = false,
-  creation = true,
+  settings: SketchSettings,
 ) {
   const group = new paper.Group();
 
-  if (universe) {
+  if (settings.layers.outline) {
     const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
     group.addChild(path);
   }
 
   const startAngle = -Math.PI / 6;
 
-  if (creation) {
-    createFlowerCircle(center, radius, startAngle, strokeColor, strokeWidth);
-  }
+  createFlowerCircle(
+    center,
+    radius,
+    startAngle,
+    settings.strokeColor,
+    settings.strokeWidth,
+  );
 
   return group;
 }

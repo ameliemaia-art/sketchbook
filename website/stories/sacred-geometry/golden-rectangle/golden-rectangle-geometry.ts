@@ -1,29 +1,32 @@
-import { create } from "domain";
 import paper from "paper";
-import { MathUtils } from "three";
 
-import { createCircle, debugPoints, lerp } from "../../../utils/paper/utils";
+import { createCircle } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
+
+export type GoldenRectangleSettings = {
+  divisions: number;
+  layers: {
+    background: boolean;
+    outline: boolean;
+    rectangle: boolean;
+    subdivisions: boolean;
+    spiral: boolean;
+  };
+};
 
 export function goldenRectangle(
   center: paper.Point,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  divisions = 9,
-  outline = false,
-  rectangle = true,
-  subdivisions = true,
-  spiral = true,
+  settings: SketchSettings & GoldenRectangleSettings,
 ) {
   const group = new paper.Group();
-
   const transparentColor = new paper.Color(0, 0, 0, 0);
 
   // Draw the outline circle
   const outlinePath = new paper.Path.Circle(center, radius);
-  outlinePath.strokeColor = strokeColor;
-  outlinePath.strokeWidth = strokeWidth;
-  if (!outline) outlinePath.visible = false;
+  outlinePath.strokeColor = settings.strokeColor;
+  outlinePath.strokeWidth = settings.strokeWidth;
+  if (!settings.layers.outline) outlinePath.visible = false;
   group.addChild(outlinePath);
 
   // Golden ratio
@@ -41,8 +44,10 @@ export function goldenRectangle(
     new paper.Point(center.x - width / 2, center.y - height / 2),
     new paper.Point(center.x + width / 2, center.y + height / 2),
   );
-  golden.strokeColor = rectangle ? strokeColor : transparentColor;
-  golden.strokeWidth = strokeWidth;
+  golden.strokeColor = settings.layers.rectangle
+    ? settings.strokeColor
+    : transparentColor;
+  golden.strokeWidth = settings.strokeWidth;
 
   // Add the rectangle to the group
   group.addChild(golden);
@@ -51,7 +56,7 @@ export function goldenRectangle(
   const rotations = [0, 90, 180, 270];
   let parent = golden;
   let index = 0;
-  for (let i = 0; i < divisions; i++) {
+  for (let i = 0; i < settings.divisions; i++) {
     const x = parent.bounds.left;
     const y = parent.bounds.top;
 
@@ -176,20 +181,24 @@ export function goldenRectangle(
     const leftPath = new paper.Path.Rectangle(left.position, left.size);
     const rightPath = new paper.Path.Rectangle(right.position, right.size);
 
-    leftPath.strokeColor = subdivisions ? strokeColor : transparentColor;
-    rightPath.strokeColor = subdivisions ? strokeColor : transparentColor;
-    leftPath.strokeWidth = strokeWidth;
-    rightPath.strokeWidth = strokeWidth;
+    leftPath.strokeColor = settings.layers.subdivisions
+      ? settings.strokeColor
+      : transparentColor;
+    rightPath.strokeColor = settings.layers.subdivisions
+      ? settings.strokeColor
+      : transparentColor;
+    leftPath.strokeWidth = settings.strokeWidth;
+    rightPath.strokeWidth = settings.strokeWidth;
 
-    if (spiral) {
+    if (settings.layers.spiral) {
       const circlePath = createCircle(
         circle.position,
         circle.radius,
-        strokeColor,
-        strokeWidth,
+        settings.strokeColor,
+        settings.strokeWidth,
       );
       const intersection = leftPath.intersect(circlePath);
-      intersection.strokeWidth = strokeWidth;
+      intersection.strokeWidth = settings.strokeWidth;
       circlePath.remove();
     }
 

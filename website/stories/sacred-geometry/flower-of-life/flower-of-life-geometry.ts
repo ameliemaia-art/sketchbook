@@ -7,8 +7,19 @@ import {
   dot,
   lerp,
 } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
 
-export function createFlowerCircle(
+export type FlowerOfLifeSettings = {
+  dimensions: number;
+  layers: {
+    petals: boolean;
+    circles: boolean;
+    lines: boolean;
+    corners: boolean;
+  };
+};
+
+function createFlowerCircle(
   center: paper.Point,
   innerRadius: number,
   startAngle: number,
@@ -74,44 +85,40 @@ export function createFlowerCircle(
 export function flowerOfLife(
   center: paper.Point,
   radius: number,
-  dimensions: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  circlesVisible = false,
-  petals = false,
-  outlineVisible = false,
-  linesVisible = false,
-  cornersVisible = false,
+  settings: SketchSettings & FlowerOfLifeSettings,
 ) {
   const group = new paper.Group();
   const dotRadius = radius * 0.01;
+  const total = 6;
+  const innerRadius = radius / settings.dimensions;
+  const startAngle = -Math.PI / 6;
 
-  if (outlineVisible) {
+  if (settings.layers.outline) {
     const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
     group.addChild(path);
   }
 
-  // Line from center
-  let total = 6;
-  let innerRadius = radius / dimensions;
-
-  if (circlesVisible) {
-    createCircle(center, innerRadius, strokeColor, strokeWidth, group);
+  if (settings.layers.circles) {
+    createCircle(
+      center,
+      innerRadius,
+      settings.strokeColor,
+      settings.strokeWidth,
+      group,
+    );
   }
-
-  const startAngle = -Math.PI / 6;
 
   const flowerCircle = createFlowerCircle(
     center,
     innerRadius,
     startAngle,
-    strokeColor,
-    strokeWidth,
+    settings.strokeColor,
+    settings.strokeWidth,
   );
 
-  for (let i = 0; i < dimensions - 1; i++) {
+  for (let i = 0; i < settings.dimensions - 1; i++) {
     const points: paper.Point[] = [];
     const outlineRadius = innerRadius * (i + 1);
     for (let j = 0; j < total; j++) {
@@ -130,35 +137,71 @@ export function flowerOfLife(
       for (let l = 0; l < circlesPerDimension; l++) {
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
-        if (circlesVisible) {
-          if (petals) {
+        if (settings.layers.circles) {
+          if (settings.layers.petals) {
             const petal = flowerCircle.clone();
             petal.position = p;
             group.addChild(petal);
           } else {
-            createCircle(p, innerRadius, strokeColor, strokeWidth, group);
+            createCircle(
+              p,
+              innerRadius,
+              settings.strokeColor,
+              settings.strokeWidth,
+              group,
+            );
           }
         }
       }
     }
 
     // draw line between points
-    if (linesVisible) {
+    if (settings.layers.lines) {
       const line = new paper.Path([...points, points[0]]);
-      line.strokeColor = strokeColor;
-      line.strokeWidth = strokeWidth;
+      line.strokeColor = settings.strokeColor;
+      line.strokeWidth = settings.strokeWidth;
       // Front lines of cube
-      createLine([points[0], center], strokeColor, strokeWidth, group);
-      createLine([center, points[2]], strokeColor, strokeWidth, group);
-      createLine([center, points[4]], strokeColor, strokeWidth, group);
+      createLine(
+        [points[0], center],
+        settings.strokeColor,
+        settings.strokeWidth,
+        group,
+      );
+      createLine(
+        [center, points[2]],
+        settings.strokeColor,
+        settings.strokeWidth,
+        group,
+      );
+      createLine(
+        [center, points[4]],
+        settings.strokeColor,
+        settings.strokeWidth,
+        group,
+      );
       // Back lines of cube
-      createLine([points[5], center], strokeColor, strokeWidth, group);
-      createLine([points[1], center], strokeColor, strokeWidth, group);
-      createLine([points[3], center], strokeColor, strokeWidth, group);
+      createLine(
+        [points[5], center],
+        settings.strokeColor,
+        settings.strokeWidth,
+        group,
+      );
+      createLine(
+        [points[1], center],
+        settings.strokeColor,
+        settings.strokeWidth,
+        group,
+      );
+      createLine(
+        [points[3], center],
+        settings.strokeColor,
+        settings.strokeWidth,
+        group,
+      );
     }
 
     // Draw dots at corners of cube
-    if (cornersVisible) {
+    if (settings.layers.corners) {
       dot(points[0], dotRadius, group);
       dot(points[1], dotRadius, group);
       dot(points[2], dotRadius, group);

@@ -1,35 +1,24 @@
 import paper from "paper";
-import { Vector3 } from "three";
-import { MathUtils } from "three/src/math/MathUtils.js";
 
 import { TWO_PI } from "@utils/three/math";
 import {
   createCircle,
   createGrid,
   createLine,
-  debugPoints,
   filterIntersectionPositions,
-  lerp,
 } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
 
-export type SketchSettings = {
-  scale: number;
-  opacity: number;
-  strokeWidth: number;
-  strokeColor: paper.Color;
+export type PlatonicSettings = {
   strokeDepthColor: paper.Color;
   grid: {
     divisions: number;
-    strokeWidth: number;
     strokeColor: paper.Color;
   };
   guide: {
     strokeColor: paper.Color;
-    strokeWidth: number;
   };
   layers: {
-    background: boolean;
-    outline: boolean;
     hexahedron: boolean;
     icosahedron: boolean;
     dodecahedron: boolean;
@@ -61,15 +50,18 @@ export function platonic(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: SketchSettings,
+  settings: SketchSettings & PlatonicSettings,
 ) {
   const group = new paper.Group();
+  const total = 6;
+  const innerRadius = radius / 5;
+  const startAngle = -Math.PI / 6;
 
   createGrid(
     center,
     size,
     settings.grid.strokeColor,
-    settings.grid.strokeWidth,
+    settings.strokeWidth,
     settings.grid.divisions,
     group,
   );
@@ -77,22 +69,23 @@ export function platonic(
     center,
     size,
     settings.grid.strokeColor,
-    settings.grid.strokeWidth,
+    settings.strokeWidth,
     5,
     group,
   );
 
-  // Line from center
-  let total = 6;
-  let innerRadius = radius / 5;
-
-  const startAngle = -Math.PI / 6;
+  if (settings.layers.outline) {
+    const path = new paper.Path.Circle(center, radius);
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
+    group.addChild(path);
+  }
 
   createCircle(
     center,
     innerRadius,
     settings.guide.strokeColor,
-    settings.guide.strokeWidth,
+    settings.strokeWidth,
     group,
   );
 
@@ -107,12 +100,11 @@ export function platonic(
       const x = center.x + Math.cos(theta) * outlineRadius;
       const y = center.y + Math.sin(theta) * outlineRadius;
       points[i].push(new paper.Point(x, y));
-
       createCircle(
         new paper.Point(x, y),
         innerRadius,
         settings.guide.strokeColor,
-        settings.guide.strokeWidth,
+        settings.strokeWidth,
         group,
       );
     }
@@ -120,7 +112,7 @@ export function platonic(
     const line = new paper.Path([...points[i], points[i][0]]);
     paths.push(line);
     line.strokeColor = settings.guide.strokeColor;
-    line.strokeWidth = settings.guide.strokeWidth;
+    line.strokeWidth = settings.strokeWidth;
     group.addChild(line);
 
     // Upwards triangle
@@ -131,7 +123,7 @@ export function platonic(
       points[i][1],
     ]);
     upwardsTriangle.strokeColor = settings.guide.strokeColor;
-    upwardsTriangle.strokeWidth = settings.guide.strokeWidth;
+    upwardsTriangle.strokeWidth = settings.strokeWidth;
     group.addChild(upwardsTriangle);
     paths.push(upwardsTriangle);
 
@@ -142,7 +134,7 @@ export function platonic(
       points[i][0],
     ]);
     downwardsTriangle.strokeColor = settings.guide.strokeColor;
-    downwardsTriangle.strokeWidth = settings.guide.strokeWidth;
+    downwardsTriangle.strokeWidth = settings.strokeWidth;
     group.addChild(downwardsTriangle);
     paths.push(downwardsTriangle);
   }
@@ -155,13 +147,13 @@ export function platonic(
     console.log(j, p0, p1, p2);
     const line0 = new paper.Path([points[1][j], points[0][p0]]);
     line0.strokeColor = settings.guide.strokeColor;
-    line0.strokeWidth = settings.guide.strokeWidth;
+    line0.strokeWidth = settings.strokeWidth;
     const line1 = new paper.Path([points[1][j], points[0][p1]]);
     line1.strokeColor = settings.guide.strokeColor;
-    line1.strokeWidth = settings.guide.strokeWidth;
+    line1.strokeWidth = settings.strokeWidth;
     const line2 = new paper.Path([points[1][j], points[0][p2]]);
     line2.strokeColor = settings.guide.strokeColor;
-    line2.strokeWidth = settings.guide.strokeWidth;
+    line2.strokeWidth = settings.strokeWidth;
     group.addChild(line0);
     group.addChild(line1);
     group.addChild(line2);
