@@ -14,12 +14,15 @@ export const GermOfLife = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const pane = new Pane({ title: "Sacred Geometry" });
     if (rootRef.current) {
       const sacred = new GermOfLifeSketch(rootRef.current);
-      new GUIGermOfLife(new Pane({ title: "Sacred Geometry" }), sacred);
+      new GUIGermOfLife(pane, sacred);
     }
 
-    return () => {};
+    return () => {
+      pane.dispose();
+    };
   }, []);
 
   return <canvas ref={rootRef} />;

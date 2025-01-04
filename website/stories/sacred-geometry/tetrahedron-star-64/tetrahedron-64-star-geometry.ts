@@ -2,6 +2,24 @@ import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
 import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
+
+export type Tetrahedron64StarSettings = {
+  layers: {
+    circles: boolean;
+    triangles: boolean;
+    masculinity: boolean;
+    femininity: boolean;
+    structure: boolean;
+    layer0: boolean;
+    layer1: boolean;
+    layer2: boolean;
+    layer3: boolean;
+    layer4: boolean;
+    layer5: boolean;
+    layer6: boolean;
+  };
+};
 
 function createMidPoints(points: paper.Point[]) {
   const midPoints: paper.Point[] = [];
@@ -16,38 +34,29 @@ function createMidPoints(points: paper.Point[]) {
 export function tetrahedron64Star(
   center: paper.Point,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  outline = false,
-  circles = false,
-  masculinity = true,
-  femininity = true,
-  structure = true,
-  layer0 = true,
-  layer1 = true,
-  layer2 = true,
-  layer3 = true,
-  layer4 = true,
-  layer5 = true,
-  layer6 = true,
+  settings: SketchSettings & Tetrahedron64StarSettings,
 ) {
   const group = new paper.Group();
+  const total = 6;
+  const dimensions = 2;
+  const innerRadius = radius / dimensions;
+  const startAngle = -Math.PI / 6;
 
-  if (outline) {
+  if (settings.layers.outline) {
     const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
     group.addChild(path);
   }
 
-  // Line from center
-  let total = 6;
-  const dimensions = 2;
-  let innerRadius = radius / dimensions;
-  const startAngle = -Math.PI / 6;
-
-  if (circles) {
-    createCircle(center, innerRadius, strokeColor, strokeWidth, group);
+  if (settings.layers.circles) {
+    createCircle(
+      center,
+      innerRadius,
+      settings.strokeColor,
+      settings.strokeWidth,
+      group,
+    );
   }
 
   // Same setup as flowerOfLife
@@ -70,8 +79,14 @@ export function tetrahedron64Star(
       for (let l = 0; l < circlesPerDimension; l++) {
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
-        if (circles) {
-          createCircle(p, innerRadius, strokeColor, strokeWidth, group);
+        if (settings.layers.circles) {
+          createCircle(
+            p,
+            innerRadius,
+            settings.strokeColor,
+            settings.strokeWidth,
+            group,
+          );
         }
       }
     }
@@ -81,9 +96,8 @@ export function tetrahedron64Star(
   // Draw hexagon
   let hexagonPoints: paper.Point[] = [];
 
-  length = 6;
-  for (let i = 0; i < length; i++) {
-    const theta = Math.PI / 6 + i * (TWO_PI / length);
+  for (let i = 0; i < total; i++) {
+    const theta = Math.PI / 6 + i * (TWO_PI / total);
     const x = center.x + Math.cos(theta) * radius;
     const y = center.y + Math.sin(theta) * radius;
     hexagonPoints.push(new paper.Point(x, y));
@@ -126,30 +140,30 @@ export function tetrahedron64Star(
   // debugPoints(feminineTriangleMidPoints, new paper.Color(0, 1, 0));
   // debugPoints(masculineTriangleMidPoints, new paper.Color(0, 1, 0));
 
-  if (masculinity) {
+  if (settings.layers.masculinity) {
     createLine(
       [...masculineTrianglePoints, masculineTrianglePoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (femininity) {
+  if (settings.layers.femininity) {
     createLine(
       [...feminineTrianglePoints, feminineTrianglePoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (structure) {
+  if (settings.layers.structure) {
     // Create hexagon
     createLine(
       [...hexagonMidPoints, hexagonMidPoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
@@ -172,20 +186,20 @@ export function tetrahedron64Star(
     innerFeminineTrianglePoints,
   );
 
-  if (layer0) {
+  if (settings.layers.layer0) {
     // Create inner masculine triangle
     createLine(
       [...innerMasculineTrianglePoints, innerMasculineTrianglePoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     // Create inner feminine triangle
     createLine(
       [...innerFeminineTrianglePoints, innerFeminineTrianglePoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
@@ -202,25 +216,25 @@ export function tetrahedron64Star(
     masculineTriangleMidPoints[2],
   ];
 
-  if (layer1) {
+  if (settings.layers.layer1) {
     createLine(
       [...innerFeminineTrianglePoints, innerFeminineTrianglePoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     createLine(
       [...inner2MasculineTrianglePoints, inner2MasculineTrianglePoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     createLine(
       [...inner2FeminineTrianglePoints, inner2FeminineTrianglePoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
@@ -229,7 +243,7 @@ export function tetrahedron64Star(
   // debugPoints(feminineTriangleMidPoints, new paper.Color(0, 1, 0));
 
   // hexagon triangles
-  if (layer2) {
+  if (settings.layers.layer2) {
     createLine(
       [
         hexagonMidPoints[4],
@@ -237,8 +251,8 @@ export function tetrahedron64Star(
         hexagonMidPoints[2],
         hexagonMidPoints[4],
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
@@ -248,14 +262,14 @@ export function tetrahedron64Star(
         hexagonMidPoints[5],
         hexagonMidPoints[3],
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
   // Horizontal lines
-  if (layer3) {
+  if (settings.layers.layer3) {
     createLine(
       [
         lerp(
@@ -269,8 +283,8 @@ export function tetrahedron64Star(
           4 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
@@ -286,8 +300,8 @@ export function tetrahedron64Star(
           1 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
@@ -304,8 +318,8 @@ export function tetrahedron64Star(
           1 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
@@ -322,8 +336,8 @@ export function tetrahedron64Star(
           4 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
@@ -340,8 +354,8 @@ export function tetrahedron64Star(
           4 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
@@ -358,13 +372,13 @@ export function tetrahedron64Star(
           1 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (layer4) {
+  if (settings.layers.layer4) {
     // Vertical lines
     createLine(
       [
@@ -379,8 +393,8 @@ export function tetrahedron64Star(
           4 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
@@ -396,8 +410,8 @@ export function tetrahedron64Star(
           1 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
@@ -414,8 +428,8 @@ export function tetrahedron64Star(
           1 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
@@ -431,8 +445,8 @@ export function tetrahedron64Star(
           4 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
@@ -449,8 +463,8 @@ export function tetrahedron64Star(
           4 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
@@ -467,8 +481,8 @@ export function tetrahedron64Star(
           1 / 6 + 1 / 6 / 2,
         ),
       ],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
@@ -507,54 +521,54 @@ export function tetrahedron64Star(
     ],
   ];
 
-  if (layer5) {
+  if (settings.layers.layer5) {
     cornerPoints.forEach((points, i) => {
-      createLine(points, strokeColor, strokeWidth, group);
+      createLine(points, settings.strokeColor, settings.strokeWidth, group);
       createLine(
         [cornerPoints[i][0], cornerPoints[i][2]],
-        strokeColor,
-        strokeWidth,
+        settings.strokeColor,
+        settings.strokeWidth,
         group,
       );
     });
   }
 
-  if (layer6) {
+  if (settings.layers.layer6) {
     // Lines
     createLine(
       [masculineTrianglePoints[0], feminineTrianglePoints[1]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [hexagonMidPoints[4], hexagonMidPoints[1]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [feminineTrianglePoints[0], masculineTrianglePoints[2]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [hexagonMidPoints[5], hexagonMidPoints[2]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [masculineTrianglePoints[1], feminineTrianglePoints[2]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [hexagonMidPoints[0], hexagonMidPoints[3]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }

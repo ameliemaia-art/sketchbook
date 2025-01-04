@@ -16,12 +16,15 @@ export const Tetrahedron64Star = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const pane = new Pane({ title: "Sacred Geometry" });
     if (rootRef.current) {
       const sacred = new Tetrahedron64StarSketch(rootRef.current);
-      new GUITetrahedron64Star(new Pane({ title: "Sacred Geometry" }), sacred);
+      new GUITetrahedron64Star(pane, sacred);
     }
 
-    return () => {};
+    return () => {
+      pane.dispose();
+    };
   }, []);
 
   return <canvas ref={rootRef} />;

@@ -6,10 +6,10 @@ import Sketch, {
   SketchSettings,
   sketchSettings,
 } from "../sketch/sketch";
-import { sriYantra, SriYantraSettings } from "./sri-yantra-geometry";
+import { sriYantra } from "./sri-yantra-geometry";
 
 export default class SriYantra extends Sketch {
-  settings: SketchSettings & SriYantraSettings = {
+  settings: SketchSettings = {
     ...sketchSettings,
     layers: {
       background: false,

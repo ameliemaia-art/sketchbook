@@ -14,12 +14,15 @@ export const Tetrahedron64 = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const pane = new Pane({ title: "Sacred Geometry" });
     if (rootRef.current) {
       const sacred = new Tetrahedron64Sketch(rootRef.current);
-      new GUITetrahedron64(new Pane({ title: "Sacred Geometry" }), sacred);
+      new GUITetrahedron64(pane, sacred);
     }
 
-    return () => {};
+    return () => {
+      pane.dispose();
+    };
   }, []);
 
   return <canvas ref={rootRef} />;

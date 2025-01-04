@@ -14,12 +14,15 @@ export const FruitOfLife = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const pane = new Pane({ title: "Sacred Geometry" });
     if (rootRef.current) {
       const sacred = new FruitOfLifeSketch(rootRef.current);
-      new GUIFruitOfLife(new Pane({ title: "Sacred Geometry" }), sacred);
+      new GUIFruitOfLife(pane, sacred);
     }
 
-    return () => {};
+    return () => {
+      pane.dispose();
+    };
   }, []);
 
   return <canvas ref={rootRef} />;

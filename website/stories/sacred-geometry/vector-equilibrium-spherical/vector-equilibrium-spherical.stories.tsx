@@ -16,15 +16,15 @@ export const VectorEquilibriumSpherical = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const pane = new Pane({ title: "Sacred Geometry" });
     if (rootRef.current) {
       const sacred = new VectorEquilibriumSphericalSketch(rootRef.current);
-      new GUIVectorEquilibriumSpherical(
-        new Pane({ title: "Sacred Geometry" }),
-        sacred,
-      );
+      new GUIVectorEquilibriumSpherical(pane, sacred);
     }
 
-    return () => {};
+    return () => {
+      pane.dispose();
+    };
   }, []);
 
   return <canvas ref={rootRef} />;

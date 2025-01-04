@@ -14,12 +14,15 @@ export const Merkaba = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const pane = new Pane({ title: "Sacred Geometry" });
     if (rootRef.current) {
       const sacred = new MerkabaSketch(rootRef.current);
-      new GUIMerkaba(new Pane({ title: "Sacred Geometry" }), sacred);
+      new GUIMerkaba(pane, sacred);
     }
 
-    return () => {};
+    return () => {
+      pane.dispose();
+    };
   }, []);
 
   return <canvas ref={rootRef} />;

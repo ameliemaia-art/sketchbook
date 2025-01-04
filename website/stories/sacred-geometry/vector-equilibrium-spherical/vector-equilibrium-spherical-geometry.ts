@@ -1,12 +1,20 @@
 import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
-import {
-  createCircle,
-  createLine,
-  debugPoints,
-  lerp,
-} from "../../../utils/paper/utils";
+import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
+
+export type VectorEquilibriumSphericalSettings = {
+  petalRadius: number;
+  petalOffset: number;
+  layers: {
+    circles: boolean;
+    structure: boolean;
+    layer0: boolean;
+    layer1: boolean;
+    layer2: boolean;
+  };
+};
 
 function createPetal(
   center: paper.Point,
@@ -53,21 +61,14 @@ function createPetal(
 export function vectorEquilibriumSpherical(
   center: paper.Point,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  outlineVisible = false,
-  circlesVisible = false,
-  structure = true,
-  layer0 = true,
-  layer1 = true,
-  layer2 = true,
+  settings: SketchSettings & VectorEquilibriumSphericalSettings,
 ) {
   const group = new paper.Group();
 
-  if (outlineVisible) {
+  if (settings.layers.outline) {
     const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
     group.addChild(path);
   }
 
@@ -77,8 +78,14 @@ export function vectorEquilibriumSpherical(
 
   const startAngle = -Math.PI / 6;
 
-  if (circlesVisible) {
-    createCircle(center, innerRadius, strokeColor, strokeWidth, group);
+  if (settings.layers.circles) {
+    createCircle(
+      center,
+      innerRadius,
+      settings.strokeColor,
+      settings.strokeWidth,
+      group,
+    );
   }
 
   const outlineRadius = radius - innerRadius;
@@ -87,12 +94,12 @@ export function vectorEquilibriumSpherical(
     const x = center.x + Math.cos(theta) * outlineRadius;
     const y = center.y + Math.sin(theta) * outlineRadius;
 
-    if (circlesVisible) {
+    if (settings.layers.circles) {
       createCircle(
         new paper.Point(x, y),
         innerRadius,
-        strokeColor,
-        strokeWidth,
+        settings.strokeColor,
+        settings.strokeWidth,
         group,
       );
     }
@@ -109,11 +116,11 @@ export function vectorEquilibriumSpherical(
     hexagonPoints.push(new paper.Point(x, y));
   }
 
-  if (structure) {
+  if (settings.layers.structure) {
     createLine(
       [...hexagonPoints, hexagonPoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
@@ -124,8 +131,13 @@ export function vectorEquilibriumSpherical(
   const innerTopLeft = lerp(hexagonPoints[3], hexagonPoints[5], 1 / 3);
 
   // Petals
-  if (layer0) {
-    const petal = createPetal(center, radius, strokeColor, strokeWidth);
+  if (settings.layers.layer0) {
+    const petal = createPetal(
+      center,
+      radius,
+      settings.strokeColor,
+      settings.strokeWidth,
+    );
     const petal2 = petal.clone();
     petal2.rotate(60, center);
     const petal3 = petal.clone();
@@ -138,55 +150,55 @@ export function vectorEquilibriumSpherical(
   const innerLineLeft = lerp(leftMid, rightMid, 1 / 6);
   const innerLineRight = lerp(rightMid, leftMid, 1 / 6);
 
-  if (layer1) {
+  if (settings.layers.layer1) {
     // Lines
     createLine(
       [innerTopLeft, innerBottomRight],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [innerTopRight, innerBottomLeft],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
     createLine(
       [innerTopRight, innerBottomLeft],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     createLine(
       [innerLineLeft, innerLineRight],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (layer2) {
+  if (settings.layers.layer2) {
     // Diagonals
     createLine(
       [hexagonPoints[5], hexagonPoints[2]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     createLine(
       [hexagonPoints[3], hexagonPoints[0]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
 
     createLine(
       [hexagonPoints[4], hexagonPoints[1]],
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }

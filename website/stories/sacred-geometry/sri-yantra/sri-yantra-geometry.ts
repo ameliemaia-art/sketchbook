@@ -5,8 +5,6 @@ import { createCircle, createLine } from "@utils/paper/utils";
 import { TWO_PI } from "@utils/three/math";
 import { SketchSettings } from "../sketch/sketch";
 
-export type SriYantraSettings = {};
-
 function createCircleCornerPoints(
   center: paper.Point,
   radius: number,
@@ -34,7 +32,7 @@ function calculatePointOnCircle(
 export function sriYantra(
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & SriYantraSettings,
+  settings: SketchSettings,
 ) {
   const group = new paper.Group();
 

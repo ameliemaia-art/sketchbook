@@ -14,12 +14,15 @@ export const SriYantra = () => {
   const rootRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const pane = new Pane({ title: "Sacred Geometry" });
     if (rootRef.current) {
       const sacred = new SriYantraSketch(rootRef.current);
-      new GUISriYantra(new Pane({ title: "Sacred Geometry" }), sacred);
+      new GUISriYantra(pane, sacred);
     }
 
-    return () => {};
+    return () => {
+      pane.dispose();
+    };
   }, []);
 
   return <canvas ref={rootRef} />;

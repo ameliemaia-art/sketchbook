@@ -1,54 +1,57 @@
 import paper from "paper";
 
 import { createCircle } from "../../../utils/paper/utils";
+import { SketchSettings } from "../sketch/sketch";
+
+export type VesicaPiscisSettings = {
+  layers: {
+    creation: boolean;
+    heaven: boolean;
+    earth: boolean;
+  };
+};
 
 export function vesciaPiscis(
   center: paper.Point,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  universe = false,
-  creation = true,
-  heaven = true,
-  earth = true,
+  settings: SketchSettings & VesicaPiscisSettings,
 ) {
   const group = new paper.Group();
+  const innerRadius = radius * (2 / 3);
 
-  if (universe) {
+  if (settings.layers.outline) {
     const path = new paper.Path.Circle(center, radius);
-    path.strokeColor = strokeColor;
-    path.strokeWidth = strokeWidth;
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
     group.addChild(path);
   }
 
-  const innerRadius = radius * (2 / 3);
-
-  if (creation) {
+  if (settings.layers.creation) {
     createCircle(
       new paper.Point(center.x, center.y),
       radius / 3,
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (heaven) {
+  if (settings.layers.heaven) {
     createCircle(
       new paper.Point(center.x, center.y - innerRadius / 2),
       innerRadius,
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
 
-  if (earth) {
+  if (settings.layers.earth) {
     createCircle(
       new paper.Point(center.x, center.y + innerRadius / 2),
       innerRadius,
-      strokeColor,
-      strokeWidth,
+      settings.strokeColor,
+      settings.strokeWidth,
       group,
     );
   }
