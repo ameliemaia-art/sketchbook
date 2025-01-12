@@ -15,8 +15,8 @@ export default class Tetrahedron64Star extends Sketch {
   settings: SketchSettings & Tetrahedron64StarSettings = {
     ...sketchSettings,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       circles: false,
       triangles: true,
       masculinity: true,

@@ -19,7 +19,7 @@ export function vesciaPiscis(
   const group = new paper.Group();
   const innerRadius = radius * (2 / 3);
 
-  if (settings.layers.outline) {
+  if (settings.layers.light) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;

@@ -144,7 +144,7 @@ export function treeOfLife(
   const debugStrokeColor = new paper.Color(1, 1, 1, 0.5);
   const circlePoints = [];
 
-  if (settings.layers.outline) {
+  if (settings.layers.light) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;

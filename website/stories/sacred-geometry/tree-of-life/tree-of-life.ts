@@ -12,8 +12,8 @@ export default class TreeOfLife extends Sketch {
   settings: SketchSettings & TreeOfLifeSettings = {
     ...sketchSettings,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       guide0: false,
       guide1: false,
       guide2: false,

@@ -15,8 +15,8 @@ export default class VectorEquilibrium extends Sketch {
   settings: SketchSettings & VectorEquilibriumSettings = {
     ...sketchSettings,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       circles: false,
       structure: true,
       layer0: true,

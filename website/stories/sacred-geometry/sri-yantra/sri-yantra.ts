@@ -12,8 +12,8 @@ export default class SriYantra extends Sketch {
   settings: SketchSettings = {
     ...sketchSettings,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       guide0: false,
       guide1: false,
       guide2: false,

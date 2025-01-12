@@ -35,7 +35,7 @@ export default class BlueprintSketch extends WebGLApp {
       id: "globals",
       lineWidth: 0.025,
     },
-    outline: {
+    light: {
       id: "outline",
       radius: 5,
       visible: true,
@@ -58,7 +58,7 @@ export default class BlueprintSketch extends WebGLApp {
     },
   };
 
-  outline: Mesh<RingGeometry, MeshBasicMaterial> | null = null;
+  light: Mesh<RingGeometry, MeshBasicMaterial> | null = null;
   lines: Line2 | null = null;
   icoshaedron: Mesh<WireframeGeometry2, LineMaterial> | null = null;
   ringGroup = new Group();

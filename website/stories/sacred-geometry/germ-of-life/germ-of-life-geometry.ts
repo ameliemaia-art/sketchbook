@@ -64,7 +64,7 @@ export function germOfLife(
 ) {
   const group = new paper.Group();
 
-  if (settings.layers.outline) {
+  if (settings.layers.light) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;

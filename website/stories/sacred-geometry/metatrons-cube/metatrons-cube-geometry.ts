@@ -6,8 +6,8 @@ import { SketchSettings } from "../sketch/sketch";
 
 export type MetatronsCubeSettings = {
   layers: {
-    background: boolean;
-    outline: boolean;
+    darkness: boolean;
+    light: boolean;
     creation: boolean;
     structure: boolean;
     masculinity: boolean;
@@ -26,7 +26,7 @@ export function metatronsCube(
   const innerRadius = radius / 5;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.outline) {
+  if (settings.layers.light) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;

@@ -1,19 +1,22 @@
 import { saveAs } from "file-saver";
 
-export function saveImage(
+export async function saveImage(
   canvas: HTMLCanvasElement,
   title: string,
   format = "image/png",
   quality = 1,
 ) {
-  const filename = `${title}-${new Date().getTime()}.${format.split("/")[1]}`;
-  canvas.toBlob(
-    function (blob) {
-      if (blob) saveAs(blob, filename);
-    },
-    format,
-    quality,
-  );
+  return new Promise((resolve) => {
+    const filename = `${title}`;
+    canvas.toBlob(
+      function (blob) {
+        if (blob) saveAs(blob, filename);
+        resolve(null);
+      },
+      format,
+      quality,
+    );
+  });
 }
 
 export function saveSVG(project: paper.Project, title: string) {

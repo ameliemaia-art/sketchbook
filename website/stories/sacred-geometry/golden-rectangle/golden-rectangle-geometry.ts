@@ -6,8 +6,8 @@ import { SketchSettings } from "../sketch/sketch";
 export type GoldenRectangleSettings = {
   divisions: number;
   layers: {
-    background: boolean;
-    outline: boolean;
+    darkness: boolean;
+    light: boolean;
     rectangle: boolean;
     subdivisions: boolean;
     spiral: boolean;
@@ -26,7 +26,7 @@ export function goldenRectangle(
   const outlinePath = new paper.Path.Circle(center, radius);
   outlinePath.strokeColor = settings.strokeColor;
   outlinePath.strokeWidth = settings.strokeWidth;
-  if (!settings.layers.outline) outlinePath.visible = false;
+  if (!settings.layers.light) outlinePath.visible = false;
   group.addChild(outlinePath);
 
   // Golden ratio

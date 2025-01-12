@@ -26,7 +26,7 @@ export function vectorEquilibrium(
   const outlineRadius = radius - innerRadius;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.outline) {
+  if (settings.layers.light) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;

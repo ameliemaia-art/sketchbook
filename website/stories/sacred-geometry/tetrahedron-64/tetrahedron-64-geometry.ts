@@ -29,7 +29,7 @@ export function tetrahedron64(
   const innerRadius = radius / dimensions;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.outline) {
+  if (settings.layers.light) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;

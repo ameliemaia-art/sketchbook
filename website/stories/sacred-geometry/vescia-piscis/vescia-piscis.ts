@@ -12,8 +12,8 @@ export default class VesicaPiscis extends Sketch {
   settings: SketchSettings & VesicaPiscisSettings = {
     ...sketchSettings,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       heaven: true,
       earth: true,
       creation: true,

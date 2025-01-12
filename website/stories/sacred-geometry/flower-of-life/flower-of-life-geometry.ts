@@ -10,12 +10,14 @@ import {
 import { SketchSettings } from "../sketch/sketch";
 
 export type FlowerOfLifeSettings = {
-  dimensions: number;
-  layers: {
+  blueprint: {
+    lines: boolean;
+    structure: boolean;
+  };
+  form: {
+    dimensions: number;
     petals: boolean;
     circles: boolean;
-    lines: boolean;
-    corners: boolean;
   };
 };
 
@@ -83,30 +85,31 @@ function createFlowerCircle(
 }
 
 export function flowerOfLife(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings & FlowerOfLifeSettings,
 ) {
-  const group = new paper.Group();
   const dotRadius = radius * 0.01;
   const total = 6;
-  const innerRadius = radius / settings.dimensions;
+  const innerRadius = radius / settings.form.dimensions;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.outline) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
-  if (settings.layers.circles) {
+  if (settings.form.circles) {
     createCircle(
       center,
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -118,7 +121,7 @@ export function flowerOfLife(
     settings.strokeWidth,
   );
 
-  for (let i = 0; i < settings.dimensions - 1; i++) {
+  for (let i = 0; i < settings.form.dimensions - 1; i++) {
     const points: paper.Point[] = [];
     const outlineRadius = innerRadius * (i + 1);
     for (let j = 0; j < total; j++) {
@@ -137,18 +140,18 @@ export function flowerOfLife(
       for (let l = 0; l < circlesPerDimension; l++) {
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
-        if (settings.layers.circles) {
-          if (settings.layers.petals) {
+        if (settings.form.circles) {
+          if (settings.form.petals) {
             const petal = flowerCircle.clone();
             petal.position = p;
-            group.addChild(petal);
+            form.addChild(petal);
           } else {
             createCircle(
               p,
               innerRadius,
               settings.strokeColor,
               settings.strokeWidth,
-              group,
+              form,
             );
           }
         }
@@ -156,63 +159,62 @@ export function flowerOfLife(
     }
 
     // draw line between points
-    if (settings.layers.lines) {
+    if (settings.blueprint.lines) {
       const line = new paper.Path([...points, points[0]]);
       line.strokeColor = settings.strokeColor;
       line.strokeWidth = settings.strokeWidth;
+      blueprint.addChild(line);
       // Front lines of cube
       createLine(
         [points[0], center],
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
       createLine(
         [center, points[2]],
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
       createLine(
         [center, points[4]],
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
       // Back lines of cube
       createLine(
         [points[5], center],
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
       createLine(
         [points[1], center],
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
       createLine(
         [points[3], center],
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
     }
 
     // Draw dots at corners of cube
-    if (settings.layers.corners) {
-      dot(points[0], dotRadius, group);
-      dot(points[1], dotRadius, group);
-      dot(points[2], dotRadius, group);
-      dot(points[3], dotRadius, group);
-      dot(points[4], dotRadius, group);
-      dot(points[5], dotRadius, group);
+    if (settings.blueprint.structure) {
+      dot(points[0], dotRadius, blueprint);
+      dot(points[1], dotRadius, blueprint);
+      dot(points[2], dotRadius, blueprint);
+      dot(points[3], dotRadius, blueprint);
+      dot(points[4], dotRadius, blueprint);
+      dot(points[5], dotRadius, blueprint);
       // dot(center, dotRadius, group);
     }
   }
 
   flowerCircle.remove();
-
-  return group;
 }

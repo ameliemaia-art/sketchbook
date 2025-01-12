@@ -13,8 +13,8 @@ export default class Merkaba extends Sketch {
     ...sketchSettings,
     divisions: 9,
     layers: {
-      background: false,
-      outline: true,
+      darkness: false,
+      light: true,
       circles: false,
       masculinity: true,
       femininity: true,

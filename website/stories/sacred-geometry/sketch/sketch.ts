@@ -9,7 +9,9 @@ export type SketchSettings = {
   strokeWidth: number;
   scale: number;
   opacity: number;
-  layers: { [key: string]: boolean };
+  darkness: boolean;
+  blueprint: { [key: string]: unknown };
+  form: { [key: string]: unknown };
 };
 
 export const sketchSettings: SketchSettings = {
@@ -17,9 +19,15 @@ export const sketchSettings: SketchSettings = {
   opacity: 1,
   strokeWidth: 1,
   strokeColor: new paper.Color(1, 1, 1, 1),
-  layers: {
-    background: false,
-    outline: false,
+  darkness: false,
+  blueprint: {
+    opacity: 0.5,
+    visible: false,
+    cosmos: false,
+  },
+  form: {
+    opacity: 1,
+    visible: true,
   },
 };
 
@@ -27,6 +35,7 @@ export default class Sketch {
   settings = sketchSettings;
 
   group?: paper.Group;
+  layers: { blueprint: paper.Group; form: paper.Group } = {};
 
   constructor(public canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -34,16 +43,22 @@ export default class Sketch {
     this.setup();
   }
 
-  setup(exporting = false) {
-    const scale = exporting ? 5 : 1;
-    this.settings.strokeWidth = 1 * scale;
-    this.canvas.width = 500;
-    this.canvas.height = 500;
-    paper.view.viewSize = new paper.Size(
-      this.canvas.width * scale,
-      this.canvas.height * scale,
-    );
-    requestAnimationFrame(() => this.draw());
+  async setup(exporting = false) {
+    return new Promise<void>((resolve) => {
+      const scale = exporting ? 5 : 1;
+      this.settings.strokeWidth = 1 * scale;
+      this.canvas.width = 500;
+      this.canvas.height = 500;
+      paper.view.viewSize = new paper.Size(
+        this.canvas.width * scale,
+        this.canvas.height * scale,
+      );
+      requestAnimationFrame(() => {
+        this.draw();
+        paper.view.update();
+        resolve();
+      });
+    });
   }
 
   draw() {
@@ -52,14 +67,25 @@ export default class Sketch {
     this.group = new paper.Group();
     this.group.opacity = this.settings.opacity;
 
+    this.layers.blueprint = new paper.Group();
+    this.layers.form = new paper.Group();
+
+    this.layers.blueprint.visible = this.settings.blueprint.visible as boolean;
+    this.layers.form.visible = this.settings.form.visible as boolean;
+
+    this.layers.blueprint.opacity = this.settings.blueprint.opacity as number;
+    this.layers.form.opacity = this.settings.form.opacity as number;
+
+    this.group.addChild(this.layers.blueprint);
+    this.group.addChild(this.layers.form);
+
     // create a rectangle to fill the background
-    if (this.settings.layers.background) {
+    if (this.settings.darkness) {
       const background = new paper.Path.Rectangle(
         paper.view.bounds.topLeft,
         paper.view.bounds.bottomRight,
       );
       background.fillColor = new paper.Color(0, 0, 0);
-      this.group.addChild(background);
     }
   }
 
@@ -71,13 +97,11 @@ export default class Sketch {
     return this.name().replace(/ /g, "-").toLowerCase();
   }
 
-  saveImage = () => {
-    this.setup(true);
-    requestAnimationFrame(() => {
-      saveImage(this.canvas, this.fileName());
-    });
-    this.setup(false);
-  };
+  async saveImage() {
+    await this.setup(true);
+    await saveImage(this.canvas, this.fileName());
+    await this.setup(false);
+  }
 
   saveSVG = () => {
     saveSVG(paper.project, this.fileName());
@@ -104,19 +128,30 @@ export class GUISketch extends GUIController {
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", this.draw);
+    this.gui.addBinding(target.settings, "darkness").on("change", this.draw);
 
-    this.folders.layers = this.addFolder(this.gui, { title: "Layers" });
-    this.folders.layers
-      .addBinding(target.settings.layers, "background")
+    this.folders.blueprint = this.addFolder(this.gui, { title: "Blueprint" });
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "visible")
+      .on("change", this.draw);
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "opacity", { min: 0, max: 1 })
+      .on("change", this.draw);
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "cosmos")
       .on("change", this.draw);
 
-    this.folders.layers
-      .addBinding(target.settings.layers, "outline")
+    this.folders.form = this.addFolder(this.gui, { title: "Form" });
+    this.folders.form
+      .addBinding(target.settings.form, "opacity", { min: 0, max: 1 })
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "visible")
       .on("change", this.draw);
 
-    this.gui
-      .addButton({ title: "Save Image", label: "" })
-      .on("click", target.saveImage);
+    this.gui.addButton({ title: "Save Image", label: "" }).on("click", () => {
+      target.saveImage();
+    });
     this.gui
       .addButton({ title: "Save SVG", label: "" })
       .on("click", target.saveSVG);

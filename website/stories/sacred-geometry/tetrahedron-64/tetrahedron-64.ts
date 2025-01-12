@@ -15,8 +15,8 @@ export default class Tetrahedron64 extends Sketch {
   settings: SketchSettings & Tetrahedron64Settings = {
     ...sketchSettings,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       circles: false,
       triangles: true,
       hexagon: true,

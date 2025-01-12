@@ -20,8 +20,8 @@ export default class Platonic extends Sketch {
       strokeColor: new paper.Color(1, 1, 1, 0.25),
     },
     layers: {
-      background: true,
-      outline: false,
+      darkness: true,
+      light: false,
       tetrahedron: false,
       hexahedron: false,
       octahedron: false,

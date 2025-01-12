@@ -7,8 +7,8 @@ import { SketchSettings } from "../sketch/sketch";
 export type MerkabaSettings = {
   divisions: number;
   layers: {
-    background: boolean;
-    outline: boolean;
+    darkness: boolean;
+    light: boolean;
     circles: boolean;
     masculinity: boolean;
     femininity: boolean;
@@ -24,7 +24,7 @@ export function merkaba(
 ) {
   const group = new paper.Group();
 
-  if (settings.layers.outline) {
+  if (settings.layers.light) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;

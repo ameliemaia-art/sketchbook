@@ -15,8 +15,8 @@ export default class MetatronsCube extends Sketch {
   settings: SketchSettings & MetatronsCubeSettings = {
     ...sketchSettings,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       creation: true,
       structure: true,
       masculinity: true,

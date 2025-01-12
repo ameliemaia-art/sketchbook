@@ -16,8 +16,8 @@ export default class GoldenRectangle extends Sketch {
     ...sketchSettings,
     divisions: 9,
     layers: {
-      background: false,
-      outline: false,
+      darkness: false,
+      light: false,
       rectangle: true,
       subdivisions: true,
       spiral: true,
