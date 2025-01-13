@@ -6,43 +6,48 @@ import Sketch, {
   SketchSettings,
   sketchSettings,
 } from "../sketch/sketch";
-import { sriYantra } from "./sri-yantra-geometry";
+import { sriYantra, SriYantraSettings } from "./sri-yantra-geometry";
 
 export default class SriYantra extends Sketch {
-  settings: SketchSettings = {
+  settings: SketchSettings & SriYantraSettings = {
     ...sketchSettings,
-    layers: {
-      darkness: false,
-      light: false,
-      guide0: false,
-      guide1: false,
-      guide2: false,
-      guide3: false,
-      guide4: false,
-      guide5: false,
-      guide6: false,
-      guide7: false,
-      guide8: false,
-      guide9: false,
-      guide10: false,
-      guide11: false,
-      guide12: false,
-      guide13: false,
-      guide14: false,
-      guide15: false,
-      guide16: false,
-      guide17: false,
-      guide18: false,
-      guide19: false,
-      guide20: false,
-      guide21: false,
-      guide22: false,
-      guide23: false,
-      guide24: false,
-      guide25: false,
-      guide26: false,
-      guide27: false,
-      guide28: false,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+      guide0: true,
+      guide1: true,
+      guide2: true,
+      guide3: true,
+      guide4: true,
+      guide5: true,
+      guide6: true,
+      guide7: true,
+      guide8: true,
+      guide9: true,
+      guide10: true,
+      guide11: true,
+      guide12: true,
+      guide13: true,
+      guide14: true,
+      guide15: true,
+      guide16: true,
+      guide17: true,
+      guide18: true,
+      guide19: true,
+      guide20: true,
+      guide21: true,
+      guide22: true,
+      guide23: true,
+      guide24: true,
+      guide25: true,
+      guide26: true,
+      guide27: true,
+      guide28: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
       step0: true,
       step1: true,
       step2: true,
@@ -58,9 +63,16 @@ export default class SriYantra extends Sketch {
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(sriYantra(center, radius, this.settings));
+    sriYantra(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -75,21 +87,14 @@ export class GUISriYantra extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.guide = this.addFolder(this.folders.layers, {
-      title: "Guides",
-    });
-    this.folders.steps = this.addFolder(this.folders.layers, {
-      title: "Steps",
-    });
-
     for (let i = 0; i < 29; i++) {
-      this.folders.guide
-        .addBinding(target.settings.layers, `guide${i}`)
+      this.folders.blueprint
+        .addBinding(target.settings.blueprint, `guide${i}`)
         .on("change", this.draw);
     }
     for (let i = 0; i < 10; i++) {
-      this.folders.steps
-        .addBinding(target.settings.layers, `step${i}`)
+      this.folders.form
+        .addBinding(target.settings.form, `step${i}`)
         .on("change", this.draw);
     }
   }

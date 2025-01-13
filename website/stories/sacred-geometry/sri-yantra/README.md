@@ -2,6 +2,8 @@
 
 The **Sri Yantra** is one of the most powerful and revered symbols in Hinduism and sacred geometry. It is a mystical diagram composed of nine interlocking triangles that represent the **cosmic creation** and the union of the divine masculine and feminine energies. Learn more about the Sri Yantra on its [Wikipedia page](https://en.wikipedia.org/wiki/Sri_Yantra).
 
+![Egg Of Life](./sri-yantra.png)
+
 ## Structure and Geometry
 
 - The Sri Yantra consists of **nine interlocking triangles** arranged in a precise geometric pattern:
