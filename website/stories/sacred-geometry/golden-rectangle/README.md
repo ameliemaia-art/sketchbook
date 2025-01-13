@@ -2,6 +2,8 @@
 
 The **Golden Rectangle** is a rectangle whose side lengths are in the **golden ratio**—a mathematical proportion that has fascinated mathematicians, artists, and architects for centuries. Learn more about the Golden Ratio on its [Wikipedia page](https://en.wikipedia.org/wiki/Golden_ratio).
 
+![Egg Of Life](./golden-rectangle.png)
+
 ## Structure and Geometry
 
 - The sides of a Golden Rectangle have a ratio of **1 : φ (phi)**, where φ (the golden ratio) is approximately **1.6180339887**.

@@ -12,13 +12,14 @@ import { SketchSettings } from "../sketch/sketch";
 export type PlatonicSettings = {
   strokeDepthColor: paper.Color;
   grid: {
+    visible: boolean;
+    opacity: number;
     divisions: number;
-    strokeColor: paper.Color;
   };
-  guide: {
-    strokeColor: paper.Color;
+  blueprint: {
+    architecture: boolean;
   };
-  layers: {
+  form: {
     hexahedron: boolean;
     icosahedron: boolean;
     dodecahedron: boolean;
@@ -47,47 +48,47 @@ function getAllIntersections(paths: paper.Path[]): paper.Point[] {
 }
 
 export function platonic(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   size: paper.Size,
   radius: number,
   settings: SketchSettings & PlatonicSettings,
 ) {
-  const group = new paper.Group();
   const total = 6;
   const innerRadius = radius / 5;
   const startAngle = -Math.PI / 6;
 
-  createGrid(
-    center,
-    size,
-    settings.grid.strokeColor,
-    settings.strokeWidth,
-    settings.grid.divisions,
-    group,
-  );
-  createGrid(
-    center,
-    size,
-    settings.grid.strokeColor,
-    settings.strokeWidth,
-    5,
-    group,
-  );
+  const gridColor = new paper.Color(1, 1, 1, settings.grid.opacity);
 
-  if (settings.layers.light) {
+  if (settings.grid.visible) {
+    createGrid(
+      center,
+      size,
+      gridColor,
+      settings.strokeWidth,
+      settings.grid.divisions,
+      form,
+    );
+    createGrid(center, size, gridColor, settings.strokeWidth, 5, form);
+  }
+
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
-  createCircle(
-    center,
-    innerRadius,
-    settings.guide.strokeColor,
-    settings.strokeWidth,
-    group,
-  );
+  if (settings.blueprint.architecture) {
+    createCircle(
+      center,
+      innerRadius,
+      settings.strokeColor,
+      settings.strokeWidth,
+      blueprint,
+    );
+  }
 
   const paths: paper.Path[] = [];
   const dimensions = 2;
@@ -100,20 +101,24 @@ export function platonic(
       const x = center.x + Math.cos(theta) * outlineRadius;
       const y = center.y + Math.sin(theta) * outlineRadius;
       points[i].push(new paper.Point(x, y));
-      createCircle(
-        new paper.Point(x, y),
-        innerRadius,
-        settings.guide.strokeColor,
-        settings.strokeWidth,
-        group,
-      );
+      if (settings.blueprint.architecture) {
+        createCircle(
+          new paper.Point(x, y),
+          innerRadius,
+          settings.strokeColor,
+          settings.strokeWidth,
+          blueprint,
+        );
+      }
     }
 
     const line = new paper.Path([...points[i], points[i][0]]);
     paths.push(line);
-    line.strokeColor = settings.guide.strokeColor;
+    line.strokeColor = settings.strokeColor;
     line.strokeWidth = settings.strokeWidth;
-    group.addChild(line);
+    blueprint.addChild(line);
+
+    line.visible = settings.blueprint.architecture;
 
     // Upwards triangle
     const upwardsTriangle = new paper.Path([
@@ -122,9 +127,9 @@ export function platonic(
       points[i][5],
       points[i][1],
     ]);
-    upwardsTriangle.strokeColor = settings.guide.strokeColor;
+    upwardsTriangle.strokeColor = settings.strokeColor;
     upwardsTriangle.strokeWidth = settings.strokeWidth;
-    group.addChild(upwardsTriangle);
+    blueprint.addChild(upwardsTriangle);
     paths.push(upwardsTriangle);
 
     const downwardsTriangle = new paper.Path([
@@ -133,10 +138,13 @@ export function platonic(
       points[i][4],
       points[i][0],
     ]);
-    downwardsTriangle.strokeColor = settings.guide.strokeColor;
+    downwardsTriangle.strokeColor = settings.strokeColor;
     downwardsTriangle.strokeWidth = settings.strokeWidth;
-    group.addChild(downwardsTriangle);
+    blueprint.addChild(downwardsTriangle);
     paths.push(downwardsTriangle);
+
+    upwardsTriangle.visible = settings.blueprint.architecture;
+    downwardsTriangle.visible = settings.blueprint.architecture;
   }
 
   // Draw lines between outer circles and inner circles
@@ -146,18 +154,21 @@ export function platonic(
     const p2 = (j + 4) % points[0].length;
     console.log(j, p0, p1, p2);
     const line0 = new paper.Path([points[1][j], points[0][p0]]);
-    line0.strokeColor = settings.guide.strokeColor;
+    line0.strokeColor = settings.strokeColor;
     line0.strokeWidth = settings.strokeWidth;
     const line1 = new paper.Path([points[1][j], points[0][p1]]);
-    line1.strokeColor = settings.guide.strokeColor;
+    line1.strokeColor = settings.strokeColor;
     line1.strokeWidth = settings.strokeWidth;
     const line2 = new paper.Path([points[1][j], points[0][p2]]);
-    line2.strokeColor = settings.guide.strokeColor;
+    line2.strokeColor = settings.strokeColor;
     line2.strokeWidth = settings.strokeWidth;
-    group.addChild(line0);
-    group.addChild(line1);
-    group.addChild(line2);
+    blueprint.addChild(line0);
+    blueprint.addChild(line1);
+    blueprint.addChild(line2);
     paths.push(line0, line1, line2);
+    line0.visible = settings.blueprint.architecture;
+    line1.visible = settings.blueprint.architecture;
+    line2.visible = settings.blueprint.architecture;
   }
 
   const intersections = filterIntersectionPositions(getAllIntersections(paths));
@@ -172,7 +183,7 @@ export function platonic(
   //   new paper.Color(1, 1, 0, 1),
   // );
 
-  if (settings.layers.tetrahedron) {
+  if (settings.form.tetrahedron) {
     // Front
     createLine(
       [
@@ -183,53 +194,53 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[49], intersections[76], intersections[48]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[76], intersections[50]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.dodecahedron) {
+  if (settings.form.dodecahedron) {
     // Back
     createLine(
       [intersections[64], intersections[80], intersections[61]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[80], intersections[76]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[65], intersections[78], intersections[62]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[60], intersections[73], intersections[63]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[78], intersections[76], intersections[73]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Front
@@ -251,7 +262,7 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -263,47 +274,47 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[68], intersections[86]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[67], intersections[77]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[69], intersections[84], intersections[66]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[76], intersections[84]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.hexahedron) {
+  if (settings.form.hexahedron) {
     // Back
     createLine(
       [intersections[49], intersections[76], intersections[48]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[76], intersections[50]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Front
@@ -319,23 +330,23 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[53], intersections[76], intersections[51]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[76], intersections[52]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.octahedron) {
+  if (settings.form.octahedron) {
     // Back
     createLine(
       [
@@ -346,7 +357,7 @@ export function platonic(
       ],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Front
@@ -362,7 +373,7 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -373,11 +384,11 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.icosahedron) {
+  if (settings.form.icosahedron) {
     // Back
     createLine(
       [
@@ -388,37 +399,37 @@ export function platonic(
       ],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[2], intersections[0], intersections[1], intersections[2]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[2], intersections[50]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[1], intersections[49]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[0], intersections[48]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[4], intersections[52]],
       settings.strokeDepthColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Front
@@ -434,7 +445,7 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Triangle
@@ -447,27 +458,27 @@ export function platonic(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[4], intersections[5], intersections[3], intersections[4]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[53], intersections[5]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [intersections[3], intersections[51]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  return group;
+  return form;
 }

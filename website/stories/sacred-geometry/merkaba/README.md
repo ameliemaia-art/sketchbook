@@ -2,6 +2,8 @@
 
 The **Merkaba** is a powerful symbol in sacred geometry, often associated with spirituality, light, and energy. It is believed to represent a **divine vehicle** used for ascension and interdimensional travel. Learn more about the Merkaba and its origins on its [Wikipedia page](https://en.wikipedia.org/wiki/Merkabah).
 
+![Egg Of Life](./merkaba.png)
+
 ## Structure and Geometry
 
 - The Merkaba is depicted as a **three-dimensional Star Tetrahedron**, consisting of two interlocking tetrahedra:

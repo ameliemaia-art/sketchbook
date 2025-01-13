@@ -5,30 +5,28 @@ import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
 export type MerkabaSettings = {
-  divisions: number;
-  layers: {
-    darkness: boolean;
-    light: boolean;
-    circles: boolean;
+  blueprint: {
+    architecture: boolean;
+  };
+  form: {
     masculinity: boolean;
     femininity: boolean;
-    unity: boolean;
-    interconnectedness: boolean;
+    union: boolean;
   };
 };
 
 export function merkaba(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings & MerkabaSettings,
 ) {
-  const group = new paper.Group();
-
-  if (settings.layers.light) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
   // Line from center
@@ -38,13 +36,13 @@ export function merkaba(
 
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.circles) {
+  if (settings.blueprint.architecture) {
     createCircle(
       center,
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      blueprint,
     );
   }
 
@@ -54,39 +52,39 @@ export function merkaba(
     const x = center.x + Math.cos(theta) * outlineRadius;
     const y = center.y + Math.sin(theta) * outlineRadius;
     points.push(new paper.Point(x, y));
-    if (settings.layers.circles) {
+    if (settings.blueprint.architecture) {
       createCircle(
         points[i],
         innerRadius,
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
     }
   }
 
-  if (settings.layers.femininity) {
+  if (settings.form.femininity) {
     createLine(
       [points[0], points[2], points[4], points[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.masculinity) {
+  if (settings.form.masculinity) {
     // Top
     createLine(
       [points[5], lerp(points[4], points[0], (1 / 3) * 2)],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[5], lerp(points[4], points[0], 1 / 3)],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Right
@@ -94,13 +92,13 @@ export function merkaba(
       [points[1], lerp(points[0], points[2], 1 / 3)],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[1], lerp(points[0], points[2], (1 / 3) * 2)],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Left
@@ -108,17 +106,17 @@ export function merkaba(
       [points[3], lerp(points[2], points[4], 1 / 3)],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[3], lerp(points[2], points[4], (1 / 3) * 2)],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.unity) {
+  if (settings.form.union) {
     // Middle
     createLine(
       [
@@ -129,31 +127,26 @@ export function merkaba(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
-  }
 
-  // Lines
-  if (settings.layers.interconnectedness) {
     createLine(
       [points[5], center],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[1], center],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[3], center],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
-
-  return group;
 }

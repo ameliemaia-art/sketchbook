@@ -2,6 +2,8 @@
 
 The **Germ of Life** is a foundational symbol in sacred geometry that represents the earliest stages of creation and growth. It is derived from the **Flower of Life**, a key geometric pattern in spiritual and metaphysical traditions. Learn more about the Flower of Life on its [Wikipedia page](https://en.wikipedia.org/wiki/Flower_of_Life).
 
+![Egg Of Life](./germ-of-life.png)
+
 ## Structure and Geometry
 
 - The Germ of Life is composed of **six overlapping circles** arranged around a central circle, forming a symmetrical flower-like design.

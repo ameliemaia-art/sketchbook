@@ -12,7 +12,7 @@ export default class EggOfLife extends Sketch {
   settings: SketchSettings & EggOfLifeSettings = {
     ...sketchSettings,
     blueprint: {
-      visible: true,
+      visible: false,
       opacity: 0.5,
       cosmos: true,
     },
@@ -26,6 +26,7 @@ export default class EggOfLife extends Sketch {
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
     eggOfLife(

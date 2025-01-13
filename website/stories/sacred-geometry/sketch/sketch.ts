@@ -35,7 +35,7 @@ export default class Sketch {
   settings = sketchSettings;
 
   group?: paper.Group;
-  layers: { blueprint: paper.Group; form: paper.Group } = {};
+  layers: { blueprint?: paper.Group; form?: paper.Group } = {};
 
   constructor(public canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -67,6 +67,16 @@ export default class Sketch {
     this.group = new paper.Group();
     this.group.opacity = this.settings.opacity;
 
+    // create a rectangle to fill the background
+    if (this.settings.darkness) {
+      const background = new paper.Path.Rectangle(
+        paper.view.bounds.topLeft,
+        paper.view.bounds.bottomRight,
+      );
+      background.fillColor = new paper.Color(0, 0, 0);
+      this.group.addChild(background);
+    }
+
     this.layers.blueprint = new paper.Group();
     this.layers.form = new paper.Group();
 
@@ -78,15 +88,6 @@ export default class Sketch {
 
     this.group.addChild(this.layers.blueprint);
     this.group.addChild(this.layers.form);
-
-    // create a rectangle to fill the background
-    if (this.settings.darkness) {
-      const background = new paper.Path.Rectangle(
-        paper.view.bounds.topLeft,
-        paper.view.bounds.bottomRight,
-      );
-      background.fillColor = new paper.Color(0, 0, 0);
-    }
   }
 
   name() {

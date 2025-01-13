@@ -11,23 +11,33 @@ import { merkaba, MerkabaSettings } from "./merkaba-geometry";
 export default class Merkaba extends Sketch {
   settings: SketchSettings & MerkabaSettings = {
     ...sketchSettings,
-    divisions: 9,
-    layers: {
-      darkness: false,
-      light: true,
-      circles: false,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+      architecture: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
       masculinity: true,
       femininity: true,
-      unity: true,
-      interconnectedness: true,
+      union: true,
     },
   };
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(merkaba(center, radius, this.settings));
+    merkaba(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -42,20 +52,17 @@ export class GUIMerkaba extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.layers
-      .addBinding(target.settings.layers, "circles")
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "architecture")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "masculinity")
+    this.folders.form
+      .addBinding(target.settings.form, "masculinity")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "femininity")
+    this.folders.form
+      .addBinding(target.settings.form, "femininity")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "unity")
-      .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "interconnectedness")
+    this.folders.form
+      .addBinding(target.settings.form, "union")
       .on("change", this.draw);
   }
 }

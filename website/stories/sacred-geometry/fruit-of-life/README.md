@@ -2,6 +2,8 @@
 
 The **Fruit of Life** is a sacred geometric pattern considered one of the most important symbols in sacred geometry. It is derived from the **Flower of Life**, a foundational geometric figure. Learn more about the Flower of Life on its [Wikipedia page](https://en.wikipedia.org/wiki/Flower_of_Life).
 
+![Egg Of Life](./fruit-of-life.png)
+
 ## Structure and Geometry
 
 - The Fruit of Life consists of **13 interconnected circles** derived from the Flower of Life pattern.

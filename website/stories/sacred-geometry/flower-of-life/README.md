@@ -2,6 +2,8 @@
 
 The **Flower of Life** is a sacred geometric pattern that has been studied and revered across cultures for centuries. Learn more about it on its [Wikipedia page](https://en.wikipedia.org/wiki/Flower_of_Life).
 
+![Egg Of Life](./flower-of-life.png)
+
 ## Structure and Geometry
 
 - The Flower of Life is composed of **overlapping, evenly spaced circles** arranged in a hexagonal pattern.
