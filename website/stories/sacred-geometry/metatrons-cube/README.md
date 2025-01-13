@@ -2,6 +2,8 @@
 
 **Metatron's Cube** is a mystical geometric figure that is central to sacred geometry and is believed to represent the structure of the universe and the flow of divine energy. It is named after **Metatron**, an archangel in Kabbalistic traditions, and is often seen as a powerful symbol for spiritual transformation and understanding. Learn more about Metatron's Cube on its [Wikipedia page](https://en.wikipedia.org/wiki/Metatron%27s_Cube).
 
+![Egg Of Life](./metatrons-cube.png)
+
 ## Structure and Geometry
 
 - Metatron's Cube begins with a **Flower of Life** pattern at its core and contains **13 circles**.

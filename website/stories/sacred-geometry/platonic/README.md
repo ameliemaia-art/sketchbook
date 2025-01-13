@@ -2,6 +2,8 @@
 
 The **Platonic Solids** are a group of five regular, convex polyhedra that have been studied since ancient Greece. They are known for their symmetry and perfect geometric proportions and are central to the study of **sacred geometry**. These solids are named after the Greek philosopher **Plato**, who associated them with the elements of nature. Learn more about the Platonic Solids on their [Wikipedia page](https://en.wikipedia.org/wiki/Platonic_solid).
 
+![Egg Of Life](./platonic.png)
+
 ## The Five Platonic Solids
 
 There are exactly five Platonic Solids, each characterized by identical faces, edges, and angles:
