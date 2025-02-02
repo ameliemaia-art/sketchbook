@@ -40,12 +40,14 @@ export function composite(
   const ctx = canvas.getContext("2d");
 
   if (ctx) {
-    // ctx.fillStyle = "#000000";
-    // ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, width, height);
 
-    layers.forEach((layer) => {
-      ctx.drawImage(layer, 0, 0, width, height);
-    });
+    console.log("xx");
+
+    // layers.forEach((layer) => {
+    //   ctx.drawImage(layer, 0, 0, width, height);
+    // });
   }
 
   return canvas;

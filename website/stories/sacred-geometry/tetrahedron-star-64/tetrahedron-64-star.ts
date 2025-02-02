@@ -14,29 +14,42 @@ import {
 export default class Tetrahedron64Star extends Sketch {
   settings: SketchSettings & Tetrahedron64StarSettings = {
     ...sketchSettings,
-    layers: {
-      darkness: false,
-      light: false,
-      circles: false,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+      circles: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
+      creation: true,
       triangles: true,
       masculinity: true,
       femininity: true,
-      structure: true,
-      layer0: true,
-      layer1: true,
-      layer2: true,
-      layer3: true,
-      layer4: true,
-      layer5: true,
-      layer6: true,
+      architecture: true,
+      dimension0: true,
+      dimension1: true,
+      dimension2: true,
+      dimension3: true,
+      dimension4: true,
+      dimension5: true,
+      union: true,
     },
   };
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(tetrahedron64Star(center, radius, this.settings));
+    tetrahedron64Star(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -51,38 +64,39 @@ export class GUITetrahedron64Star extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.layers
-      .addBinding(target.settings.layers, "circles")
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "circles")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "masculinity")
+
+    this.folders.form
+      .addBinding(target.settings.form, "masculinity")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "femininity")
+    this.folders.form
+      .addBinding(target.settings.form, "femininity")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "structure")
+    this.folders.form
+      .addBinding(target.settings.form, "architecture")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer0")
+    this.folders.form
+      .addBinding(target.settings.form, "dimension0")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer1")
+    this.folders.form
+      .addBinding(target.settings.form, "dimension1")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer2")
+    this.folders.form
+      .addBinding(target.settings.form, "dimension2")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer3")
+    this.folders.form
+      .addBinding(target.settings.form, "dimension3")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer4")
+    this.folders.form
+      .addBinding(target.settings.form, "dimension4")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer5")
+    this.folders.form
+      .addBinding(target.settings.form, "dimension5")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer6")
+    this.folders.form
+      .addBinding(target.settings.form, "union")
       .on("change", this.draw);
   }
 }

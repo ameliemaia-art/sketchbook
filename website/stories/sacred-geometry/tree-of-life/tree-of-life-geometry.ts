@@ -10,20 +10,23 @@ import {
 import { SketchSettings } from "../sketch/sketch";
 
 export type TreeOfLifeSettings = {
-  layers: {
+  blueprint: {
     guide0: boolean;
     guide1: boolean;
     guide2: boolean;
     guide3: boolean;
-    form1: boolean;
-    form2: boolean;
-    form3: boolean;
-    form4: boolean;
-    form5: boolean;
-    form6: boolean;
-    form7: boolean;
-    form8: boolean;
-    form9: boolean;
+  };
+  form: {
+    architecture0: boolean;
+    architecture1: boolean;
+    architecture2: boolean;
+    architecture3: boolean;
+    architecture4: boolean;
+    architecture5: boolean;
+    architecture6: boolean;
+    architecture7: boolean;
+    architecture8: boolean;
+    architecture9: boolean;
   };
 };
 
@@ -132,23 +135,24 @@ function drawGuideLines(
 }
 
 export function treeOfLife(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings & TreeOfLifeSettings,
 ) {
-  const group = new paper.Group();
   const startAngle = -Math.PI / 6;
   const innerRadius = radius / 3;
   const dimensions = 3;
   const total = 6;
-  const debugStrokeColor = new paper.Color(1, 1, 1, 0.5);
+  const debugStrokeColor = new paper.Color(1, 1, 1, 0.25);
   const circlePoints = [];
 
-  if (settings.layers.light) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
   for (let i = 0; i < dimensions - 1; i++) {
@@ -171,13 +175,13 @@ export function treeOfLife(
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
 
-        if (settings.layers.guide0) {
+        if (settings.blueprint.guide0) {
           createCircle(
             p,
             innerRadius,
             debugStrokeColor,
             settings.strokeWidth,
-            group,
+            blueprint,
           );
         }
 
@@ -188,7 +192,7 @@ export function treeOfLife(
 
   // debugPoints(circlePoints, new paper.Color(0, 1, 0, 1));
 
-  const lines = [];
+  // const lines = [];
 
   const treeOfLifePoints = [
     //
@@ -210,7 +214,6 @@ export function treeOfLife(
   //   // debugPoints(treeOfLifePoints, new paper.Color(1, 1, 1, 0.75), r);
   // }
 
-  const circleGroup = new paper.Group();
   const circles: paper.Path.Circle[] = [];
 
   const transparentColor = new paper.Color(0, 0, 0, 0);
@@ -220,19 +223,19 @@ export function treeOfLife(
       createCircle(
         point,
         r,
-        settings.layers.guide1 ? debugStrokeColor : transparentColor,
+        settings.blueprint.guide1 ? debugStrokeColor : transparentColor,
         settings.strokeWidth,
-        circleGroup,
+        form,
       ),
     );
   });
 
-  if (settings.layers.guide2) {
+  if (settings.blueprint.guide2) {
     drawGuideLines(
       treeOfLifePoints,
       debugStrokeColor,
       settings.strokeWidth,
-      group,
+      blueprint,
     );
   }
 
@@ -429,12 +432,14 @@ export function treeOfLife(
   // const test = lerp(treeOfLifePoints[5], treeOfLifePoints[6], 0.5);
   // createCircle(test, r, new paper.Color(1, 0, 0, 1), 1, group);
 
-  if (settings.layers.guide3) {
-    debugPoints(
-      points,
-      debugStrokeColor,
-      settings.strokeWidth,
-      smallCircleRadius,
+  if (settings.blueprint.guide3) {
+    blueprint.addChild(
+      debugPoints(
+        points,
+        debugStrokeColor,
+        settings.strokeWidth,
+        smallCircleRadius,
+      ),
     );
   }
 
@@ -455,385 +460,383 @@ export function treeOfLife(
   //   createCircle(point, smallCircleRadius, strokeColor, 1, group);
   // });
 
-  if (settings.layers.form0) {
+  if (settings.form.architecture0) {
     treeOfLifePoints.forEach((point, i) => {
       circles.push(
         createCircle(
           point,
           r,
-          settings.layers.form0 ? settings.strokeColor : transparentColor,
+          settings.form.architecture0 ? settings.strokeColor : transparentColor,
           settings.strokeWidth,
-          circleGroup,
+          form,
         ),
       );
     });
   }
 
   // Circle 0
-  if (settings.layers.form1) {
+  if (settings.form.architecture1) {
     createLine(
       [points[0], points[7]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[1], points[6]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[2], points[89]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[3], points[93]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[4], points[15]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[5], points[14]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[88], points[90]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[92], points[94]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[91], points[39]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[95], points[38]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 1
-  if (settings.layers.form2) {
+  if (settings.form.architecture2) {
     createLine(
       [points[8], points[16]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[9], points[17]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[12], points[98]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[13], points[96]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[99], points[51]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[97], points[50]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[10], points[23]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[11], points[22]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 4
-  if (settings.layers.form3) {
+  if (settings.form.architecture3) {
     createLine(
       [points[20], points[100]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[21], points[102]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[101], points[53]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[103], points[52]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[18], points[31]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[19], points[30]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 2
-  if (settings.layers.form4) {
+  if (settings.form.architecture4) {
     createLine(
       [points[24], points[32]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[25], points[33]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[27], points[40]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[26], points[41]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[28], points[55]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[29], points[54]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 3
-  if (settings.layers.form5) {
+  if (settings.form.architecture5) {
     createLine(
       [points[34], points[43]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[35], points[42]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[36], points[65]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[37], points[64]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 7
-  if (settings.layers.form6) {
+  if (settings.form.architecture6) {
     createLine(
       [points[57], points[44]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[56], points[45]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[58], points[68]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[59], points[69]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[61], points[74]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[60], points[75]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[60], points[75]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[63], points[82]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[62], points[83]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 6
-  if (settings.layers.form7) {
+  if (settings.form.architecture7) {
     createLine(
       [points[66], points[47]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[67], points[46]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[70], points[79]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[71], points[78]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[72], points[87]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[73], points[86]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 8
-  if (settings.layers.form8) {
+  if (settings.form.architecture8) {
     createLine(
       [points[77], points[105]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[104], points[48]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[76], points[107]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[106], points[49]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Circle 9
-  if (settings.layers.form9) {
+  if (settings.form.architecture9) {
     createLine(
       [points[85], points[80]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [points[84], points[81]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
-
-  return group;
 }

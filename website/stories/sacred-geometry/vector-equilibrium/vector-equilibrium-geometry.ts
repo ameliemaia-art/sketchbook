@@ -5,41 +5,45 @@ import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
 export type VectorEquilibriumSettings = {
-  layers: {
+  blueprint: {
+    creation: boolean;
     circles: boolean;
+  };
+  form: {
     structure: boolean;
-    layer0: boolean;
-    layer1: boolean;
-    layer2: boolean;
-    layer3: boolean;
+    architecture0: boolean;
+    architecture1: boolean;
+    architecture2: boolean;
+    union: boolean;
   };
 };
 
 export function vectorEquilibrium(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings & VectorEquilibriumSettings,
 ) {
-  const group = new paper.Group();
   const total = 6;
   const innerRadius = radius / 3;
   const outlineRadius = radius - innerRadius;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.light) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
-  if (settings.layers.circles) {
+  if (settings.blueprint.creation) {
     createCircle(
       center,
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      blueprint,
     );
   }
 
@@ -49,13 +53,13 @@ export function vectorEquilibrium(
     const x = center.x + Math.cos(theta) * outlineRadius;
     const y = center.y + Math.sin(theta) * outlineRadius;
     points.push(new paper.Point(x, y));
-    if (settings.layers.circles) {
+    if (settings.blueprint.circles) {
       createCircle(
         points[i],
         innerRadius,
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
     }
   }
@@ -71,12 +75,12 @@ export function vectorEquilibrium(
     hexagonPoints.push(new paper.Point(x, y));
   }
 
-  if (settings.layers.structure) {
+  if (settings.form.structure) {
     createLine(
       [...hexagonPoints, hexagonPoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -88,47 +92,47 @@ export function vectorEquilibrium(
   const innerTopLeft = lerp(hexagonPoints[3], hexagonPoints[5], 1 / 3);
 
   // Horizontal lines
-  if (settings.layers.layer0) {
+  if (settings.form.architecture0) {
     createLine(
       [hexagonPoints[0], innerBottomRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [hexagonPoints[2], innerBottomLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [hexagonPoints[5], innerTopRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [hexagonPoints[3], innerTopLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [innerTopLeft, hexagonPoints[4], innerTopRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [innerBottomLeft, hexagonPoints[1], innerBottomRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -138,26 +142,26 @@ export function vectorEquilibrium(
   const innerLineLeft = lerp(leftMid, rightMid, 1 / 6);
   const innerLineRight = lerp(rightMid, leftMid, 1 / 6);
 
-  if (settings.layers.layer1) {
+  if (settings.form.architecture1) {
     // Vertical lines
     createLine(
       [innerTopRight, innerBottomRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [innerTopLeft, innerBottomLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [innerLineLeft, innerLineRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Diagonal lines
@@ -166,77 +170,75 @@ export function vectorEquilibrium(
       [hexagonPoints[5], innerLineRight, hexagonPoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [hexagonPoints[2], innerLineLeft, hexagonPoints[3]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer2) {
+  if (settings.form.architecture2) {
     // Cross lines
     createLine(
       [innerTopLeft, innerBottomRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [innerTopRight, innerBottomLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [innerBottomLeft, innerLineRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [innerBottomRight, innerLineLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [innerTopLeft, innerLineRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [innerTopRight, innerLineLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer3) {
+  if (settings.form.union) {
     createLine(
       [hexagonPoints[5], hexagonPoints[2]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [hexagonPoints[3], hexagonPoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [hexagonPoints[1], hexagonPoints[4]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
-
-  return group;
 }

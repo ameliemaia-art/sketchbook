@@ -7,12 +7,15 @@ import { SketchSettings } from "../sketch/sketch";
 export type VectorEquilibriumSphericalSettings = {
   petalRadius: number;
   petalOffset: number;
-  layers: {
+  blueprint: {
+    creation: boolean;
     circles: boolean;
+  };
+  form: {
     structure: boolean;
-    layer0: boolean;
-    layer1: boolean;
-    layer2: boolean;
+    energy: boolean;
+    architecture0: boolean;
+    architecture1: boolean;
   };
 };
 
@@ -59,17 +62,17 @@ function createPetal(
 }
 
 export function vectorEquilibriumSpherical(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings & VectorEquilibriumSphericalSettings,
 ) {
-  const group = new paper.Group();
-
-  if (settings.layers.light) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
   // Line from center
@@ -78,13 +81,13 @@ export function vectorEquilibriumSpherical(
 
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.circles) {
+  if (settings.blueprint.creation) {
     createCircle(
       center,
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      blueprint,
     );
   }
 
@@ -94,13 +97,13 @@ export function vectorEquilibriumSpherical(
     const x = center.x + Math.cos(theta) * outlineRadius;
     const y = center.y + Math.sin(theta) * outlineRadius;
 
-    if (settings.layers.circles) {
+    if (settings.blueprint.circles) {
       createCircle(
         new paper.Point(x, y),
         innerRadius,
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        blueprint,
       );
     }
   }
@@ -116,12 +119,12 @@ export function vectorEquilibriumSpherical(
     hexagonPoints.push(new paper.Point(x, y));
   }
 
-  if (settings.layers.structure) {
+  if (settings.form.structure) {
     createLine(
       [...hexagonPoints, hexagonPoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -131,17 +134,20 @@ export function vectorEquilibriumSpherical(
   const innerTopLeft = lerp(hexagonPoints[3], hexagonPoints[5], 1 / 3);
 
   // Petals
-  if (settings.layers.layer0) {
+  if (settings.form.energy) {
     const petal = createPetal(
       center,
       radius,
       settings.strokeColor,
       settings.strokeWidth,
     );
+    form.addChild(petal);
     const petal2 = petal.clone();
     petal2.rotate(60, center);
+    form.addChild(petal2);
     const petal3 = petal.clone();
     petal3.rotate(120, center);
+    form.addChild(petal3);
   }
 
   // Middle line
@@ -150,58 +156,56 @@ export function vectorEquilibriumSpherical(
   const innerLineLeft = lerp(leftMid, rightMid, 1 / 6);
   const innerLineRight = lerp(rightMid, leftMid, 1 / 6);
 
-  if (settings.layers.layer1) {
+  if (settings.form.architecture0) {
     // Lines
     createLine(
       [innerTopLeft, innerBottomRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [innerTopRight, innerBottomLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [innerTopRight, innerBottomLeft],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [innerLineLeft, innerLineRight],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer2) {
+  if (settings.form.architecture1) {
     // Diagonals
     createLine(
       [hexagonPoints[5], hexagonPoints[2]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [hexagonPoints[3], hexagonPoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [hexagonPoints[4], hexagonPoints[1]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
-
-  return group;
 }

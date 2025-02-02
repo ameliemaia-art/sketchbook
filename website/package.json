@@ -27,6 +27,7 @@
     "next": "14.2.3",
     "paper": "^0.12.17",
     "postprocessing": "^6.36.4",
+    "prettier": "^3.4.2",
     "react": "^18",
     "react-dom": "^18",
     "stats-gl": "^3.3.0",

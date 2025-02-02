@@ -14,23 +14,36 @@ import {
 export default class VectorEquilibrium extends Sketch {
   settings: SketchSettings & VectorEquilibriumSettings = {
     ...sketchSettings,
-    layers: {
-      darkness: false,
-      light: false,
-      circles: false,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+      creation: true,
+      circles: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
       structure: true,
-      layer0: true,
-      layer1: true,
-      layer2: true,
-      layer3: true,
+      architecture0: true,
+      architecture1: true,
+      architecture2: true,
+      union: true,
     },
   };
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(vectorEquilibrium(center, radius, this.settings));
+    vectorEquilibrium(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -45,23 +58,26 @@ export class GUIVectorEquilibrium extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.layers
-      .addBinding(target.settings.layers, "circles")
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "creation")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "structure")
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "circles")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer0")
+    this.folders.form
+      .addBinding(target.settings.form, "structure")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer1")
+    this.folders.form
+      .addBinding(target.settings.form, "architecture0")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer2")
+    this.folders.form
+      .addBinding(target.settings.form, "architecture1")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer3")
+    this.folders.form
+      .addBinding(target.settings.form, "architecture2")
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "union")
       .on("change", this.draw);
   }
 }
