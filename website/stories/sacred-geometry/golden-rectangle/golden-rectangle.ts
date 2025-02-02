@@ -14,22 +14,33 @@ import {
 export default class GoldenRectangle extends Sketch {
   settings: SketchSettings & GoldenRectangleSettings = {
     ...sketchSettings,
-    divisions: 9,
-    layers: {
-      background: false,
-      outline: false,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
+      divisions: 9,
       rectangle: true,
-      subdivisions: true,
+      subdivide: true,
       spiral: true,
     },
   };
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-
-    this.group?.addChild(goldenRectangle(center, radius, this.settings));
+    goldenRectangle(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -44,23 +55,22 @@ export class GUIGoldenRectangle extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.gui
-      .addBinding(target.settings, "divisions", {
+    this.folders.form
+      .addBinding(target.settings.form, "divisions", {
         min: 0,
         max: 10,
         step: 1,
         index: 3,
       })
       .on("change", this.draw);
-
-    this.folders.layers
-      .addBinding(target.settings.layers, "rectangle")
+    this.folders.form
+      .addBinding(target.settings.form, "rectangle")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "subdivisions")
+    this.folders.form
+      .addBinding(target.settings.form, "subdivide")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "spiral")
+    this.folders.form
+      .addBinding(target.settings.form, "spiral")
       .on("change", this.draw);
   }
 }

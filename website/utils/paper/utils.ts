@@ -66,8 +66,9 @@ export function debugPoints(
   fontSize = 15,
   fontColor = new paper.Color(1, 1, 1, 1),
 ) {
+  const group = new paper.Group();
   points.forEach((point, i) => {
-    createCircle(point, radius, color, strokeWidth);
+    group.addChild(createCircle(point, radius, color, strokeWidth));
 
     if (showText) {
       // Draw text next to point
@@ -76,8 +77,10 @@ export function debugPoints(
       text.style.fontSize = fontSize;
       text.fillColor = fontColor;
       text.position = new paper.Point(point.x, point.y);
+      group.addChild(text);
     }
   });
+  return group;
 }
 
 export function filterIntersectionPositions(

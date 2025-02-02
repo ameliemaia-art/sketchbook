@@ -5,10 +5,10 @@ import { createCircle } from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
 export type MetatronsCubeSettings = {
-  layers: {
-    background: boolean;
-    outline: boolean;
+  blueprint: {};
+  form: {
     creation: boolean;
+    architecture: boolean;
     structure: boolean;
     masculinity: boolean;
     femininity: boolean;
@@ -17,29 +17,30 @@ export type MetatronsCubeSettings = {
 };
 
 export function metatronsCube(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings & MetatronsCubeSettings,
 ) {
-  const group = new paper.Group();
   const total = 6;
   const innerRadius = radius / 5;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.outline) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
-  if (settings.layers.creation) {
+  if (settings.form.creation) {
     createCircle(
       center,
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -61,26 +62,26 @@ export function metatronsCube(
       // text.style.fillColor = new paper.Color(1, 0, 0);
       // group.addChild(text);
 
-      if (settings.layers.creation) {
+      if (settings.form.architecture) {
         createCircle(
           new paper.Point(x, y),
           innerRadius,
           settings.strokeColor,
           settings.strokeWidth,
-          group,
+          form,
         );
       }
     }
 
-    if (settings.layers.structure) {
+    if (settings.form.structure) {
       const line = new paper.Path([...points[i], points[i][0]]);
       line.strokeColor = settings.strokeColor;
       line.strokeWidth = settings.strokeWidth;
-      group.addChild(line);
+      form.addChild(line);
     }
 
     // Upwards triangle
-    if (settings.layers.masculinity) {
+    if (settings.form.masculinity) {
       const upwardsTriangle = new paper.Path([
         points[i][1],
         points[i][3],
@@ -89,10 +90,10 @@ export function metatronsCube(
       ]);
       upwardsTriangle.strokeColor = settings.strokeColor;
       upwardsTriangle.strokeWidth = settings.strokeWidth;
-      group.addChild(upwardsTriangle);
+      form.addChild(upwardsTriangle);
     }
 
-    if (settings.layers.femininity) {
+    if (settings.form.femininity) {
       const downwardsTriangle = new paper.Path([
         points[i][0],
         points[i][2],
@@ -101,11 +102,11 @@ export function metatronsCube(
       ]);
       downwardsTriangle.strokeColor = settings.strokeColor;
       downwardsTriangle.strokeWidth = settings.strokeWidth;
-      group.addChild(downwardsTriangle);
+      form.addChild(downwardsTriangle);
     }
   }
 
-  if (settings.layers.interconnectedness) {
+  if (settings.form.interconnectedness) {
     // Draw lines between outer circles and inner circles
     for (let j = 0; j < 6; j++) {
       const p0 = (j + 2) % points[0].length;
@@ -120,11 +121,9 @@ export function metatronsCube(
       const line2 = new paper.Path([points[1][j], points[0][p2]]);
       line2.strokeColor = settings.strokeColor;
       line2.strokeWidth = settings.strokeWidth;
-      group.addChild(line0);
-      group.addChild(line1);
-      group.addChild(line2);
+      form.addChild(line0);
+      form.addChild(line1);
+      form.addChild(line2);
     }
   }
-
-  return group;
 }

@@ -5,19 +5,22 @@ import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
 export type Tetrahedron64StarSettings = {
-  layers: {
+  blueprint: {
     circles: boolean;
+  };
+  form: {
+    creation: boolean;
     triangles: boolean;
     masculinity: boolean;
     femininity: boolean;
-    structure: boolean;
-    layer0: boolean;
-    layer1: boolean;
-    layer2: boolean;
-    layer3: boolean;
-    layer4: boolean;
-    layer5: boolean;
-    layer6: boolean;
+    architecture: boolean;
+    dimension0: boolean;
+    dimension1: boolean;
+    dimension2: boolean;
+    dimension3: boolean;
+    dimension4: boolean;
+    dimension5: boolean;
+    union: boolean;
   };
 };
 
@@ -32,6 +35,8 @@ function createMidPoints(points: paper.Point[]) {
 }
 
 export function tetrahedron64Star(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings & Tetrahedron64StarSettings,
@@ -42,20 +47,20 @@ export function tetrahedron64Star(
   const innerRadius = radius / dimensions;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.outline) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
-  if (settings.layers.circles) {
+  if (settings.blueprint.creation) {
     createCircle(
       center,
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      blueprint,
     );
   }
 
@@ -79,13 +84,13 @@ export function tetrahedron64Star(
       for (let l = 0; l < circlesPerDimension; l++) {
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
-        if (settings.layers.circles) {
+        if (settings.blueprint.circles) {
           createCircle(
             p,
             innerRadius,
             settings.strokeColor,
             settings.strokeWidth,
-            group,
+            blueprint,
           );
         }
       }
@@ -114,7 +119,7 @@ export function tetrahedron64Star(
   //   [...hexagonPoints, hexagonPoints[0]],
   //   new paper.Color(0, 1, 0, 1),
   //   strokeWidth,
-  //   group,
+  //   form,
   // );
 
   // Create masculine triangle
@@ -140,31 +145,31 @@ export function tetrahedron64Star(
   // debugPoints(feminineTriangleMidPoints, new paper.Color(0, 1, 0));
   // debugPoints(masculineTriangleMidPoints, new paper.Color(0, 1, 0));
 
-  if (settings.layers.masculinity) {
+  if (settings.form.masculinity) {
     createLine(
       [...masculineTrianglePoints, masculineTrianglePoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.femininity) {
+  if (settings.form.femininity) {
     createLine(
       [...feminineTrianglePoints, feminineTrianglePoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.structure) {
+  if (settings.form.architecture) {
     // Create hexagon
     createLine(
       [...hexagonMidPoints, hexagonMidPoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -186,13 +191,13 @@ export function tetrahedron64Star(
     innerFeminineTrianglePoints,
   );
 
-  if (settings.layers.layer0) {
+  if (settings.form.dimension0) {
     // Create inner masculine triangle
     createLine(
       [...innerMasculineTrianglePoints, innerMasculineTrianglePoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Create inner feminine triangle
@@ -200,7 +205,7 @@ export function tetrahedron64Star(
       [...innerFeminineTrianglePoints, innerFeminineTrianglePoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -216,26 +221,26 @@ export function tetrahedron64Star(
     masculineTriangleMidPoints[2],
   ];
 
-  if (settings.layers.layer1) {
+  if (settings.form.dimension1) {
     createLine(
       [...innerFeminineTrianglePoints, innerFeminineTrianglePoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [...inner2MasculineTrianglePoints, inner2MasculineTrianglePoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [...inner2FeminineTrianglePoints, inner2FeminineTrianglePoints[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -243,7 +248,7 @@ export function tetrahedron64Star(
   // debugPoints(feminineTriangleMidPoints, new paper.Color(0, 1, 0));
 
   // hexagon triangles
-  if (settings.layers.layer2) {
+  if (settings.form.dimension2) {
     createLine(
       [
         hexagonMidPoints[4],
@@ -253,7 +258,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -264,12 +269,12 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
   // Horizontal lines
-  if (settings.layers.layer3) {
+  if (settings.form.dimension3) {
     createLine(
       [
         lerp(
@@ -285,7 +290,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -302,7 +307,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -320,7 +325,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -338,7 +343,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -356,7 +361,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -374,11 +379,11 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer4) {
+  if (settings.form.dimension4) {
     // Vertical lines
     createLine(
       [
@@ -395,7 +400,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -412,7 +417,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -430,7 +435,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -447,7 +452,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -465,7 +470,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -483,7 +488,7 @@ export function tetrahedron64Star(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -521,57 +526,55 @@ export function tetrahedron64Star(
     ],
   ];
 
-  if (settings.layers.layer5) {
+  if (settings.form.dimension5) {
     cornerPoints.forEach((points, i) => {
-      createLine(points, settings.strokeColor, settings.strokeWidth, group);
+      createLine(points, settings.strokeColor, settings.strokeWidth, form);
       createLine(
         [cornerPoints[i][0], cornerPoints[i][2]],
         settings.strokeColor,
         settings.strokeWidth,
-        group,
+        form,
       );
     });
   }
 
-  if (settings.layers.layer6) {
+  if (settings.form.union) {
     // Lines
     createLine(
       [masculineTrianglePoints[0], feminineTrianglePoints[1]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [hexagonMidPoints[4], hexagonMidPoints[1]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [feminineTrianglePoints[0], masculineTrianglePoints[2]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [hexagonMidPoints[5], hexagonMidPoints[2]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [masculineTrianglePoints[1], feminineTrianglePoints[2]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [hexagonMidPoints[0], hexagonMidPoints[3]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
-
-  return group;
 }

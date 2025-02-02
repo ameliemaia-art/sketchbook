@@ -14,10 +14,16 @@ import {
 export default class MetatronsCube extends Sketch {
   settings: SketchSettings & MetatronsCubeSettings = {
     ...sketchSettings,
-    layers: {
-      background: false,
-      outline: false,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
       creation: true,
+      architecture: true,
       structure: true,
       masculinity: true,
       femininity: true,
@@ -27,9 +33,16 @@ export default class MetatronsCube extends Sketch {
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(metatronsCube(center, radius, this.settings));
+    metatronsCube(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -44,20 +57,23 @@ export class GUIMetatronsCube extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.layers
-      .addBinding(target.settings.layers, "structure")
+    this.folders.form
+      .addBinding(target.settings.form, "creation")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "creation")
+    this.folders.form
+      .addBinding(target.settings.form, "architecture")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "masculinity")
+    this.folders.form
+      .addBinding(target.settings.form, "structure")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "femininity")
+    this.folders.form
+      .addBinding(target.settings.form, "masculinity")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "interconnectedness")
+    this.folders.form
+      .addBinding(target.settings.form, "femininity")
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "interconnectedness")
       .on("change", this.draw);
   }
 }

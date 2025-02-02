@@ -13,15 +13,19 @@ export default class Platonic extends Sketch {
     ...sketchSettings,
     strokeDepthColor: new paper.Color(1, 1, 1, 0.5),
     grid: {
+      visible: true,
       divisions: 25,
-      strokeColor: new paper.Color(1, 1, 1, 0.1),
+      opacity: 0.1,
     },
-    guide: {
-      strokeColor: new paper.Color(1, 1, 1, 0.25),
+    blueprint: {
+      opacity: 0.25,
+      visible: true,
+      cosmos: false,
+      architecture: true,
     },
-    layers: {
-      background: true,
-      outline: false,
+    form: {
+      opacity: 1,
+      visible: true,
       tetrahedron: false,
       hexahedron: false,
       octahedron: false,
@@ -32,10 +36,16 @@ export default class Platonic extends Sketch {
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(
-      platonic(center, paper.view.size, radius, this.settings),
+    platonic(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      paper.view.size,
+      radius,
+      this.settings,
     );
   }
 
@@ -60,38 +70,34 @@ export class GUIPlatonic extends GUISketch {
       })
       .on("change", this.draw);
 
-    this.folders.grid = this.addFolder(this.gui, { title: "Grid", index: 4 });
+    this.folders.grid = this.addFolder(this.gui, { title: "Grid", index: 5 });
     this.folders.grid
-      .addBinding(target.settings.grid.strokeColor, "alpha", {
+      .addBinding(target.settings.grid, "visible")
+      .on("change", this.draw);
+    this.folders.grid
+      .addBinding(target.settings.grid, "opacity", {
         min: 0,
         max: 1,
-        label: "strokeColor",
       })
       .on("change", this.draw);
 
-    this.folders.guide = this.addFolder(this.gui, { title: "Guide", index: 5 });
-    this.folders.guide
-      .addBinding(target.settings.guide.strokeColor, "alpha", {
-        min: 0,
-        max: 1,
-        label: "strokeColor",
-      })
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "architecture")
       .on("change", this.draw);
-
-    this.folders.layers
-      .addBinding(target.settings.layers, "hexahedron")
+    this.folders.form
+      .addBinding(target.settings.form, "hexahedron")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "icosahedron")
+    this.folders.form
+      .addBinding(target.settings.form, "icosahedron")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "tetrahedron")
+    this.folders.form
+      .addBinding(target.settings.form, "tetrahedron")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "octahedron")
+    this.folders.form
+      .addBinding(target.settings.form, "octahedron")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "dodecahedron")
+    this.folders.form
+      .addBinding(target.settings.form, "dodecahedron")
       .on("change", this.draw);
   }
 }

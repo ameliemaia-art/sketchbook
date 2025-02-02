@@ -4,14 +4,22 @@ import { TWO_PI } from "@utils/three/math";
 import { lerp } from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
+export type GermOfLifeSettings = {
+  blueprint: {};
+  form: {
+    seed: boolean;
+    petal: boolean;
+  };
+};
+
 function createFlowerCircle(
   center: paper.Point,
   innerRadius: number,
   startAngle: number,
   strokeColor: paper.Color,
   strokeWidth: number,
+  form: paper.Group,
 ) {
-  const group = new paper.Group();
   const total = 6;
   const points: paper.Point[] = [];
   const outlineRadius = innerRadius;
@@ -52,34 +60,42 @@ function createFlowerCircle(
     const centerPetal = petal.clone();
     centerPetal.position.y = points[4].y;
     centerPetal.rotate(angle * i, center);
+    form.addChild(centerPetal);
   }
   petal.remove();
-  return group;
 }
 
 export function germOfLife(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings,
 ) {
-  const group = new paper.Group();
-
-  if (settings.layers.outline) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
+  }
+
+  if (settings.form.seed) {
+    const path = new paper.Path.Circle(center, radius);
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
+    form.addChild(path);
   }
 
   const startAngle = -Math.PI / 6;
 
-  createFlowerCircle(
-    center,
-    radius,
-    startAngle,
-    settings.strokeColor,
-    settings.strokeWidth,
-  );
-
-  return group;
+  if (settings.form.petal) {
+    createFlowerCircle(
+      center,
+      radius,
+      startAngle,
+      settings.strokeColor,
+      settings.strokeWidth,
+      form,
+    );
+  }
 }

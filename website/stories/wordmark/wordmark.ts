@@ -30,8 +30,8 @@ export default class Wordmark {
   ) {
     this.canvas = canvas;
 
-    canvas.width = 500;
-    canvas.height = 500;
+    canvas.width = 2500;
+    canvas.height = 2500;
     paper.setup(canvas);
 
     this.identity = new Identity(canvas, false);

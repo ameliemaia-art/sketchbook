@@ -11,31 +11,43 @@ import { treeOfLife, TreeOfLifeSettings } from "./tree-of-life-geometry";
 export default class TreeOfLife extends Sketch {
   settings: SketchSettings & TreeOfLifeSettings = {
     ...sketchSettings,
-    layers: {
-      background: false,
-      outline: false,
-      guide0: false,
-      guide1: false,
-      guide2: false,
-      guide3: false,
-      form0: true,
-      form1: true,
-      form2: true,
-      form3: true,
-      form4: true,
-      form5: true,
-      form6: true,
-      form7: true,
-      form8: true,
-      form9: true,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+      guide0: true,
+      guide1: true,
+      guide2: true,
+      guide3: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
+      architecture0: true,
+      architecture1: true,
+      architecture2: true,
+      architecture3: true,
+      architecture4: true,
+      architecture5: true,
+      architecture6: true,
+      architecture7: true,
+      architecture8: true,
+      architecture9: true,
     },
   };
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(treeOfLife(center, radius, this.settings));
+    treeOfLife(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -50,21 +62,14 @@ export class GUITreeOfLife extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.guide = this.addFolder(this.folders.layers, {
-      title: "Guides",
-    });
-    this.folders.form = this.addFolder(this.folders.layers, {
-      title: "Form",
-    });
-
     for (let i = 0; i < 4; i++) {
-      this.folders.guide
-        .addBinding(target.settings.layers, `guide${i}`)
+      this.folders.blueprint
+        .addBinding(target.settings.blueprint, `guide${i}`)
         .on("change", this.draw);
     }
     for (let i = 0; i < 10; i++) {
       this.folders.form
-        .addBinding(target.settings.layers, `form${i}`)
+        .addBinding(target.settings.form, `architecture${i}`)
         .on("change", this.draw);
     }
   }

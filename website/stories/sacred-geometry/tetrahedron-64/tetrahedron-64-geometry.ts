@@ -5,44 +5,42 @@ import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
 export type Tetrahedron64Settings = {
-  layers: {
+  blueprint: {
     circles: boolean;
-    triangles: boolean;
-    hexagon: boolean;
-    layer0: boolean;
-    layer1: boolean;
-    layer2: boolean;
-    layer3: boolean;
-    layer4: boolean;
-    layer5: boolean;
+  };
+  form: {
+    architecture: boolean;
+    multidimensional: boolean;
+    union: boolean;
   };
 };
 
 export function tetrahedron64(
+  blueprint: paper.Group,
+  form: paper.Group,
   center: paper.Point,
   radius: number,
   settings: SketchSettings,
 ) {
-  const group = new paper.Group();
   const total = 6;
   const dimensions = 2;
   const innerRadius = radius / dimensions;
   const startAngle = -Math.PI / 6;
 
-  if (settings.layers.outline) {
+  if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
     path.strokeColor = settings.strokeColor;
     path.strokeWidth = settings.strokeWidth;
-    group.addChild(path);
+    blueprint.addChild(path);
   }
 
-  if (settings.layers.circles) {
+  if (settings.blueprint.circles) {
     createCircle(
       center,
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      blueprint,
     );
   }
 
@@ -66,13 +64,13 @@ export function tetrahedron64(
       for (let l = 0; l < circlesPerDimension; l++) {
         const t = l / (circlesPerDimension - 1);
         const p = lerp(p0, p1, t);
-        if (settings.layers.circles) {
+        if (settings.blueprint.circles) {
           createCircle(
             p,
             innerRadius,
             settings.strokeColor,
             settings.strokeWidth,
-            group,
+            blueprint,
           );
         }
       }
@@ -88,12 +86,12 @@ export function tetrahedron64(
     const y = center.y + Math.sin(theta) * radius;
     trianglePointsOuter.push(new paper.Point(x, y));
   }
-  if (settings.layers.triangles) {
+  if (settings.form.architecture) {
     createLine(
       [...trianglePointsOuter, trianglePointsOuter[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -107,12 +105,12 @@ export function tetrahedron64(
     trianglePointsInner.push(new paper.Point(x, y));
   }
 
-  if (settings.layers.triangles) {
+  if (settings.form.architecture) {
     createLine(
       [...trianglePointsInner, trianglePointsInner[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
@@ -130,10 +128,10 @@ export function tetrahedron64(
   //   [...hexagonPoints, hexagonPoints[0]],
   //   new paper.Color(0, 1, 0, 1),
   //   strokeWidth,
-  //   group,
+  //   form,
   // );
 
-  if (settings.layers.hexagon) {
+  if (settings.form.architecture) {
     // Bottom hexagon line
     createLine(
       [
@@ -144,7 +142,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Left hexagon line
@@ -157,7 +155,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Right hexagon line
@@ -171,13 +169,13 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Middle left and right corners of hexagon
   }
 
-  if (settings.layers.layer0) {
+  if (settings.form.multidimensional) {
     createLine(
       [
         lerp(hexagonPoints[5], hexagonPoints[0], 0.5),
@@ -185,7 +183,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -194,7 +192,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Top left and right corners of hexagon
@@ -205,7 +203,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -214,7 +212,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Bottom left and right corners of hexagon
@@ -225,7 +223,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -234,23 +232,23 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer1) {
+  if (settings.form.multidimensional) {
     // Top corners of hexagon to tip of smaller triangle
     createLine(
       [lerp(hexagonPoints[4], hexagonPoints[5], 0.5), trianglePointsInner[2]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [lerp(hexagonPoints[3], hexagonPoints[4], 0.5), trianglePointsInner[2]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Middle left and right corners
@@ -258,31 +256,31 @@ export function tetrahedron64(
       [lerp(hexagonPoints[5], hexagonPoints[0], 0.5), trianglePointsInner[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [lerp(hexagonPoints[2], hexagonPoints[3], 0.5), trianglePointsInner[1]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     // Bottom left and right corners
     createLine(
       [lerp(hexagonPoints[0], hexagonPoints[1], 0.5), trianglePointsInner[0]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
       [lerp(hexagonPoints[1], hexagonPoints[2], 0.5), trianglePointsInner[1]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer2) {
+  if (settings.form.multidimensional) {
     // Connect top corners of outer triangle
     createLine(
       [
@@ -299,7 +297,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Left corners of outer triangle
@@ -318,7 +316,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -336,7 +334,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -350,7 +348,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -364,7 +362,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -374,7 +372,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -384,7 +382,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -394,7 +392,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -404,11 +402,11 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer3) {
+  if (settings.form.multidimensional) {
     // Inverted triangle in the middle
     createLine(
       [
@@ -419,7 +417,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Inverted triangle on the sides
@@ -431,7 +429,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -441,11 +439,11 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer4) {
+  if (settings.form.multidimensional) {
     // Inverted triangle on the bottom
     createLine(
       [
@@ -455,7 +453,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Next layer of inverted triangles
@@ -471,7 +469,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -485,7 +483,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [
@@ -499,7 +497,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     // Inverted triangle underneath
@@ -519,7 +517,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -538,7 +536,7 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
 
     createLine(
@@ -557,31 +555,29 @@ export function tetrahedron64(
       ],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
 
-  if (settings.layers.layer5) {
+  if (settings.form.union) {
     // Lines
     createLine(
       [center, hexagonPoints[5]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [center, hexagonPoints[1]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
     createLine(
       [center, hexagonPoints[3]],
       settings.strokeColor,
       settings.strokeWidth,
-      group,
+      form,
     );
   }
-
-  return group;
 }

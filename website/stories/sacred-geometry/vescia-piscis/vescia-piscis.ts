@@ -11,20 +11,33 @@ import { vesciaPiscis, VesicaPiscisSettings } from "./vescia-piscis-geometry";
 export default class VesicaPiscis extends Sketch {
   settings: SketchSettings & VesicaPiscisSettings = {
     ...sketchSettings,
-    layers: {
-      background: false,
-      outline: false,
-      heaven: true,
-      earth: true,
-      creation: true,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
+      divinity: true,
+      awakening: true,
+      conscious: true,
+      unconscious: true,
     },
   };
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(vesciaPiscis(center, radius, this.settings));
+    vesciaPiscis(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -39,14 +52,17 @@ export class GUIVesicaPiscis extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.layers
-      .addBinding(target.settings.layers, "creation")
+    this.folders.form
+      .addBinding(target.settings.form, "divinity")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "heaven")
+    this.folders.form
+      .addBinding(target.settings.form, "awakening")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "earth")
+    this.folders.form
+      .addBinding(target.settings.form, "conscious")
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "unconscious")
       .on("change", this.draw);
   }
 }

@@ -14,26 +14,33 @@ import {
 export default class Tetrahedron64 extends Sketch {
   settings: SketchSettings & Tetrahedron64Settings = {
     ...sketchSettings,
-    layers: {
-      background: false,
-      outline: false,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
       circles: false,
-      triangles: true,
-      hexagon: true,
-      layer0: true,
-      layer1: true,
-      layer2: true,
-      layer3: true,
-      layer4: true,
-      layer5: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
+      architecture: true,
+      multidimensional: true,
+      union: true,
     },
   };
 
   draw() {
     super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    this.group?.addChild(tetrahedron64(center, radius, this.settings));
+    tetrahedron64(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
   }
 
   name() {
@@ -48,32 +55,17 @@ export class GUITetrahedron64 extends GUISketch {
   ) {
     super(gui, target, target.name());
 
-    this.folders.layers
-      .addBinding(target.settings.layers, "circles")
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "circles")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "triangles")
+    this.folders.form
+      .addBinding(target.settings.form, "architecture")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "hexagon")
+    this.folders.form
+      .addBinding(target.settings.form, "multidimensional")
       .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer0")
-      .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer1")
-      .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer2")
-      .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer3")
-      .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer4")
-      .on("change", this.draw);
-    this.folders.layers
-      .addBinding(target.settings.layers, "layer5")
+    this.folders.form
+      .addBinding(target.settings.form, "union")
       .on("change", this.draw);
   }
 }
