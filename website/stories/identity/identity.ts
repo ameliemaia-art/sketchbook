@@ -8,24 +8,24 @@ import { Settings } from "./types";
 
 // Adjust this if canvas size changes
 // 512 = 1 for original logo
-const strokeScale = 1;
 
 export default class Identity {
   settings: Settings = {
     scale: 0.25,
     opacity: 1,
+    darkness: false,
     creation: {
-      width: 2 * strokeScale,
+      width: 2,
       alpha: 1,
       color: new paper.Color(0),
     },
     stars: {
-      width: 1 * strokeScale,
+      width: 1,
       alpha: 1,
       color: new paper.Color(0),
     },
     realm: {
-      width: 1 * strokeScale,
+      width: 1,
       alpha: 0.5,
       color: new paper.Color(0),
     },
@@ -35,12 +35,12 @@ export default class Identity {
     },
     icoshahedron: {
       front: {
-        width: 1.5 * strokeScale,
+        width: 1.5,
         alpha: 1,
         color: new paper.Color(0),
       },
       back: {
-        width: 1.5 * strokeScale,
+        width: 1.5, // * strokeScale,
         alpha: 0.5,
         color: new paper.Color(0),
       },
@@ -51,35 +51,61 @@ export default class Identity {
     },
   };
 
-  constructor(
-    public canvas: HTMLCanvasElement,
-    setup = true,
-  ) {
-    this.canvas = canvas;
+  canvas?: HTMLCanvasElement;
 
-    if (setup) {
-      canvas.width = 500;
-      canvas.height = 500;
-      paper.setup(canvas);
+  constructor(canvas?: HTMLCanvasElement, setup = true) {
+    if (setup && canvas instanceof HTMLCanvasElement) {
+      this.canvas = canvas;
+      paper.setup(this.canvas);
+      this.setup();
     }
-
-    this.draw();
   }
 
-  draw = () => {
-    paper.project.activeLayer.removeChildren();
+  async setup(exporting = false) {
+    return new Promise<void>((resolve) => {
+      const scale = exporting ? 5 : 1;
+      this.updateSettings(scale);
+      if (this.canvas) {
+        this.canvas.width = 500;
+        this.canvas.height = 500;
+        paper.view.viewSize = new paper.Size(
+          this.canvas.width * scale,
+          this.canvas.height * scale,
+        );
+      }
+      requestAnimationFrame(() => {
+        this.draw();
+        paper.view.update();
+        resolve();
+      });
+    });
+  }
+
+  updateSettings = (scale: number) => {
+    this.settings.creation.width = 2 * scale;
+    this.settings.stars.width = 1 * scale;
+    this.settings.realm.width = 1 * scale;
+    this.settings.icoshahedron.front.width = 1.5 * scale;
+    this.settings.icoshahedron.back.width = 1.5 * scale;
+  };
+
+  draw = (clear = true) => {
+    if (clear) {
+      paper.project.activeLayer.removeChildren();
+    }
 
     let group = new paper.Group();
     group.opacity = this.settings.opacity;
 
     // create a rectangle to fill the background
-    // const background = new paper.Path.Rectangle(
-    //   paper.view.bounds.topLeft,
-    //   paper.view.bounds.bottomRight,
-    // );
-    // color the background black
-    // background.fillColor = new paper.Color(0, 0, 0);
-    // group.addChild(background);
+    if (this.settings.darkness) {
+      const background = new paper.Path.Rectangle(
+        paper.view.bounds.topLeft,
+        paper.view.bounds.bottomRight,
+      );
+      background.fillColor = new paper.Color(0, 0, 0);
+      group.addChild(background);
+    }
 
     const radius = paper.view.size.width * this.settings.scale;
     const center = paper.view.bounds.center;
@@ -149,16 +175,22 @@ export default class Identity {
     paper.view.rotate(180);
   };
 
-  saveImage = () => {
-    saveImage(this.canvas, "identity");
+  // saveImage = () => {
+  //   saveImage(this.canvas, "identity");
 
-    // const composition = composite(
-    //   this.canvas.width / 2,
-    //   this.canvas.height / 2,
-    //   [this.canvas],
-    // );
-    // saveImage(composition, "identity");
-  };
+  //   // const composition = composite(
+  //   //   this.canvas.width / 2,
+  //   //   this.canvas.height / 2,
+  //   //   [this.canvas],
+  //   // );
+  //   // saveImage(composition, "identity");
+  // };
+
+  async saveImage() {
+    await this.setup(true);
+    await saveImage(this.canvas!, "identity");
+    await this.setup(false);
+  }
 
   saveSVG = () => {
     saveSVG(paper.project, "identity");
@@ -175,14 +207,19 @@ export class IdentityGUI extends GUIController {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Identity" });
 
-    this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
-    this.gui.addButton({ title: "Save SVG" }).on("click", target.saveSVG);
+    this.gui.addButton({ title: "Save Image", label: "" }).on("click", () => {
+      target.saveImage();
+    });
+    this.gui
+      .addButton({ title: "Save SVG", label: "" })
+      .on("click", target.saveSVG);
     this.gui
       .addBinding(target.settings, "scale", { min: 0, max: 0.5 })
       .on("change", target.draw);
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", target.draw);
+    this.gui.addBinding(target.settings, "darkness").on("change", target.draw);
 
     const guiCreation = this.addFolder(this.gui, { title: "creation" });
     const guiRealm = this.addFolder(this.gui, { title: "realm" });

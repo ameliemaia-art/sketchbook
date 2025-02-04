@@ -33,6 +33,7 @@ export function composite(
   width: number,
   height: number,
   layers: HTMLCanvasElement[],
+  background = true,
 ) {
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -40,14 +41,14 @@ export function composite(
   const ctx = canvas.getContext("2d");
 
   if (ctx) {
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, width, height);
+    if (background) {
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, width, height);
+    }
 
-    console.log("xx");
-
-    // layers.forEach((layer) => {
-    //   ctx.drawImage(layer, 0, 0, width, height);
-    // });
+    layers.forEach((layer) => {
+      ctx.drawImage(layer, 0, 0, width, height);
+    });
   }
 
   return canvas;

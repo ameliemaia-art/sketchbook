@@ -7,6 +7,7 @@ import Identity, { IdentityGUI } from "../identity/identity";
 
 export default class Wordmark {
   settings = {
+    darkness: false,
     text: {
       size: 0.0735,
       color: "#ffffff", // eb0000
@@ -14,7 +15,7 @@ export default class Wordmark {
     },
     debug: {
       width: 1,
-      color: "#ffffff",
+      color: "#ff0000",
       enabled: false,
     },
   };
@@ -30,32 +31,52 @@ export default class Wordmark {
   ) {
     this.canvas = canvas;
 
-    canvas.width = 2500;
-    canvas.height = 2500;
-    paper.setup(canvas);
-
-    this.identity = new Identity(canvas, false);
+    this.identity = new Identity(undefined, false);
     this.identity.settings.opacity = 0.25;
 
     // Canvas
     this.textCanvas = document.createElement("canvas");
     this.textCtx = this.textCanvas.getContext("2d");
-    this.textCanvas.width = canvas.width;
-    this.textCanvas.height = canvas.height;
-    this.textCtx?.scale(2, 2);
-
-    Object.assign(this.textCanvas.style, {
-      position: "absolute",
-      top: "0",
-      left: "0",
-      width: `${canvas.width / 2}px`,
-      height: `${canvas.height / 2}px`,
-    });
 
     root.appendChild(this.textCanvas);
 
+    paper.setup(this.canvas);
+
     document.fonts.ready.then(() => {
-      this.draw();
+      this.setup();
+    });
+  }
+
+  async setup(exporting = false) {
+    return new Promise<void>((resolve) => {
+      const scale = exporting ? 5 : 1;
+
+      this.canvas.width = 500;
+      this.canvas.height = 500;
+      paper.view.viewSize = new paper.Size(
+        this.canvas.width * scale,
+        this.canvas.height * scale,
+      );
+
+      this.textCanvas.width = this.canvas.width;
+      this.textCanvas.height = this.canvas.height;
+      this.textCtx?.scale(2, 2);
+      this.identity.updateSettings(scale);
+
+      Object.assign(this.textCanvas.style, {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: `${this.canvas.width / 2}px`,
+        height: `${this.canvas.height / 2}px`,
+        // border: "1px solid white",
+      });
+
+      requestAnimationFrame(() => {
+        this.draw();
+        paper.view.update();
+        resolve();
+      });
     });
   }
 
@@ -63,7 +84,16 @@ export default class Wordmark {
     if (!this.textCtx) return;
     paper.project.activeLayer.removeChildren();
 
-    this.identity.draw();
+    // create a rectangle to fill the background
+    if (this.settings.darkness) {
+      const background = new paper.Path.Rectangle(
+        paper.view.bounds.topLeft,
+        paper.view.bounds.bottomRight,
+      );
+      background.fillColor = new paper.Color(0, 0, 0);
+    }
+
+    this.identity.draw(false);
 
     this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
 
@@ -113,16 +143,19 @@ export default class Wordmark {
     );
   };
 
-  saveImage = () => {
-    const composition = composite(
-      this.canvas.width / 2,
-      this.canvas.height / 2,
-      [this.canvas, this.textCanvas],
-    );
+  async saveImage() {
+    await this.setup(true);
 
-    saveImage(this.textCanvas, "wordmark");
-    // saveImage(composition, "wordmark");
-  };
+    const composition = composite(
+      this.canvas.width,
+      this.canvas.height,
+      [this.canvas, this.textCanvas],
+      false,
+    );
+    await saveImage(composition, "wordmark");
+
+    await this.setup(false);
+  }
 
   saveSVG = () => {
     saveSVG(paper.project, "wordmark");
@@ -139,10 +172,13 @@ export class WordmarkGUI extends GUIController {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Wordmark" });
 
-    this.gui.addButton({ title: "Draw" }).on("click", target.draw);
-    this.gui.addButton({ title: "Save Image" }).on("click", target.saveImage);
+    this.gui.addButton({ title: "Draw", label: "" }).on("click", target.draw);
+    this.gui.addButton({ title: "Save Image", label: "" }).on("click", () => {
+      target.saveImage();
+    });
+    this.gui.addBinding(target.settings, "darkness").on("change", target.draw);
     this.gui
-      .addBinding(target.settings.debug, "enabled")
+      .addBinding(target.settings.debug, "enabled", { label: "guidelines" })
       .on("change", target.draw);
 
     const text = this.gui.addFolder({ title: "Text" });

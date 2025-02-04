@@ -7,6 +7,7 @@ export type DrawSettings = {
 export type Settings = {
   scale: number;
   opacity: number;
+  darkness: boolean;
   creation: DrawSettings;
   stars: DrawSettings;
   realm: DrawSettings;
