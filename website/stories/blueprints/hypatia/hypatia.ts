@@ -20,8 +20,9 @@ export default class Hypatia extends Sketch {
     form: {
       visible: true,
       opacity: 1,
+      outline: true,
       earth: true,
-      planets: true,
+      planets: false,
       planetsMaxRotation: 1.75,
     },
   };
@@ -52,6 +53,9 @@ export class GUIHypatia extends GUISketch {
   ) {
     super(gui, target, target.name());
 
+    this.folders.form
+      .addBinding(target.settings.form, "outline")
+      .on("change", this.draw);
     this.folders.form
       .addBinding(target.settings.form, "earth")
       .on("change", this.draw);

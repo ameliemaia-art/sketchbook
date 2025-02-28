@@ -1,6 +1,7 @@
 import paper from "paper";
 import { MathUtils } from "three";
 
+import { createLine } from "@utils/paper/utils";
 import { TWO_PI } from "@utils/three/math";
 import { SketchSettings } from "../sketch/sketch";
 
@@ -12,6 +13,23 @@ export type HypatiaSettings = {
     planetsMaxRotation: number;
   };
 };
+
+function createElipse(
+  radius: number,
+  center,
+  perspectiveFactorX,
+  perspectiveFactorY,
+  strokeColor,
+  strokeWidth,
+) {
+  const path = new paper.Path.Ellipse({
+    center: center,
+    size: [radius * 2 * perspectiveFactorX, radius * 2 * perspectiveFactorY], // Making Y-axis shorter
+    strokeColor,
+    strokeWidth,
+  });
+  return path;
+}
 
 export function hypatia(
   blueprint: paper.Group,
@@ -27,6 +45,24 @@ export function hypatia(
     blueprint.addChild(path);
   }
 
+  const col = new paper.Color(1, 1, 1, 0.5);
+
+  if (settings.form.outline) {
+    const path = new paper.Path.Circle(center, radius);
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.strokeWidth;
+    form.addChild(path);
+  }
+
+  const M = 1 / Math.sqrt(3);
+
+  // createElipse(radius, center, 1, M, col, settings.strokeWidth);
+  createElipse(radius, center, M, 1, col, settings.strokeWidth);
+  const l = createElipse(radius, center, M, 1, col, settings.strokeWidth);
+  l.rotate(45);
+  const r = createElipse(radius, center, M, 1, col, settings.strokeWidth);
+  r.rotate(-45);
+
   const earthRadius = radius / 20;
 
   if (settings.form.earth) {
@@ -40,7 +76,7 @@ export function hypatia(
   // Space 7 concentril circles
   const total = 7;
   const minRadius = radius / 5;
-  const maxRadius = radius;
+  const maxRadius = radius * 1;
 
   const planetRadius = radius / 20;
 
@@ -48,7 +84,7 @@ export function hypatia(
     const p = i / (total - 1);
     const r = MathUtils.lerp(minRadius, maxRadius, p);
 
-    const perspectiveFactorY = 1 / Math.sqrt(3); // ~0.577
+    const perspectiveFactorY = M; // ~0.577
     const perspectiveFactorX = 1; // Major axis remains 1
 
     const path = new paper.Path.Ellipse({
