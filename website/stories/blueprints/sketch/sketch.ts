@@ -9,6 +9,7 @@ export type SketchSettings = {
   strokeWidth: number;
   scale: number;
   opacity: number;
+  seed: number;
   darkness: boolean;
   blueprint: { [key: string]: unknown };
   form: { [key: string]: unknown };
@@ -18,6 +19,7 @@ export const sketchSettings: SketchSettings = {
   scale: 0.85,
   opacity: 1,
   strokeWidth: 1,
+  seed: 0,
   strokeColor: new paper.Color(1, 1, 1, 1),
   darkness: false,
   blueprint: {
@@ -125,6 +127,9 @@ export class GUISketch extends GUIController {
       .on("change", this.draw);
     this.gui
       .addBinding(target.settings, "scale", { min: 0.1 })
+      .on("change", this.draw);
+    this.gui
+      .addBinding(target.settings, "seed", { min: 0, step: 1 })
       .on("change", this.draw);
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })

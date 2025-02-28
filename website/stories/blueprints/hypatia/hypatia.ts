@@ -1,6 +1,7 @@
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
+import mathSeeded from "@utils/math-seeded";
 import Sketch, {
   GUISketch,
   SketchSettings,
@@ -12,6 +13,7 @@ export default class Hypatia extends Sketch {
   settings: SketchSettings & HypatiaSettings = {
     ...sketchSettings,
     scale: 0.85,
+    seed: 0,
     blueprint: {
       visible: true,
       opacity: 0.5,
@@ -21,17 +23,40 @@ export default class Hypatia extends Sketch {
       visible: true,
       opacity: 1,
       outline: true,
-      earth: true,
-      planets: false,
-      planetsMaxRotation: 1.75,
+      hypatia: {
+        visible: true,
+        radius: 0.01,
+      },
+      planets: {
+        visible: true,
+        color: 0.25,
+        spiral: 2.25,
+        radius: 0.0025,
+      },
+      stars: {
+        visible: true,
+        total: 5000,
+        radius: 0.0015,
+        color: 0.5,
+      },
+      motionPaths: {
+        visible: true,
+        dash: 0.005,
+        color: 1,
+      },
     },
   };
+
+  constructor(canvas: HTMLCanvasElement) {
+    super(canvas);
+  }
 
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
+    mathSeeded.setSeed(this.settings.seed);
     hypatia(
       this.layers.blueprint,
       this.layers.form,
@@ -56,24 +81,69 @@ export class GUIHypatia extends GUISketch {
     this.folders.form
       .addBinding(target.settings.form, "outline")
       .on("change", this.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "earth")
-      .on("change", this.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "planets")
+
+    this.folders.hypatia = this.addFolder(this.folders.form, {
+      title: "hypatia",
+    });
+    this.folders.hypatia
+      .addBinding(target.settings.form.hypatia, "visible")
       .on("change", this.draw);
 
-    this.folders.form
-      .addBinding(target.settings.form, "planetsMaxRotation", {
+    this.folders.planets = this.addFolder(this.folders.form, {
+      title: "planets",
+    });
+    this.folders.planets
+      .addBinding(target.settings.form.planets, "visible")
+      .on("change", this.draw);
+    this.folders.planets
+      .addBinding(target.settings.form.planets, "color", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", this.draw);
+    this.folders.planets
+      .addBinding(target.settings.form.planets, "spiral", {
         min: 0,
         max: 10,
       })
       .on("change", this.draw);
+    this.folders.planets
+      .addBinding(target.settings.form.planets, "radius", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", this.draw);
+
+    this.folders.stars = this.addFolder(this.folders.form, { title: "stars" });
+    this.folders.stars
+      .addBinding(target.settings.form.stars, "visible")
+      .on("change", this.draw);
+    this.folders.stars
+      .addBinding(target.settings.form.stars, "radius", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", this.draw);
+
+    this.folders.stars
+      .addBinding(target.settings.form.stars, "total", {
+        min: 1,
+        max: 10000,
+        step: 1,
+      })
+      .on("change", this.draw);
+
+    this.folders.motionPaths = this.addFolder(this.folders.form, {
+      title: "motion paths",
+    });
+    this.folders.motionPaths
+      .addBinding(target.settings.form.motionPaths, "visible")
+      .on("change", this.draw);
+    this.folders.motionPaths
+      .addBinding(target.settings.form.motionPaths, "color", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", this.draw);
   }
 }
-
-/**
- * Motion of planets around the center
- *
- *
- */
