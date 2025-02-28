@@ -43,6 +43,7 @@ export function vectorEquilibrium(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       blueprint,
     );
   }
@@ -59,6 +60,7 @@ export function vectorEquilibrium(
         innerRadius,
         settings.strokeColor,
         settings.strokeWidth,
+        undefined,
         blueprint,
       );
     }

@@ -100,6 +100,7 @@ export function sriYantra(
     innerRadius,
     settings.blueprint.guide0 ? debugStrokeColor : transparentColor,
     settings.strokeWidth,
+    undefined,
     blueprint,
   );
 
@@ -115,6 +116,7 @@ export function sriYantra(
         innerRadius,
         settings.blueprint.guide1 ? debugStrokeColor : transparentColor,
         settings.strokeWidth,
+        undefined,
         blueprint,
       ),
     );
@@ -221,6 +223,7 @@ export function sriYantra(
     innerSideRadius,
     settings.blueprint.guide5 ? debugStrokeColor : transparentColor,
     settings.strokeWidth,
+    undefined,
     blueprint,
   );
   const innerLeftCircle = createCircle(
@@ -228,6 +231,7 @@ export function sriYantra(
     innerSideRadius,
     settings.blueprint.guide5 ? debugStrokeColor : transparentColor,
     settings.strokeWidth,
+    undefined,
     blueprint,
   );
 
@@ -601,6 +605,7 @@ export function sriYantra(
     innerRadius,
     settings.blueprint.guide0 ? debugStrokeColor : transparentColor,
     settings.strokeWidth,
+    undefined,
     blueprint,
   );
   const cornerCircle1 = createCircle(
@@ -608,6 +613,7 @@ export function sriYantra(
     innerRadius,
     settings.blueprint.guide0 ? debugStrokeColor : transparentColor,
     settings.strokeWidth,
+    undefined,
     blueprint,
   );
   const cornerCircle2 = createCircle(
@@ -615,6 +621,7 @@ export function sriYantra(
     innerRadius,
     settings.blueprint.guide0 ? debugStrokeColor : transparentColor,
     settings.strokeWidth,
+    undefined,
     blueprint,
   );
   const cornerCircle3 = createCircle(
@@ -622,6 +629,7 @@ export function sriYantra(
     innerRadius,
     settings.blueprint.guide0 ? debugStrokeColor : transparentColor,
     settings.strokeWidth,
+    undefined,
     blueprint,
   );
 

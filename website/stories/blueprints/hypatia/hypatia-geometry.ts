@@ -2,7 +2,7 @@ import paper from "paper";
 import { MathUtils } from "three";
 
 import mathSeeded from "@utils/math-seeded";
-import { createCircle } from "@utils/paper/utils";
+import { createCircle, createLine } from "@utils/paper/utils";
 import { TWO_PI } from "@utils/three/math";
 import { SketchSettings } from "../sketch/sketch";
 
@@ -28,7 +28,11 @@ export type HypatiaSettings = {
       spiral: number;
       radius: number;
     };
-    motionPaths: {
+    orbit: {
+      visible: boolean;
+      color: number;
+    };
+    motion: {
       visible: boolean;
       color: number;
       dash: number;
@@ -74,6 +78,7 @@ function createElipse(
   strokeColor: paper.Color,
   strokeWidth: number,
   dash: number,
+  group: paper.Group,
 ) {
   const path = new paper.Path.Ellipse({
     center: center,
@@ -83,13 +88,19 @@ function createElipse(
   });
   path.dashOffset = dash;
   path.dashArray = [dash, dash];
+  group.addChild(path);
   return path;
 }
 
-function createStar(position: paper.Point, radius: number, color: paper.Color) {
+function createStar(
+  position: paper.Point,
+  radius: number,
+  color: paper.Color,
+  group: paper.Group,
+) {
   const star = new paper.Path.Circle(position, radius);
   star.fillColor = color;
-  return star;
+  group.addChild(star);
 }
 
 export function hypatia(
@@ -113,13 +124,7 @@ export function hypatia(
     form.addChild(path);
   }
 
-  const starColor = new paper.Color(1, 1, 1, settings.form.stars.color);
-  const motionPathColor = new paper.Color(
-    1,
-    1,
-    1,
-    settings.form.motionPaths.color,
-  );
+  const motionColor = new paper.Color(1, 1, 1, settings.form.motion.color);
   const planetColor = new paper.Color(1, 1, 1, settings.form.planets.color);
 
   if (settings.form.stars.visible) {
@@ -127,40 +132,49 @@ export function hypatia(
       const theta = mathSeeded.random() * TWO_PI; // Full azimuthal range
       const phi = Math.acos(2 * mathSeeded.random() - 1); // Uniform sphere sampling
       const point2D = projectSphericalTo2D(theta, phi, radius, center);
-      createStar(point2D, radius * settings.form.stars.radius, starColor);
+      const starColor = new paper.Color(
+        1,
+        1,
+        1,
+        mathSeeded.random() > 0.9 ? 1 : mathSeeded.randFloat(0.15, 0.75),
+      );
+      createStar(point2D, radius * settings.form.stars.radius, starColor, form);
     }
   }
 
   const SM_AXIS_RATIO = 1 / Math.sqrt(3); // ~0.577
 
-  if (settings.form.motionPaths.visible) {
-    const dash = radius * settings.form.motionPaths.dash;
+  if (settings.form.motion.visible) {
+    const dash = radius * settings.form.motion.dash;
     createElipse(
       radius,
       center,
       1,
       SM_AXIS_RATIO,
-      motionPathColor,
+      motionColor,
       settings.strokeWidth,
       dash,
+      form,
     );
     createElipse(
       radius,
       center,
       SM_AXIS_RATIO,
       1,
-      motionPathColor,
+      motionColor,
       settings.strokeWidth,
       dash,
+      form,
     );
     const l = createElipse(
       radius,
       center,
       SM_AXIS_RATIO,
       1,
-      motionPathColor,
+      motionColor,
       settings.strokeWidth,
       dash,
+      form,
     );
     l.rotate(45);
     const r = createElipse(
@@ -168,9 +182,10 @@ export function hypatia(
       center,
       SM_AXIS_RATIO,
       1,
-      motionPathColor,
+      motionColor,
       settings.strokeWidth,
       dash,
+      form,
     );
     r.rotate(-45);
   }
@@ -186,7 +201,7 @@ export function hypatia(
     form.addChild(path);
   }
 
-  if (settings.form.planets.visible) {
+  if (settings.form.orbit.visible) {
     for (let i = 0; i < total; i++) {
       const p = i / (total - 1);
       const r = MathUtils.lerp(minRadius, maxRadius, p);
@@ -207,20 +222,31 @@ export function hypatia(
 
       path.strokeColor = planetColor;
       path.strokeWidth = settings.strokeWidth;
+
+      const dash = radius * settings.form.motion.dash;
+      path.dashOffset = dash;
+      path.dashArray = [dash, dash];
+
       form.addChild(path);
 
-      const theta = MathUtils.lerp(0, TWO_PI * settings.form.planets.spiral, p);
-      const planet = createCircle(
-        new paper.Point(
-          center.x + Math.cos(theta) * r * perspectiveFactorX,
-          center.y + Math.sin(theta) * r * perspectiveFactorY,
-        ),
-        radius * settings.form.planets.radius,
-        settings.strokeColor,
-        settings.strokeWidth,
-      );
-      planet.fillColor = settings.strokeColor;
-      form.addChild(planet);
+      if (settings.form.planets.visible) {
+        const theta = MathUtils.lerp(
+          0,
+          TWO_PI * settings.form.planets.spiral,
+          p,
+        );
+        createCircle(
+          new paper.Point(
+            center.x + Math.cos(theta) * r * perspectiveFactorX,
+            center.y + Math.sin(theta) * r * perspectiveFactorY,
+          ),
+          radius * settings.form.planets.radius,
+          undefined,
+          undefined,
+          settings.strokeColor,
+          form,
+        );
+      }
     }
   }
 }

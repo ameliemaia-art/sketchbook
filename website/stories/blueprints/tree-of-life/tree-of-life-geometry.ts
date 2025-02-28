@@ -181,6 +181,7 @@ export function treeOfLife(
             innerRadius,
             debugStrokeColor,
             settings.strokeWidth,
+            undefined,
             blueprint,
           );
         }
@@ -225,6 +226,7 @@ export function treeOfLife(
         r,
         settings.blueprint.guide1 ? debugStrokeColor : transparentColor,
         settings.strokeWidth,
+        undefined,
         form,
       ),
     );
@@ -468,6 +470,7 @@ export function treeOfLife(
           r,
           settings.form.architecture0 ? settings.strokeColor : transparentColor,
           settings.strokeWidth,
+          undefined,
           form,
         ),
       );

@@ -3,6 +3,7 @@ import { FolderApi } from "tweakpane";
 
 import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
+import mathSeeded from "@utils/math-seeded";
 
 export type SketchSettings = {
   strokeColor: paper.Color;
@@ -100,6 +101,11 @@ export default class Sketch {
     return this.name().replace(/ /g, "-").toLowerCase();
   }
 
+  incrementSeed = () => {
+    mathSeeded.setSeed(this.settings.seed++);
+    this.draw();
+  };
+
   async saveImage() {
     await this.setup(true);
     await saveImage(this.canvas, this.fileName());
@@ -131,6 +137,13 @@ export class GUISketch extends GUIController {
     this.gui
       .addBinding(target.settings, "seed", { min: 0, step: 1 })
       .on("change", this.draw);
+    this.gui
+      .addButton({ title: "Increment seed", label: "" })
+      .on("click", () => {
+        target.incrementSeed();
+        this.gui.refresh();
+      });
+
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", this.draw);

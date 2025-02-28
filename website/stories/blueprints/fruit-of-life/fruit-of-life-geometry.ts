@@ -38,6 +38,7 @@ export function fruitOfLife(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       form,
     );
   }
@@ -55,6 +56,7 @@ export function fruitOfLife(
           innerRadius,
           settings.strokeColor,
           settings.strokeWidth,
+          undefined,
           form,
         );
       }

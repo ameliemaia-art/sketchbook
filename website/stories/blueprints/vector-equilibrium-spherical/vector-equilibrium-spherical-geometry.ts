@@ -87,6 +87,7 @@ export function vectorEquilibriumSpherical(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       blueprint,
     );
   }
@@ -103,6 +104,7 @@ export function vectorEquilibriumSpherical(
         innerRadius,
         settings.strokeColor,
         settings.strokeWidth,
+        undefined,
         blueprint,
       );
     }

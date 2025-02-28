@@ -109,6 +109,7 @@ export function flowerOfLife(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       form,
     );
   }

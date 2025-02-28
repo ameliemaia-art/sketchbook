@@ -13,7 +13,8 @@ export default class Hypatia extends Sketch {
   settings: SketchSettings & HypatiaSettings = {
     ...sketchSettings,
     scale: 0.85,
-    seed: 0,
+    seed: 25,
+    darkness: true,
     blueprint: {
       visible: true,
       opacity: 0.5,
@@ -27,11 +28,15 @@ export default class Hypatia extends Sketch {
         visible: true,
         radius: 0.01,
       },
+      orbit: {
+        visible: true,
+        color: 0.5,
+      },
       planets: {
         visible: true,
         color: 0.25,
         spiral: 2.25,
-        radius: 0.0025,
+        radius: 0.005,
       },
       stars: {
         visible: true,
@@ -39,7 +44,7 @@ export default class Hypatia extends Sketch {
         radius: 0.0015,
         color: 0.5,
       },
-      motionPaths: {
+      motion: {
         visible: true,
         dash: 0.005,
         color: 1,
@@ -89,6 +94,19 @@ export class GUIHypatia extends GUISketch {
       .addBinding(target.settings.form.hypatia, "visible")
       .on("change", this.draw);
 
+    this.folders.orbit = this.addFolder(this.folders.form, {
+      title: "orbit",
+    });
+    this.folders.orbit
+      .addBinding(target.settings.form.orbit, "visible")
+      .on("change", this.draw);
+    this.folders.orbit
+      .addBinding(target.settings.form.orbit, "color", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", this.draw);
+
     this.folders.planets = this.addFolder(this.folders.form, {
       title: "planets",
     });
@@ -128,19 +146,19 @@ export class GUIHypatia extends GUISketch {
     this.folders.stars
       .addBinding(target.settings.form.stars, "total", {
         min: 1,
-        max: 10000,
+        max: 100000,
         step: 1,
       })
       .on("change", this.draw);
 
-    this.folders.motionPaths = this.addFolder(this.folders.form, {
-      title: "motion paths",
+    this.folders.motion = this.addFolder(this.folders.form, {
+      title: "motion",
     });
-    this.folders.motionPaths
-      .addBinding(target.settings.form.motionPaths, "visible")
+    this.folders.motion
+      .addBinding(target.settings.form.motion, "visible")
       .on("change", this.draw);
-    this.folders.motionPaths
-      .addBinding(target.settings.form.motionPaths, "color", {
+    this.folders.motion
+      .addBinding(target.settings.form.motion, "color", {
         min: 0,
         max: 1,
       })

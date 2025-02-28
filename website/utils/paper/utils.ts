@@ -18,13 +18,21 @@ export function dot(
 export function createCircle(
   centerPoint: paper.Point,
   radius: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
+  strokeColor?: paper.Color,
+  strokeWidth?: number,
+  fillColor?: paper.Color,
   group?: paper.Group,
 ) {
   const circle = new paper.Path.Circle(centerPoint, radius);
-  circle.strokeColor = strokeColor;
-  circle.strokeWidth = strokeWidth;
+  if (fillColor) {
+    circle.fillColor = fillColor;
+  }
+  if (strokeColor) {
+    circle.strokeColor = strokeColor;
+  }
+  if (strokeWidth) {
+    circle.strokeWidth = strokeWidth;
+  }
   if (group) {
     group.addChild(circle);
   }

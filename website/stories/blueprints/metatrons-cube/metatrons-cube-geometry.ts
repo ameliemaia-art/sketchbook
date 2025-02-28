@@ -40,6 +40,7 @@ export function metatronsCube(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       form,
     );
   }
@@ -68,6 +69,7 @@ export function metatronsCube(
           innerRadius,
           settings.strokeColor,
           settings.strokeWidth,
+          undefined,
           form,
         );
       }

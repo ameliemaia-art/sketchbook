@@ -39,6 +39,7 @@ export function eggOfLife(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       form,
     );
   }
@@ -54,6 +55,7 @@ export function eggOfLife(
         innerRadius,
         settings.strokeColor,
         settings.strokeWidth,
+        undefined,
         form,
       );
     }

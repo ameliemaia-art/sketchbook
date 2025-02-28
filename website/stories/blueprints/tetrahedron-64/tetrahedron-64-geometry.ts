@@ -40,6 +40,7 @@ export function tetrahedron64(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       blueprint,
     );
   }
@@ -70,6 +71,7 @@ export function tetrahedron64(
             innerRadius,
             settings.strokeColor,
             settings.strokeWidth,
+            undefined,
             blueprint,
           );
         }

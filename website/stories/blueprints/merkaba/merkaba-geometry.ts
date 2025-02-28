@@ -42,6 +42,7 @@ export function merkaba(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       blueprint,
     );
   }
@@ -58,6 +59,7 @@ export function merkaba(
         innerRadius,
         settings.strokeColor,
         settings.strokeWidth,
+        undefined,
         blueprint,
       );
     }

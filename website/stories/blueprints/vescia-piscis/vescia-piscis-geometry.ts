@@ -42,6 +42,7 @@ export function vesciaPiscis(
       radius / 3,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       form,
     );
   }
@@ -52,6 +53,7 @@ export function vesciaPiscis(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       form,
     );
   }
@@ -62,6 +64,7 @@ export function vesciaPiscis(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       form,
     );
   }
