@@ -26,7 +26,7 @@ export default class Hypatia extends Sketch {
       outline: true,
       hypatia: {
         visible: true,
-        radius: 0.01,
+        radius: 0.015,
       },
       orbit: {
         visible: true,
@@ -35,8 +35,8 @@ export default class Hypatia extends Sketch {
       planets: {
         visible: true,
         color: 0.25,
-        spiral: 2.25,
-        radius: 0.005,
+        spiral: 270,
+        radius: 0.0075,
       },
       stars: {
         visible: true,
@@ -122,7 +122,6 @@ export class GUIHypatia extends GUISketch {
     this.folders.planets
       .addBinding(target.settings.form.planets, "spiral", {
         min: 0,
-        max: 10,
       })
       .on("change", this.draw);
     this.folders.planets

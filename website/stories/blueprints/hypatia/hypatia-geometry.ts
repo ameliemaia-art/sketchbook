@@ -216,7 +216,7 @@ export function hypatia(
       const path = new paper.Path.Ellipse({
         center: center,
         size: [r * 2 * perspectiveFactorX, r * 2 * perspectiveFactorY],
-        strokeColor: settings.strokeColor,
+        strokeColor: settings.form.orbit.color,
         strokeWidth: settings.strokeWidth,
       });
 
@@ -232,13 +232,31 @@ export function hypatia(
       if (settings.form.planets.visible) {
         const theta = MathUtils.lerp(
           0,
-          TWO_PI * settings.form.planets.spiral,
+          MathUtils.degToRad(settings.form.planets.spiral),
           p,
         );
+        const theta2 =
+          Math.PI +
+          MathUtils.lerp(
+            0,
+            MathUtils.degToRad(settings.form.planets.spiral),
+            p,
+          );
         createCircle(
           new paper.Point(
             center.x + Math.cos(theta) * r * perspectiveFactorX,
             center.y + Math.sin(theta) * r * perspectiveFactorY,
+          ),
+          radius * settings.form.planets.radius,
+          undefined,
+          undefined,
+          settings.strokeColor,
+          form,
+        );
+        createCircle(
+          new paper.Point(
+            center.x + Math.cos(theta2) * r * perspectiveFactorX,
+            center.y + Math.sin(theta2) * r * perspectiveFactorY,
           ),
           radius * settings.form.planets.radius,
           undefined,
