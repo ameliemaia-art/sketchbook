@@ -48,14 +48,14 @@ export default class Sketch {
   ) {
     this.canvas = canvas;
     paper.setup(this.canvas);
-    this.frame = new Frame(root);
+    this.frame = new Frame(root, this.canvas);
     this.setup();
   }
 
   async setup(exporting = false) {
     await this.frame.setup(exporting);
     return new Promise<void>((resolve) => {
-      const scale = exporting ? 5 : 1;
+      const scale = exporting ? 3 : 1;
       this.settings.strokeWidth = 1 * scale;
       this.canvas.width = 500;
       this.canvas.height = 500;
@@ -98,6 +98,10 @@ export default class Sketch {
 
     this.group.addChild(this.layers.blueprint);
     this.group.addChild(this.layers.form);
+
+    requestAnimationFrame(() => {
+      this.frame.draw();
+    });
   }
 
   name() {
@@ -116,14 +120,15 @@ export default class Sketch {
   async saveImage() {
     await this.setup(true);
 
-    const composition = composite(
-      this.frame.textCanvas.width,
-      this.frame.textCanvas.height,
-      [this.canvas, this.frame.textCanvas],
-      false,
-    );
+    // const composition = composite(
+    //   this.frame.textCanvas.width,
+    //   this.frame.textCanvas.height,
+    //   [this.canvas, this.frame.textCanvas],
+    //   false,
+    // );
 
-    await saveImage(composition, this.fileName());
+    await saveImage(this.frame.textCanvas, this.fileName());
+    // await saveImage(this.canvas, this.fileName());
 
     await this.setup(false);
   }

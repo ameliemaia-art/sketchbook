@@ -36,12 +36,12 @@ export default class Hypatia extends Sketch {
         visible: true,
         color: 0.25,
         spiral: 810,
-        radius: 0.005,
+        radius: 0.0075,
       },
       stars: {
         visible: true,
         total: 5000,
-        radius: 0.0015,
+        radius: 0.002,
         color: 0.5,
       },
       motion: {

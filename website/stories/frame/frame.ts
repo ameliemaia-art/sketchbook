@@ -5,8 +5,8 @@ import GUIController from "@utils/gui/gui";
 
 export default class Frame {
   settings = {
-    darkness: false,
-    imageScale: 0.05,
+    darkness: true,
+    imageScale: 0.1,
   };
 
   assets: {
@@ -15,9 +15,12 @@ export default class Frame {
 
   textCanvas: HTMLCanvasElement;
   textCtx: CanvasRenderingContext2D | null;
-  visible = false;
+  visible = true;
 
-  constructor(root: HTMLElement) {
+  constructor(
+    root: HTMLElement,
+    public sketchCanvas: HTMLCanvasElement,
+  ) {
     // Canvas
     this.textCanvas = document.createElement("canvas");
     this.textCtx = this.textCanvas.getContext("2d");
@@ -48,18 +51,18 @@ export default class Frame {
   async setup(exporting = false) {
     await this.loadAssets();
     return new Promise<void>((resolve) => {
-      const scale = exporting ? 5 : 1;
+      const scale = exporting ? 3 : 1;
 
-      this.textCanvas.width = 500 * scale;
-      this.textCanvas.height = 500 * scale;
+      this.textCanvas.width = 1080 * scale;
+      this.textCanvas.height = 1920 * scale;
       this.textCtx?.scale(2, 2);
 
       Object.assign(this.textCanvas.style, {
         position: "absolute",
         top: "0",
         left: "0",
-        // width: `${this.textCanvas.width / 2}px`,
-        // height: `${this.textCanvas.height / 2}px`,
+        width: `${this.textCanvas.width / 4}px`,
+        height: `${this.textCanvas.height / 4}px`,
         // border: "1px solid white",
       });
 
@@ -75,6 +78,8 @@ export default class Frame {
 
     if (!this.visible) return;
 
+    this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
+
     if (this.settings.darkness) {
       this.textCtx.fillStyle = "#000000";
       this.textCtx.fillRect(
@@ -85,29 +90,37 @@ export default class Frame {
       );
     }
 
-    this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
-
     const size = this.textCanvas.width * this.settings.imageScale;
     const width = this.textCanvas.width / 2;
     const height = this.textCanvas.height / 2;
 
-    // this.textCtx.drawImage(
-    //   this.assets.title,
-    //   width / 2 - size / 2,
-    //   0,
-    //   size,
-    //   size,
-    // );
+    this.textCtx.drawImage(
+      this.assets.title,
+      width / 2 - size / 2,
+      size,
+      size,
+      size,
+    );
+
     // this.drawRect(width / 2 - size / 2, height - size, size, size);
     // this.drawRect(0, height - size, size, size);
     // this.drawRect(width - size, height - size, size, size);
     this.textCtx.drawImage(this.assets.year, 0, height - size, size, size);
+
     this.textCtx.drawImage(
       this.assets.wordmark,
       width - size,
       height - size,
       size,
       size,
+    );
+
+    this.textCtx.drawImage(
+      this.sketchCanvas,
+      0,
+      height / 2 - width / 2,
+      width,
+      width,
     );
   };
 
