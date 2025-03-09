@@ -70,6 +70,14 @@ function projectSphericalTo2D(
   return new paper.Point(center.x + projectedX, center.y + projectedY);
 }
 
+function setDashLength(path: paper.Path, dash: number) {
+  let pathLength = path.length;
+  let numDashes = Math.ceil(pathLength / (dash * 2));
+  let adjustedDash = pathLength / (numDashes * 2);
+  path.dashOffset = adjustedDash;
+  path.dashArray = [adjustedDash, adjustedDash];
+}
+
 function createElipse(
   radius: number,
   center: paper.Point,
@@ -86,9 +94,8 @@ function createElipse(
     strokeColor,
     strokeWidth,
   });
-  path.dashOffset = dash;
-  path.dashArray = [dash, dash];
   group.addChild(path);
+  setDashLength(path, dash);
   return path;
 }
 
@@ -193,7 +200,7 @@ export function hypatia(
   const total = 7;
   const hypatiaRadius = radius * settings.form.hypatia.radius;
   const minRadius = radius / 5;
-  const maxRadius = radius * 1;
+  const maxRadius = radius;
 
   if (settings.form.hypatia.visible) {
     const path = new paper.Path.Circle(center, hypatiaRadius);
@@ -216,30 +223,28 @@ export function hypatia(
       const path = new paper.Path.Ellipse({
         center: center,
         size: [r * 2 * perspectiveFactorX, r * 2 * perspectiveFactorY],
-        strokeColor: settings.form.orbit.color,
-        strokeWidth: settings.strokeWidth,
       });
 
-      path.strokeColor = planetColor;
-      path.strokeWidth = settings.strokeWidth;
+      path.strokeColor = new paper.Color(1, 1, 1, settings.form.orbit.color);
+      path.strokeWidth = settings.strokeWidth / 2;
 
       const dash = radius * settings.form.motion.dash;
-      path.dashOffset = dash;
-      path.dashArray = [dash, dash];
+      setDashLength(path, dash);
 
       form.addChild(path);
 
       if (settings.form.planets.visible) {
+        const startAngle = Math.PI;
         const theta = MathUtils.lerp(
-          0,
-          MathUtils.degToRad(settings.form.planets.spiral),
+          startAngle,
+          startAngle + MathUtils.degToRad(settings.form.planets.spiral),
           p,
         );
         const theta2 =
           Math.PI +
           MathUtils.lerp(
-            0,
-            MathUtils.degToRad(settings.form.planets.spiral),
+            startAngle,
+            startAngle + MathUtils.degToRad(settings.form.planets.spiral),
             p,
           );
         createCircle(

@@ -24,7 +24,7 @@ export const Wordmark = () => {
 
   return (
     <>
-      <p className="load-font">IXIIIIIXI</p>
+      <p className="load-font-stencil">IXIIIIIXI</p>
       <div className="wordmark" ref={rootRef}>
         <canvas ref={canvasRef} />;
       </div>

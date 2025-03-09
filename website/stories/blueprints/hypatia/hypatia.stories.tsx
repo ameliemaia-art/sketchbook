@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import EggOfLifeSketch, { GUIHypatia } from "./hypatia";
+import HypatiaSketch, { GUIHypatia } from "./hypatia";
 
 import "../../global.css";
 
@@ -11,13 +11,14 @@ export default {
 };
 
 export const Hypatia = () => {
-  const rootRef = useRef<HTMLCanvasElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const pane = new Pane({ title: "Human" });
-    if (rootRef.current) {
-      const sacred = new EggOfLifeSketch(rootRef.current);
-      new GUIHypatia(pane, sacred);
+    if (rootRef.current && canvasRef.current) {
+      const hypatia = new HypatiaSketch(rootRef.current, canvasRef.current);
+      new GUIHypatia(pane, hypatia);
     }
 
     return () => {
@@ -25,5 +26,12 @@ export const Hypatia = () => {
     };
   }, []);
 
-  return <canvas ref={rootRef} />;
+  return (
+    <div className="sketch">
+      <p className="load-font-stencil load-font-regular">IXIIIIIXI</p>
+      <div className="wordmark" ref={rootRef}>
+        <canvas ref={canvasRef} />;
+      </div>
+    </div>
+  );
 };

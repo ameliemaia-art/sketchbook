@@ -36,6 +36,8 @@ body {
 .tp-dfwv {
   width: 320px !important;
   position: fixed !important;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .sb-show-main canvas {
@@ -55,10 +57,34 @@ body {
   font-style: normal;
 }
 
-.load-font {
+@font-face {
+  font-family: "Berlingske Serif Text";
+  src: url("/assets/fonts/BerlingskeSerifText-Regular.eot");
+  src:
+    url("/assets/fonts/BerlingskeSerifText-Regular.eot?#iefix")
+      format("embedded-opentype"),
+    url("/assets/fonts/BerlingskeSerifText-Regular.woff2") format("woff2"),
+    url("/assets/fonts/BerlingskeSerifText-Regular.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+
+.load-font-stencil {
   color: white;
   font-family: "Berlingske Serif Stencil";
   position: absolute;
   opacity: 0;
   pointer-events: none;
+}
+
+.load-font-regular {
+  color: white;
+  font-family: "Berlingske Serif Text";
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sketch {
+  position: relative;
 }

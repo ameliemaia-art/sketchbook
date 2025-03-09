@@ -1,7 +1,8 @@
+import Frame from "@/stories/frame/frame";
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
-import { saveImage, saveSVG } from "@utils/common/file";
+import { composite, saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
 import mathSeeded from "@utils/math-seeded";
 
@@ -39,14 +40,20 @@ export default class Sketch {
 
   group?: paper.Group;
   layers: { blueprint?: paper.Group; form?: paper.Group } = {};
+  frame: Frame;
 
-  constructor(public canvas: HTMLCanvasElement) {
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
     this.canvas = canvas;
     paper.setup(this.canvas);
+    this.frame = new Frame(root);
     this.setup();
   }
 
   async setup(exporting = false) {
+    await this.frame.setup(exporting);
     return new Promise<void>((resolve) => {
       const scale = exporting ? 5 : 1;
       this.settings.strokeWidth = 1 * scale;
@@ -108,7 +115,16 @@ export default class Sketch {
 
   async saveImage() {
     await this.setup(true);
-    await saveImage(this.canvas, this.fileName());
+
+    const composition = composite(
+      this.frame.textCanvas.width,
+      this.frame.textCanvas.height,
+      [this.canvas, this.frame.textCanvas],
+      false,
+    );
+
+    await saveImage(composition, this.fileName());
+
     await this.setup(false);
   }
 

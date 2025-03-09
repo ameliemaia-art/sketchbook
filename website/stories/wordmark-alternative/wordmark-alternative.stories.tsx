@@ -32,7 +32,7 @@ export const WordmarkAlternative = () => {
 
   return (
     <>
-      <p className="load-font">IXIIIIIXI</p>
+      <p className="load-font-stencil">IXIIIIIXI</p>
       <div className="wordmark-alternative" ref={rootRef}>
         <canvas ref={canvasRef} />;
       </div>
