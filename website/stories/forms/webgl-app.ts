@@ -62,7 +62,7 @@ export default class WebGLApp {
     orthCamera: false,
     stats: true,
     helpers: false,
-    frustumSize: 25,
+    frustumSize: 750,
   };
 
   renderPass: RenderPass;
@@ -121,10 +121,10 @@ export default class WebGLApp {
 
     this.postProcessing.addPass(this.renderPass);
     // this.postProcessing.addPass(this.aoPass);
-    // this.postProcessing.addPass(this.bloomPass);
+    this.postProcessing.addPass(this.bloomPass);
     this.postProcessing.addPass(this.fxaaPass);
     this.postProcessing.addPass(this.outputPass);
-    // this.postProcessing.addPass(this.vignettePass);
+    this.postProcessing.addPass(this.vignettePass);
 
     this.screenshot = new Screenshot(
       this.renderer,
@@ -160,7 +160,7 @@ export default class WebGLApp {
 
     this.cameras.main.position.z = 5;
     this.cameras.main.lookAt(0, 0, 0);
-    this.orthographicCamera.position.z = 5;
+    this.orthographicCamera.position.z = 750;
 
     resetCamera(this.cameras.dev, 1000, new Vector3(0, 0.5, 1));
 
@@ -268,8 +268,8 @@ export default class WebGLApp {
     this.orthographicCamera.right = (this.settings.frustumSize * aspect) / 2;
     this.orthographicCamera.top = this.settings.frustumSize / 2;
     this.orthographicCamera.bottom = this.settings.frustumSize / -2;
-    this.orthographicCamera.near = 0.01;
-    this.orthographicCamera.far = 10000;
+    this.orthographicCamera.near = 0.1;
+    this.orthographicCamera.far = 1000;
 
     this.cameras.dev.updateProjectionMatrix();
     this.cameras.main.updateProjectionMatrix();

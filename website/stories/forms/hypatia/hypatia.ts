@@ -1,13 +1,12 @@
+import { hypatiaSettings } from "@/stories/blueprints/hypatia/hypatia";
 import {
-  DoubleSide,
   ExtrudeGeometry,
+  IcosahedronGeometry,
   MathUtils,
   Mesh,
   MeshBasicMaterial,
   Path,
-  RingGeometry,
   Shape,
-  TubeGeometry,
 } from "three";
 
 import { GUIType } from "@utils/gui/gui-types";
@@ -22,14 +21,36 @@ export default class HypatiaSketch extends WebGLApp {
   outlineHorizontal!: Mesh<ExtrudeGeometry, MeshBasicMaterial>;
   outlineVerticalX!: Mesh<ExtrudeGeometry, MeshBasicMaterial>;
   outlineVerticalZ!: Mesh<ExtrudeGeometry, MeshBasicMaterial>;
+  planets: Mesh<IcosahedronGeometry, MeshBasicMaterial>[] = [];
+
+  radius = 500;
+
+  ringSpeeds: number[] = [];
+
+  animation = {
+    speed: 1,
+  };
 
   create() {
-    this.cameras.main.position.z = 1000;
+    this.cameras.main.position.z = 750;
     this.cameras.main.lookAt(0, 0, 0);
 
+    this.createHypatia();
     this.createOutline();
+    this.createOrbit();
+  }
 
-    this.createConcentricRings();
+  createHypatia() {
+    const mesh = new Mesh(
+      new IcosahedronGeometry(
+        this.radius * hypatiaSettings.form.hypatia.radius,
+        3,
+      ),
+      new MeshBasicMaterial({ wireframe: false }),
+    );
+    mesh.name = "Hypatia";
+    this.scene.add(mesh);
+    return mesh;
   }
 
   createOutline() {
@@ -37,10 +58,11 @@ export default class HypatiaSketch extends WebGLApp {
     let total = 3;
     for (let i = 0; i < total; i++) {
       const theta = i * (TWO_PI / total);
+      const r = this.radius / 2;
 
-      const meshX = this.createRing(250, 1, 1, 0xffffff);
-      const meshY = this.createRing(250, 1, 1, 0xffffff);
-      const meshZ = this.createRing(250, 1, 1, 0xffffff);
+      const meshX = this.createRing(r, 1, 1, 0xffffff);
+      const meshY = this.createRing(r, 1, 1, 0xffffff);
+      const meshZ = this.createRing(r, 1, 1, 0xffffff);
 
       meshX.rotation.x = theta;
       meshY.rotation.y = theta;
@@ -83,13 +105,12 @@ export default class HypatiaSketch extends WebGLApp {
     return mesh;
   }
 
-  createConcentricRings() {
+  createOrbit() {
     const total = 7;
-    const thickness = 1;
-    const radius = 250;
-    const minRadius = radius / 5;
-    const maxRadius = radius;
-    const depth = 1;
+    const thickness = 0.5;
+    const r = this.radius / 2;
+    const minRadius = r / 5;
+    const maxRadius = r;
 
     const SM_AXIS_RATIO = 1 / Math.sqrt(3); // ~0.577
 
@@ -135,7 +156,7 @@ export default class HypatiaSketch extends WebGLApp {
       // Extrude the ring geometry to give it depth on the edges
       const extrudeSettings = {
         steps: 1,
-        depth,
+        depth: thickness,
         bevelEnabled: false,
         curveSegments: 64, // Increase the number of segments for smoother edges
       };
@@ -145,17 +166,94 @@ export default class HypatiaSketch extends WebGLApp {
       const ring = new Mesh(geometry, this.material);
 
       // ring.rotation.x = Math.PI / 2;
-      const theta = MathUtils.lerp(0, 45, p); // Calculate current angle
+      let theta = MathUtils.lerp(0, 45, p); // Calculate current angle
 
       // ring.rotation.x = MathUtils.degToRad(theta); // Rotate ring to face camera
-      // ring.rotation.x = MathUtils.degToRad(theta); // Rotate ring to face camera
-      ring.rotation.x = Math.PI / 2;
+      ring.rotation.x = MathUtils.degToRad(theta); // Rotate ring to face camera
+      // ring.rotation.x = Math.PI / 2;
       ring.scale.z = perspectiveFactorY;
+
+      this.ringSpeeds.push(MathUtils.lerp(2, 1, p)); // Randomize ring speeds
 
       this.scene.add(ring);
 
       this.orbitMeshes.push(ring); // Store each ring for later animation
+
+      // Planet
+      const startAngle = Math.PI;
+      theta = MathUtils.lerp(
+        startAngle,
+        startAngle + MathUtils.degToRad(hypatiaSettings.form.planets.spiral),
+        p,
+      );
+
+      let mesh = new Mesh(
+        new IcosahedronGeometry(
+          radius * hypatiaSettings.form.planets.radius * 2,
+          3,
+        ),
+        new MeshBasicMaterial({ wireframe: false, color: 0xffffff }),
+      );
+      mesh.position.set(
+        Math.cos(theta) * radius,
+        Math.sin(theta) * radius * perspectiveFactorY,
+        0,
+      );
+      mesh.userData.theta = theta;
+      mesh.userData.radius = radius;
+      mesh.userData.perspectiveFactorY = perspectiveFactorY;
+      mesh.name = `Planet-0-${i}`;
+      ring.add(mesh);
+
+      this.planets.push(mesh);
+
+      theta =
+        Math.PI +
+        MathUtils.lerp(
+          startAngle,
+          startAngle + MathUtils.degToRad(hypatiaSettings.form.planets.spiral),
+          p,
+        );
+
+      mesh = new Mesh(
+        new IcosahedronGeometry(
+          radius * hypatiaSettings.form.planets.radius * 2,
+          3,
+        ),
+        new MeshBasicMaterial({ wireframe: false, color: 0xffffff }),
+      );
+      mesh.userData.theta = theta;
+      mesh.userData.radius = radius;
+      mesh.userData.perspectiveFactorY = perspectiveFactorY;
+      mesh.position.set(
+        Math.cos(theta) * radius,
+        Math.sin(theta) * radius * perspectiveFactorY,
+        0,
+      );
+      mesh.name = `Planet-1-${i}`;
+      ring.add(mesh);
+
+      this.planets.push(mesh);
     }
+  }
+
+  onUpdate(delta: number) {
+    this.planets.forEach((mesh: Mesh) => {
+      mesh.userData.theta += delta;
+      mesh.position.set(
+        Math.cos(mesh.userData.theta) * mesh.userData.radius,
+        Math.sin(mesh.userData.theta) *
+          mesh.userData.radius *
+          mesh.userData.perspectiveFactorY,
+        0,
+      );
+    });
+
+    this.orbitMeshes.forEach((ring, i) => {
+      // ring.rotation.x += delta;
+      ring.rotation.x += delta * this.animation.speed * this.ringSpeeds[i];
+      // ring.rotation.z += delta;
+    });
   }
 }
 

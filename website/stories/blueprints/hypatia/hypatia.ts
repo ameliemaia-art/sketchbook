@@ -9,49 +9,50 @@ import Sketch, {
 } from "../sketch/sketch";
 import { hypatia, HypatiaSettings } from "./hypatia-geometry";
 
+export const hypatiaSettings: SketchSettings & HypatiaSettings = {
+  ...sketchSettings,
+  scale: 0.85,
+  seed: 25,
+  darkness: true,
+  blueprint: {
+    visible: true,
+    opacity: 0.5,
+    cosmos: false,
+  },
+  form: {
+    visible: true,
+    opacity: 1,
+    outline: true,
+    hypatia: {
+      visible: true,
+      radius: 0.015,
+    },
+    orbit: {
+      visible: true,
+      color: 0.5,
+    },
+    planets: {
+      visible: true,
+      color: 0.25,
+      spiral: 810,
+      radius: 0.0075,
+    },
+    stars: {
+      visible: true,
+      total: 5000,
+      radius: 0.002,
+      color: 0.5,
+    },
+    motion: {
+      visible: true,
+      dash: 0.005,
+      color: 1,
+    },
+  },
+};
+
 export default class Hypatia extends Sketch {
-  settings: SketchSettings & HypatiaSettings = {
-    ...sketchSettings,
-    title: "Hypatia",
-    scale: 0.85,
-    seed: 25,
-    darkness: true,
-    blueprint: {
-      visible: true,
-      opacity: 0.5,
-      cosmos: false,
-    },
-    form: {
-      visible: true,
-      opacity: 1,
-      outline: true,
-      hypatia: {
-        visible: true,
-        radius: 0.015,
-      },
-      orbit: {
-        visible: true,
-        color: 0.5,
-      },
-      planets: {
-        visible: true,
-        color: 0.25,
-        spiral: 810,
-        radius: 0.0075,
-      },
-      stars: {
-        visible: true,
-        total: 5000,
-        radius: 0.002,
-        color: 0.5,
-      },
-      motion: {
-        visible: true,
-        dash: 0.005,
-        color: 1,
-      },
-    },
-  };
+  settings: SketchSettings & HypatiaSettings = hypatiaSettings;
 
   constructor(
     public root: HTMLElement,
