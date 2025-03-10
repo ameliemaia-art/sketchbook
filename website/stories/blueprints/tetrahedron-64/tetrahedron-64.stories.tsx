@@ -11,12 +11,16 @@ export default {
 };
 
 export const Tetrahedron64 = () => {
-  const rootRef = useRef<HTMLCanvasElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const pane = new Pane({ title: "Sacred Geometry" });
-    if (rootRef.current) {
-      const sacred = new Tetrahedron64Sketch(rootRef.current);
+    if (rootRef.current && canvasRef.current) {
+      const sacred = new Tetrahedron64Sketch(
+        rootRef.current,
+        canvasRef.current,
+      );
       new GUITetrahedron64(pane, sacred);
     }
 
@@ -25,5 +29,12 @@ export const Tetrahedron64 = () => {
     };
   }, []);
 
-  return <canvas ref={rootRef} />;
+  return (
+    <div className="sketch">
+      <p className="load-font-stencil load-font-regular">IXIIIIIXI</p>
+      <div className="wordmark" ref={rootRef}>
+        <canvas ref={canvasRef} />;
+      </div>
+    </div>
+  );
 };

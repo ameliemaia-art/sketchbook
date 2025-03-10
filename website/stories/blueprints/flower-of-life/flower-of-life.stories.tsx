@@ -11,12 +11,13 @@ export default {
 };
 
 export const FlowerOfLife = () => {
-  const rootRef = useRef<HTMLCanvasElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const pane = new Pane({ title: "Sacred Geometry" });
-    if (rootRef.current) {
-      const sacred = new FlowerOfLifeSketch(rootRef.current);
+    if (rootRef.current && canvasRef.current) {
+      const sacred = new FlowerOfLifeSketch(rootRef.current, canvasRef.current);
       new GUIFlowerOfLife(pane, sacred);
     }
 
@@ -25,5 +26,12 @@ export const FlowerOfLife = () => {
     };
   }, []);
 
-  return <canvas ref={rootRef} />;
+  return (
+    <div className="sketch">
+      <p className="load-font-stencil load-font-regular">IXIIIIIXI</p>
+      <div className="wordmark" ref={rootRef}>
+        <canvas ref={canvasRef} />;
+      </div>
+    </div>
+  );
 };

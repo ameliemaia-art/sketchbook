@@ -60,9 +60,9 @@ export default class Frame {
       Object.assign(this.textCanvas.style, {
         position: "absolute",
         top: "0",
-        left: "0",
-        width: `${this.textCanvas.width / 4}px`,
-        height: `${this.textCanvas.height / 4}px`,
+        left: "520px",
+        width: `${500 * (9 / 16)}px`,
+        height: `${500}px`,
         // border: "1px solid white",
       });
 
@@ -71,6 +71,10 @@ export default class Frame {
         resolve();
       });
     });
+  }
+
+  toggle(visible: boolean) {
+    this.textCanvas.style.display = visible ? "" : "none";
   }
 
   draw = () => {
@@ -93,36 +97,53 @@ export default class Frame {
     const size = this.textCanvas.width * this.settings.imageScale;
     const width = this.textCanvas.width / 2;
     const height = this.textCanvas.height / 2;
+    const outline = false;
 
-    this.textCtx.drawImage(
+    this.drawImage(
       this.assets.title,
       width / 2 - size / 2,
       size,
       size,
       size,
+      outline,
     );
 
-    // this.drawRect(width / 2 - size / 2, height - size, size, size);
-    // this.drawRect(0, height - size, size, size);
-    // this.drawRect(width - size, height - size, size, size);
-    this.textCtx.drawImage(this.assets.year, 0, height - size, size, size);
+    this.drawImage(this.assets.year, 0, height - size, size, size, outline);
 
-    this.textCtx.drawImage(
+    this.drawImage(
       this.assets.wordmark,
       width - size,
       height - size,
       size,
       size,
+      outline,
     );
 
-    this.textCtx.drawImage(
+    this.drawImage(
       this.sketchCanvas,
       0,
       height / 2 - width / 2,
       width,
       width,
+      outline,
     );
   };
+
+  drawImage(
+    image: HTMLCanvasElement | HTMLImageElement,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    outline: boolean,
+  ) {
+    if (!this.textCtx) return;
+    this.textCtx.drawImage(image, x, y, width, height);
+
+    if (outline) {
+      this.drawRect(x, y, width, height);
+    }
+  }
 
   drawRect(x: number, y: number, width: number, height: number) {
     if (!this.textCtx) return;

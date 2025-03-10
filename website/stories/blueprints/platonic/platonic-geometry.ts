@@ -86,6 +86,7 @@ export function platonic(
       innerRadius,
       settings.strokeColor,
       settings.strokeWidth,
+      undefined,
       blueprint,
     );
   }
@@ -107,6 +108,7 @@ export function platonic(
           innerRadius,
           settings.strokeColor,
           settings.strokeWidth,
+          undefined,
           blueprint,
         );
       }

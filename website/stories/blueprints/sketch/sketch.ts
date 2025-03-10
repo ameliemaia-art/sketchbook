@@ -41,6 +41,7 @@ export default class Sketch {
   group?: paper.Group;
   layers: { blueprint?: paper.Group; form?: paper.Group } = {};
   frame: Frame;
+  frameEnabled = true;
 
   constructor(
     public root: HTMLElement,
@@ -53,9 +54,10 @@ export default class Sketch {
   }
 
   async setup(exporting = false) {
+    const exportScale = this.frameEnabled ? 3 : 5;
     await this.frame.setup(exporting);
     return new Promise<void>((resolve) => {
-      const scale = exporting ? 3 : 1;
+      const scale = exporting ? exportScale : 1;
       this.settings.strokeWidth = 1 * scale;
       this.canvas.width = 500;
       this.canvas.height = 500;
@@ -99,9 +101,13 @@ export default class Sketch {
     this.group.addChild(this.layers.blueprint);
     this.group.addChild(this.layers.form);
 
-    requestAnimationFrame(() => {
-      this.frame.draw();
-    });
+    this.frame.toggle(this.frameEnabled);
+
+    if (this.frameEnabled) {
+      requestAnimationFrame(() => {
+        this.frame.draw();
+      });
+    }
   }
 
   name() {
@@ -120,15 +126,11 @@ export default class Sketch {
   async saveImage() {
     await this.setup(true);
 
-    // const composition = composite(
-    //   this.frame.textCanvas.width,
-    //   this.frame.textCanvas.height,
-    //   [this.canvas, this.frame.textCanvas],
-    //   false,
-    // );
-
-    await saveImage(this.frame.textCanvas, this.fileName());
-    // await saveImage(this.canvas, this.fileName());
+    if (this.frameEnabled) {
+      await saveImage(this.frame.textCanvas, this.fileName());
+    } else {
+      await saveImage(this.canvas, this.fileName());
+    }
 
     await this.setup(false);
   }
@@ -169,6 +171,9 @@ export class GUISketch extends GUIController {
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
       .on("change", this.draw);
     this.gui.addBinding(target.settings, "darkness").on("change", this.draw);
+    this.gui
+      .addBinding(target, "frameEnabled", { label: "frame" })
+      .on("change", this.draw);
 
     this.folders.blueprint = this.addFolder(this.gui, { title: "Blueprint" });
     this.folders.blueprint
