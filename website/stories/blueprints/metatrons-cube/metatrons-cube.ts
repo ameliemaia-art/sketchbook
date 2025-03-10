@@ -31,6 +31,13 @@ export default class MetatronsCube extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Metatrons Cube");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -43,10 +50,6 @@ export default class MetatronsCube extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Metatrons Cube";
   }
 }
 

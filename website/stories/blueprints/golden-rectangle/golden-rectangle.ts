@@ -29,6 +29,13 @@ export default class GoldenRectangle extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Golden Rectangle");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -41,10 +48,6 @@ export default class GoldenRectangle extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Golden Rectangle";
   }
 }
 

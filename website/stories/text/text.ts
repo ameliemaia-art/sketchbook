@@ -24,73 +24,58 @@ export default class Text {
   textCtx: CanvasRenderingContext2D | null;
 
   constructor(
-    public root: HTMLElement,
-    public canvas: HTMLCanvasElement,
+    public root?: HTMLElement,
+    public title: string = "IXIIIIIXI",
   ) {
-    this.canvas = canvas;
-
     // Canvas
     this.textCanvas = document.createElement("canvas");
     this.textCtx = this.textCanvas.getContext("2d");
 
-    root.appendChild(this.textCanvas);
-
-    paper.setup(this.canvas);
+    root?.appendChild(this.textCanvas);
 
     document.fonts.ready.then(() => {
       this.setup();
     });
   }
 
-  async setup(exporting = false) {
+  async setup(width: number = 500, height: number = 500, scale = 1) {
     return new Promise<void>((resolve) => {
-      const scale = exporting ? 5 : 1;
-
-      this.canvas.width = 500;
-      this.canvas.height = 500;
-      paper.view.viewSize = new paper.Size(
-        this.canvas.width * scale,
-        this.canvas.height * scale,
-      );
-
-      this.textCanvas.width = this.canvas.width;
-      this.textCanvas.height = this.canvas.height;
+      this.textCanvas.width = width * scale;
+      this.textCanvas.height = height * scale;
       this.textCtx?.scale(2, 2);
 
       Object.assign(this.textCanvas.style, {
         position: "absolute",
         top: "0",
         left: "0",
-        width: `${this.canvas.width / 2}px`,
-        height: `${this.canvas.height / 2}px`,
+        width: `${this.textCanvas.width / 2}px`,
+        height: `${this.textCanvas.height / 2}px`,
         border: "1px solid white",
       });
 
-      requestAnimationFrame(() => {
-        this.draw();
-        paper.view.update();
-        resolve();
-      });
+      this.draw();
+      resolve();
     });
   }
 
   draw = () => {
     if (!this.textCtx) return;
-    paper.project.activeLayer.removeChildren();
-
-    // create a rectangle to fill the background
-    if (this.settings.darkness) {
-      const background = new paper.Path.Rectangle(
-        paper.view.bounds.topLeft,
-        paper.view.bounds.bottomRight,
-      );
-      background.fillColor = new paper.Color(0, 0, 0);
-    }
 
     this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
 
+    // create a rectangle to fill the background
+    if (this.settings.darkness) {
+      this.textCtx.fillStyle = "#000000";
+      this.textCtx.fillRect(
+        0,
+        0,
+        this.textCanvas.width,
+        this.textCanvas.height,
+      );
+    }
+
     const width = this.textCanvas.width;
-    const height = this.textCanvas.width;
+    const height = this.textCanvas.height;
     const centerX = this.textCanvas.width / 4;
     const centerY = this.textCanvas.height / 4;
 
@@ -113,23 +98,24 @@ export default class Text {
     }
 
     // Text
-    const text = "HYPATIA";
 
-    const fontSize = this.settings.text.size * this.canvas.height;
+    const fontSize = this.settings.text.size * this.textCanvas.height;
     this.textCtx.font = `${fontSize}px 'Berlingske Serif Regular'`;
     this.textCtx.fillStyle = "#ffffff";
     this.textCtx.letterSpacing = `${this.settings.text.letterSpacing * fontSize}px`;
 
-    const metrics = this.textCtx.measureText(text);
+    const metrics = this.textCtx.measureText(this.title);
 
     const textWidth =
       metrics.actualBoundingBoxRight - metrics.actualBoundingBoxLeft;
     const textHeight =
       metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
 
+    console.log(textWidth, width);
+
     this.textCtx.fillStyle = this.settings.text.color;
     this.textCtx.fillText(
-      text,
+      this.title,
       centerX - textWidth / 2,
       centerY + textHeight / 2,
     );
@@ -138,13 +124,7 @@ export default class Text {
   async saveImage() {
     await this.setup(true);
 
-    const composition = composite(
-      this.canvas.width,
-      this.canvas.height,
-      [this.canvas, this.textCanvas],
-      false,
-    );
-    await saveImage(composition, "text");
+    await saveImage(this.textCanvas, "text");
 
     await this.setup(false);
   }

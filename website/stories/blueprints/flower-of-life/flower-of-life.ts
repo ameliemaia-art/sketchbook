@@ -27,6 +27,13 @@ export default class FlowerOfLife extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Flower Of Life");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -39,10 +46,6 @@ export default class FlowerOfLife extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Flower Of Life";
   }
 }
 

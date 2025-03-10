@@ -2,6 +2,7 @@ import { FolderApi, Pane } from "tweakpane";
 
 import { composite, saveImage } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
+import Text from "../text/text";
 
 export default class Frame {
   settings = {
@@ -17,13 +18,21 @@ export default class Frame {
   textCtx: CanvasRenderingContext2D | null;
   visible = true;
 
+  titleText: Text;
+  yearText: Text;
+
   constructor(
     root: HTMLElement,
     public sketchCanvas: HTMLCanvasElement,
+    title: string = "IXIIIIIXI",
+    year: string = "MMXXV",
   ) {
     // Canvas
     this.textCanvas = document.createElement("canvas");
     this.textCtx = this.textCanvas.getContext("2d");
+
+    this.titleText = new Text(undefined, title.toUpperCase());
+    this.yearText = new Text(undefined, year.toUpperCase());
 
     root.appendChild(this.textCanvas);
 
@@ -41,18 +50,17 @@ export default class Frame {
   }
 
   async loadAssets() {
-    this.assets.title = await this.loadImage("/assets/images/frame/title.png");
-    this.assets.year = await this.loadImage("/assets/images/frame/year.png");
     this.assets.wordmark = await this.loadImage(
       "/assets/images/frame/wordmark.png",
     );
   }
 
   async setup(exporting = false) {
+    const scale = exporting ? 3 : 1;
     await this.loadAssets();
+    await this.titleText.setup(1500, 500, scale);
+    await this.yearText.setup(500, 500, scale);
     return new Promise<void>((resolve) => {
-      const scale = exporting ? 3 : 1;
-
       this.textCanvas.width = 1080 * scale;
       this.textCanvas.height = 1920 * scale;
       this.textCtx?.scale(2, 2);
@@ -94,25 +102,41 @@ export default class Frame {
       );
     }
 
+    let scaledWidth =
+      this.titleText.textCanvas.width * this.settings.imageScale * 2;
+    let scaledHeight =
+      this.titleText.textCanvas.height * this.settings.imageScale * 2;
+
     const size = this.textCanvas.width * this.settings.imageScale;
-    const width = this.textCanvas.width / 2;
+    const canvasWidth = this.textCanvas.width / 2;
     const height = this.textCanvas.height / 2;
     const outline = false;
 
     this.drawImage(
-      this.assets.title,
-      width / 2 - size / 2,
-      size,
-      size,
-      size,
+      this.titleText.textCanvas,
+      canvasWidth / 2 - scaledWidth / 2,
+      scaledHeight,
+      scaledWidth,
+      scaledHeight,
       outline,
     );
 
-    this.drawImage(this.assets.year, 0, height - size, size, size, outline);
+    scaledWidth = this.yearText.textCanvas.width * this.settings.imageScale * 2;
+    scaledHeight =
+      this.yearText.textCanvas.height * this.settings.imageScale * 2;
+
+    this.drawImage(
+      this.yearText.textCanvas,
+      0,
+      height - scaledHeight,
+      scaledWidth,
+      scaledHeight,
+      outline,
+    );
 
     this.drawImage(
       this.assets.wordmark,
-      width - size,
+      canvasWidth - size,
       height - size,
       size,
       size,
@@ -122,9 +146,9 @@ export default class Frame {
     this.drawImage(
       this.sketchCanvas,
       0,
-      height / 2 - width / 2,
-      width,
-      width,
+      height / 2 - canvasWidth / 2,
+      canvasWidth,
+      canvasWidth,
       outline,
     );
   };

@@ -62,12 +62,14 @@ class SoundAnalyzer extends EventDispatcher {
     this.htmlAudio = new Audio(fileUrl);
     this.htmlAudio.crossOrigin = "anonymous"; // Enable CORS if needed
     this.htmlAudio.controls = true;
+    document.body.appendChild(this.htmlAudio);
 
     const onLoaded = () => {
       if (!this.htmlAudio) return;
 
       // Create a Three.js Audio instance and link it with the HTML5 audio
       const context = this.listener.context;
+
       const source = context.createMediaElementSource(this.htmlAudio);
 
       // Create the Three.js Audio object using the context and source

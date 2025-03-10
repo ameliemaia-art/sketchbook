@@ -15,7 +15,10 @@ export const Text = () => {
 
   useEffect(() => {
     if (rootRef.current && canvasRef.current) {
-      const Text = new TextSketch(rootRef.current, canvasRef.current);
+      const Text = new TextSketch(
+        rootRef.current,
+        "Vector Equilibrium Sperical",
+      );
       new TextGUI(new Pane({ title: "Text" }), Text);
     }
 

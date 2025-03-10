@@ -32,6 +32,13 @@ export default class VectorEquilibrium extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Vector Equilibrium");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -44,10 +51,6 @@ export default class VectorEquilibrium extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Vector Equilibrium";
   }
 }
 

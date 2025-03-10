@@ -38,6 +38,13 @@ export default class Tetrahedron64Star extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "64 Tetrahedron Star");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -50,10 +57,6 @@ export default class Tetrahedron64Star extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "64 Tetrahedron Star";
   }
 }
 

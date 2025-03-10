@@ -24,6 +24,13 @@ export default class FruitOfLife extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Fruit Of Life");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -36,10 +43,6 @@ export default class FruitOfLife extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Fruit of Life";
   }
 }
 

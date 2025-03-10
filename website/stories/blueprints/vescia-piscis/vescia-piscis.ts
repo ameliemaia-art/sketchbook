@@ -26,6 +26,13 @@ export default class VesicaPiscis extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Vesica Piscis");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -38,10 +45,6 @@ export default class VesicaPiscis extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Vesica Piscis";
   }
 }
 

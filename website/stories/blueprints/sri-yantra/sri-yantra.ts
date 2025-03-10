@@ -61,6 +61,13 @@ export default class SriYantra extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Sri Yantra");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -73,10 +80,6 @@ export default class SriYantra extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Sri Yantra";
   }
 }
 

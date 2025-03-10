@@ -12,6 +12,7 @@ import { hypatia, HypatiaSettings } from "./hypatia-geometry";
 export default class Hypatia extends Sketch {
   settings: SketchSettings & HypatiaSettings = {
     ...sketchSettings,
+    title: "Hypatia",
     scale: 0.85,
     seed: 25,
     darkness: true,
@@ -52,6 +53,13 @@ export default class Hypatia extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Hypatia");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -65,10 +73,6 @@ export default class Hypatia extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Hypatia";
   }
 }
 

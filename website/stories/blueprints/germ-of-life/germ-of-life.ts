@@ -24,6 +24,13 @@ export default class GermOfLife extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Germ Of Life");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -36,10 +43,6 @@ export default class GermOfLife extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Germ Of Life";
   }
 }
 

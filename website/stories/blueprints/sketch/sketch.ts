@@ -46,10 +46,11 @@ export default class Sketch {
   constructor(
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
+    public title: string,
   ) {
     this.canvas = canvas;
     paper.setup(this.canvas);
-    this.frame = new Frame(root, this.canvas);
+    this.frame = new Frame(root, this.canvas, this.title);
     this.setup();
   }
 
@@ -111,7 +112,7 @@ export default class Sketch {
   }
 
   name() {
-    return "sketch";
+    return this.title;
   }
 
   fileName() {

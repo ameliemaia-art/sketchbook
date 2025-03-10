@@ -34,6 +34,13 @@ export default class Platonic extends Sketch {
     },
   };
 
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Platonic");
+  }
+
   draw() {
     super.draw();
     if (!this.layers.blueprint || !this.layers.form) return;
@@ -47,10 +54,6 @@ export default class Platonic extends Sketch {
       radius,
       this.settings,
     );
-  }
-
-  name() {
-    return "Platonic";
   }
 }
 
