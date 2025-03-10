@@ -120,11 +120,11 @@ export default class WebGLApp {
     this.copyPassToRenderTarget = new ShaderPass(CopyShader);
 
     this.postProcessing.addPass(this.renderPass);
-    this.postProcessing.addPass(this.aoPass);
-    this.postProcessing.addPass(this.bloomPass);
+    // this.postProcessing.addPass(this.aoPass);
+    // this.postProcessing.addPass(this.bloomPass);
     this.postProcessing.addPass(this.fxaaPass);
     this.postProcessing.addPass(this.outputPass);
-    this.postProcessing.addPass(this.vignettePass);
+    // this.postProcessing.addPass(this.vignettePass);
 
     this.screenshot = new Screenshot(
       this.renderer,
@@ -143,13 +143,16 @@ export default class WebGLApp {
       this.renderer.domElement,
     );
 
-    this.helpers.gridHelperX = new GridHelper(50, 50);
-    this.helpers.gridHelperY = new GridHelper(50, 50);
-    this.helpers.gridHelperZ = new GridHelper(50, 50);
-    this.helpers.gridHelperY.rotateX(Math.PI / 2);
-    this.helpers.gridHelperZ.rotateX(Math.PI / 2);
-    this.helpers.gridHelperZ.rotateZ(Math.PI / 2);
-    this.helpers.axes = new AxesHelper(5);
+    this.helpers.gridHelperX = new GridHelper(500, 50);
+
+    // this.helpers.gridHelperY = new GridHelper(500, 50);
+    // this.helpers.gridHelperY.rotateX(Math.PI / 2);
+
+    // this.helpers.gridHelperZ = new GridHelper(500, 50);
+    // this.helpers.gridHelperZ.rotateX(Math.PI / 2);
+    // this.helpers.gridHelperZ.rotateZ(Math.PI / 2);
+
+    this.helpers.axes = new AxesHelper(50);
     this.helpers.camera = new CameraHelper(this.cameras.main);
     this.helpersGroup.add(...Object.values(this.helpers));
 
@@ -159,7 +162,7 @@ export default class WebGLApp {
     this.cameras.main.lookAt(0, 0, 0);
     this.orthographicCamera.position.z = 5;
 
-    resetCamera(this.cameras.dev, 10, new Vector3(0, 0.5, 1));
+    resetCamera(this.cameras.dev, 1000, new Vector3(0, 0.5, 1));
 
     const element = document.querySelector(
       ".sb-show-main.sb-main-padded",
