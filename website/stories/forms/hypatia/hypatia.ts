@@ -1,5 +1,6 @@
 import { hypatiaSettings } from "@/stories/blueprints/hypatia/hypatia";
 import {
+  DoubleSide,
   ExtrudeGeometry,
   IcosahedronGeometry,
   MathUtils,
@@ -15,7 +16,17 @@ import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 
 export default class HypatiaSketch extends WebGLApp {
   up!: Mesh<ExtrudeGeometry, MeshBasicMaterial>;
-  material = new MeshBasicMaterial({ color: 0xffffff });
+  material = new MeshBasicMaterial({
+    color: 0x333333,
+    side: DoubleSide,
+    wireframe: false,
+  });
+  wireframeMaterial = new MeshBasicMaterial({
+    color: 0xffffff,
+    wireframe: true,
+    side: DoubleSide,
+  });
+
   orbitMeshes: Mesh[] = [];
 
   outlineHorizontal!: Mesh<ExtrudeGeometry, MeshBasicMaterial>;
@@ -24,7 +35,6 @@ export default class HypatiaSketch extends WebGLApp {
   planets: Mesh<IcosahedronGeometry, MeshBasicMaterial>[] = [];
 
   radius = 500;
-
   ringSpeeds: number[] = [];
 
   animation = {
@@ -35,8 +45,8 @@ export default class HypatiaSketch extends WebGLApp {
     this.cameras.main.position.z = 750;
     this.cameras.main.lookAt(0, 0, 0);
 
-    this.createHypatia();
-    this.createOutline();
+    // this.createHypatia();
+    // this.createOutline();
     this.createOrbit();
   }
 
@@ -55,7 +65,7 @@ export default class HypatiaSketch extends WebGLApp {
 
   createOutline() {
     const meshes = [];
-    let total = 3;
+    let total = 1;
     for (let i = 0; i < total; i++) {
       const theta = i * (TWO_PI / total);
       const r = this.radius / 2;
@@ -98,7 +108,10 @@ export default class HypatiaSketch extends WebGLApp {
       curveSegments: 64, // Increase the number of segments for smoother edges
     });
 
-    const mesh = new Mesh(geometry, new MeshBasicMaterial({ color: color }));
+    const mesh = new Mesh(
+      geometry,
+      new MeshBasicMaterial({ color: color, wireframe: true }),
+    );
 
     this.scene.add(mesh);
 
@@ -106,8 +119,8 @@ export default class HypatiaSketch extends WebGLApp {
   }
 
   createOrbit() {
-    const total = 7;
-    const thickness = 0.5;
+    const total = 1;
+    const thickness = 2;
     const r = this.radius / 2;
     const minRadius = r / 5;
     const maxRadius = r;
@@ -115,7 +128,7 @@ export default class HypatiaSketch extends WebGLApp {
     const SM_AXIS_RATIO = 1 / Math.sqrt(3); // ~0.577
 
     for (let i = 0; i < total; i++) {
-      const p = i / (total - 1);
+      const p = i / (total - 1) || 0;
       const radius = MathUtils.lerp(minRadius, maxRadius, p);
 
       const perspectiveFactorY = MathUtils.lerp(
@@ -164,12 +177,13 @@ export default class HypatiaSketch extends WebGLApp {
       const geometry = new ExtrudeGeometry(shape, extrudeSettings);
 
       const ring = new Mesh(geometry, this.material);
+      ring.add(new Mesh(geometry, this.wireframeMaterial));
 
       // ring.rotation.x = Math.PI / 2;
       let theta = MathUtils.lerp(0, 45, p); // Calculate current angle
 
       // ring.rotation.x = MathUtils.degToRad(theta); // Rotate ring to face camera
-      ring.rotation.x = MathUtils.degToRad(theta); // Rotate ring to face camera
+      // ring.rotation.x = MathUtils.degToRad(theta); // Rotate ring to face camera
       // ring.rotation.x = Math.PI / 2;
       ring.scale.z = perspectiveFactorY;
 
@@ -180,64 +194,68 @@ export default class HypatiaSketch extends WebGLApp {
       this.orbitMeshes.push(ring); // Store each ring for later animation
 
       // Planet
-      const startAngle = Math.PI;
-      theta = MathUtils.lerp(
-        startAngle,
-        startAngle + MathUtils.degToRad(hypatiaSettings.form.planets.spiral),
-        p,
-      );
-
-      let mesh = new Mesh(
-        new IcosahedronGeometry(
-          radius * hypatiaSettings.form.planets.radius * 2,
-          3,
-        ),
-        new MeshBasicMaterial({ wireframe: false, color: 0xffffff }),
-      );
-      mesh.position.set(
-        Math.cos(theta) * radius,
-        Math.sin(theta) * radius * perspectiveFactorY,
-        0,
-      );
-      mesh.userData.theta = theta;
-      mesh.userData.radius = radius;
-      mesh.userData.perspectiveFactorY = perspectiveFactorY;
-      mesh.name = `Planet-0-${i}`;
-      ring.add(mesh);
-
-      this.planets.push(mesh);
-
-      theta =
-        Math.PI +
-        MathUtils.lerp(
+      if (false) {
+        const startAngle = Math.PI;
+        theta = MathUtils.lerp(
           startAngle,
           startAngle + MathUtils.degToRad(hypatiaSettings.form.planets.spiral),
           p,
         );
 
-      mesh = new Mesh(
-        new IcosahedronGeometry(
-          radius * hypatiaSettings.form.planets.radius * 2,
-          3,
-        ),
-        new MeshBasicMaterial({ wireframe: false, color: 0xffffff }),
-      );
-      mesh.userData.theta = theta;
-      mesh.userData.radius = radius;
-      mesh.userData.perspectiveFactorY = perspectiveFactorY;
-      mesh.position.set(
-        Math.cos(theta) * radius,
-        Math.sin(theta) * radius * perspectiveFactorY,
-        0,
-      );
-      mesh.name = `Planet-1-${i}`;
-      ring.add(mesh);
+        let mesh = new Mesh(
+          new IcosahedronGeometry(
+            radius * hypatiaSettings.form.planets.radius * 2,
+            3,
+          ),
+          new MeshBasicMaterial({ wireframe: false, color: 0xffffff }),
+        );
+        mesh.position.set(
+          Math.cos(theta) * radius,
+          Math.sin(theta) * radius * perspectiveFactorY,
+          0,
+        );
+        mesh.userData.theta = theta;
+        mesh.userData.radius = radius;
+        mesh.userData.perspectiveFactorY = perspectiveFactorY;
+        mesh.name = `Planet-0-${i}`;
+        ring.add(mesh);
 
-      this.planets.push(mesh);
+        this.planets.push(mesh);
+
+        theta =
+          Math.PI +
+          MathUtils.lerp(
+            startAngle,
+            startAngle +
+              MathUtils.degToRad(hypatiaSettings.form.planets.spiral),
+            p,
+          );
+
+        mesh = new Mesh(
+          new IcosahedronGeometry(
+            radius * hypatiaSettings.form.planets.radius * 2,
+            3,
+          ),
+          new MeshBasicMaterial({ wireframe: false, color: 0xffffff }),
+        );
+        mesh.userData.theta = theta;
+        mesh.userData.radius = radius;
+        mesh.userData.perspectiveFactorY = perspectiveFactorY;
+        mesh.position.set(
+          Math.cos(theta) * radius,
+          Math.sin(theta) * radius * perspectiveFactorY,
+          0,
+        );
+        mesh.name = `Planet-1-${i}`;
+        ring.add(mesh);
+
+        this.planets.push(mesh);
+      }
     }
   }
 
   onUpdate(delta: number) {
+    return;
     this.planets.forEach((mesh: Mesh) => {
       mesh.userData.theta += delta;
       mesh.position.set(

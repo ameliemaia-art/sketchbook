@@ -162,7 +162,7 @@ export default class WebGLApp {
     this.cameras.main.lookAt(0, 0, 0);
     this.orthographicCamera.position.z = 750;
 
-    resetCamera(this.cameras.dev, 1000, new Vector3(0, 0.5, 1));
+    resetCamera(this.cameras.dev, 100, new Vector3(0, 0.5, 1));
 
     const element = document.querySelector(
       ".sb-show-main.sb-main-padded",
