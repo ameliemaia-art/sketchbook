@@ -1,6 +1,9 @@
 import pymel.core as pm
 import math
 
+TORUS_RADIUS = 25
+TORUS_SUBDIVISIONS = 200
+
 # ----------------------------------------------------
 # Utility Function: Linear Interpolation (lerp)
 # ----------------------------------------------------
@@ -8,10 +11,30 @@ def lerp(a, b, t):
     """Linearly interpolate between a and b by t."""
     return a + (b - a) * t
 
+def create_light_torus(major_radius=10, minor_radius=1, subdivisions_major=20, subdivisions_minor=10, name="regularTorus"):
+    """
+    Creates a regular torus mesh using the polyTorus command.
+
+    Parameters:
+      major_radius (float): The major (ring) radius of the torus.
+      minor_radius (float): The minor (tube) radius of the torus.
+      subdivisions_major (int): Number of subdivisions around the torus ring.
+      subdivisions_minor (int): Number of subdivisions along the tube.
+      name (str): The name for the torus mesh.
+
+    Returns:
+      PyNode: The created torus mesh.
+    """
+    torus_mesh = pm.polyTorus(r=major_radius, sr=minor_radius, sx=subdivisions_major, sy=subdivisions_minor, name=name)[0]
+    pm.select(torus_mesh)
+    print("Regular torus mesh created successfully!")
+    return torus_mesh
+
+
 # ----------------------------------------------------
 # Function: Create a Closed Quadrant Profile
 # ----------------------------------------------------
-def create_quadrant_profile(circle_radius=1.0, cross_thickness=0.2, arc_sections=8):
+def create_quadrant_profile(circle_radius=1.0, cross_thickness=0.5, arc_sections=8):
     """
     Creates a fully closed quadrant curve profile.
     
@@ -88,9 +111,9 @@ def sweep_profile(profile_curve, torus_radius=10, path_divisions=50):
 # ----------------------------------------------------
 # MAIN PROCESS: Duplicate, Sweep, and Combine Quadrants
 # ----------------------------------------------------
-def create_full_torus():
+def create_motion_orbit_sculpture():
     # Create the original quadrant profile.
-    original_profile = create_quadrant_profile(circle_radius=1.0, cross_thickness=0.2, arc_sections=8)
+    original_profile = create_quadrant_profile(circle_radius=1.0, cross_thickness=0.25, arc_sections=8)
     
     swept_meshes = []
     # Define the rotation angles for the four quadrants.
@@ -101,15 +124,65 @@ def create_full_torus():
         pm.xform(profile_dup, rotation=(0, 0, angle), relative=True, worldSpace=True)
         pm.makeIdentity(profile_dup, apply=True, translate=True, rotate=True, scale=True)
         # Sweep the rotated profile along the torus path.
-        swept = sweep_profile(profile_dup, torus_radius=10, path_divisions=50)
-        swept_meshes.append(swept)
+        swept = sweep_profile(profile_dup, torus_radius=TORUS_RADIUS, path_divisions=TORUS_SUBDIVISIONS)
+        # swept_meshes.append(swept)
+
+        poly_mesh = pm.nurbsToPoly(swept, format=3, polygonType=1, name="polySweptTorus")[0]
+        pm.polyNormal(poly_mesh, normalMode=0, userNormalMode=0)
+        pm.delete(swept)
+        swept_meshes.append(poly_mesh)
     
+    
+    print(swept_meshes)
     # Combine all the swept meshes into one final torus.
-    full_torus = pm.polyUnite(swept_meshes, ch=False, mergeUVSets=True, name="fullTorus")[0]
+    full_torus = pm.polyUnite(swept_meshes, ch=False, mergeUVSets=True, name="motion_structure")[0]
     pm.delete(full_torus, constructionHistory=True)
     pm.select(full_torus)
+    pm.polyNormal(full_torus, normalMode=0, userNormalMode=0)
     print("✅ Successfully created a full torus from individual quadrant sweeps!")
+
+
+    light = create_light_torus(TORUS_RADIUS, 0.1, TORUS_SUBDIVISIONS, 25, "motion_structure_light")
+
+    group = pm.group(em=True, name="motion_structure_group")
+    pm.parent(full_torus, group)
+    pm.parent(light, group)
+    pm.xform(group, centerPivots=True)
+
     return full_torus
 
+
+
+def create_outline_from_group(original_group, total=1):
+    meshes = []
+    for i in range(total):
+          # Compute the rotation angle in radians.
+          theta = i * (2 * math.pi / total)
+          
+          # Duplicate the original group three times.
+          meshX = pm.duplicate(original_group)[0]
+          meshY = pm.duplicate(original_group)[0]
+          meshZ = pm.duplicate(original_group)[0]
+          
+          # Rename them for clarity.
+          meshX.rename("motion_structure_X")
+          meshY.rename("motion_structure_Y")
+          meshZ.rename("motion_structure_Z")
+          
+          # Set rotations.
+          # Convert from radians to degrees.
+          meshX.rotate.set(math.degrees(theta), 0, 0)
+          meshY.rotate.set(0, math.degrees(theta), 0)
+          # For meshZ, rotate about X-axis by 90° (in degrees) and about Y-axis by theta.
+          meshZ.rotate.set(math.degrees(math.pi/2), math.degrees(theta), 0)
+          
+          meshes.extend([meshX, meshY, meshZ])
+    
+    return meshes
+
+
+
+
 # Run the full process.
-create_full_torus()
+create_motion_orbit_sculpture()
+create_outline_from_group(pm.PyNode("motion_structure_group"), total=4)
