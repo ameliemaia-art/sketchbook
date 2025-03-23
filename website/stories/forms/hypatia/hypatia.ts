@@ -46,8 +46,8 @@ export default class HypatiaSketch extends WebGLApp {
     this.cameras.main.lookAt(0, 0, 0);
 
     // this.createHypatia();
-    // this.createOutline();
-    this.createOrbit();
+    this.createOutline();
+    // this.createOrbit();
   }
 
   createHypatia() {
@@ -65,21 +65,27 @@ export default class HypatiaSketch extends WebGLApp {
 
   createOutline() {
     const meshes = [];
-    let total = 1;
+    let total = 5;
     for (let i = 0; i < total; i++) {
       const theta = i * (TWO_PI / total);
       const r = this.radius / 2;
 
-      const meshX = this.createRing(r, 1, 1, 0xffffff);
-      const meshY = this.createRing(r, 1, 1, 0xffffff);
+      const meshX = this.createRing(r, 1, 1, 0x00ff00);
       const meshZ = this.createRing(r, 1, 1, 0xffffff);
+      meshes.push(meshX, meshZ);
 
       meshX.rotation.x = theta;
-      meshY.rotation.y = theta;
+
+      if (i !== 0) {
+        const meshY = this.createRing(r, 1, 1, 0xffffff);
+        meshY.rotation.y = theta;
+        meshes.push(meshY);
+        meshY.visible = false;
+      }
+      meshZ.visible = false;
+
       meshZ.rotation.y = theta;
       meshZ.rotation.x = Math.PI / 2;
-
-      meshes.push(meshX, meshY, meshZ);
     }
   }
 

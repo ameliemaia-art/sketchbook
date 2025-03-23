@@ -133,7 +133,6 @@ def create_motion_orbit_sculpture():
         swept_meshes.append(poly_mesh)
     
     
-    print(swept_meshes)
     # Combine all the swept meshes into one final torus.
     full_torus = pm.polyUnite(swept_meshes, ch=False, mergeUVSets=True, name="motion_structure")[0]
     pm.delete(full_torus, constructionHistory=True)
@@ -148,41 +147,43 @@ def create_motion_orbit_sculpture():
     pm.parent(full_torus, group)
     pm.parent(light, group)
     pm.xform(group, centerPivots=True)
+    pm.delete(original_profile)
 
-    return full_torus
+    return group
 
 
 
-def create_outline_from_group(original_group, total=1):
-    meshes = []
+def create_outline_from_group(group, total=1):
+    groupX = pm.group(em=True, name="structure_x_group")
+    groupY = pm.group(em=True, name="structure_y_group")
+    groupZ = pm.group(em=True, name="structure_z_group")
     for i in range(total):
-          # Compute the rotation angle in radians.
-          theta = i * (2 * math.pi / total)
+          theta = i * (360 / total)
           
-          # Duplicate the original group three times.
-          meshX = pm.duplicate(original_group)[0]
-          meshY = pm.duplicate(original_group)[0]
-          meshZ = pm.duplicate(original_group)[0]
-          
-          # Rename them for clarity.
+          meshX = pm.duplicate(group)[0]
+          meshZ = pm.duplicate(group)[0]
+          pm.parent(meshX, groupX)
+          pm.parent(meshZ, groupZ)
+
           meshX.rename("motion_structure_X")
-          meshY.rename("motion_structure_Y")
           meshZ.rename("motion_structure_Z")
-          
-          # Set rotations.
-          # Convert from radians to degrees.
-          meshX.rotate.set(math.degrees(theta), 0, 0)
-          meshY.rotate.set(0, math.degrees(theta), 0)
-          # For meshZ, rotate about X-axis by 90° (in degrees) and about Y-axis by theta.
-          meshZ.rotate.set(math.degrees(math.pi/2), math.degrees(theta), 0)
-          
-          meshes.extend([meshX, meshY, meshZ])
-    
-    return meshes
 
+          meshX.rotateX.set(theta)
+          meshZ.rotate.set(0, 90, theta)
 
+          if i != 0:
+            meshY = pm.duplicate(group)[0]
+            meshY.rename("motion_structure_Y")
+            meshY.rotate.set(90, theta, 0)
+            pm.parent(meshY, groupY)
+
+    pm.delete(group)
+    group2 = pm.group(em=True, name="motion_structure")
+    pm.parent(groupX, group2)
+    pm.parent(groupY, group2)
+    pm.parent(groupZ, group2)
+    return group2
 
 
 # Run the full process.
-create_motion_orbit_sculpture()
-create_outline_from_group(pm.PyNode("motion_structure_group"), total=4)
+create_outline_from_group(create_motion_orbit_sculpture(), total=5)
