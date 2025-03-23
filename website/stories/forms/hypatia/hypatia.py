@@ -12,8 +12,8 @@ ORBIT_PROFILE_RADIUS = 1
 HYPATIA_RADIUS = 0.05
 
 # Orbit
-ORBIT_THICKNESS = 0.05
-ORBIT_HEIGHT = HYPATIA_RADIUS*2
+ORBIT_THICKNESS = 0.005
+ORBIT_HEIGHT = HYPATIA_RADIUS
 
 # ----------------------------------------------------
 # Utility Function: Linear Interpolation (lerp)
@@ -210,6 +210,7 @@ def create_hypatia():
 def create_orbit():
     total = 7
     thickness = RADIUS * ORBIT_THICKNESS
+    extrusion_thickness = RADIUS * ORBIT_THICKNESS
     height = RADIUS * ORBIT_HEIGHT
     min_radius = RADIUS / 5
     max_radius = RADIUS * (6/7)
@@ -225,49 +226,59 @@ def create_orbit():
         ring_radius = min_radius + p * (max_radius - min_radius)
         perspective_factor_y = SM_AXIS_RATIO + p * (SM_AXIS_RATIO * (1 + SM_AXIS_RATIO) - SM_AXIS_RATIO)
 
-        # Create an ellipse curve
+        # Create an ellipse curve (NURBS) as the extrusion path.
         ellipse = pm.circle(radius=ring_radius, normal=(0, 1, 0), sections=100, name=f'Ellipse_{i}')[0]
-        pm.xform(ellipse, scale=(perspective_factor_y, 1, 1))  # Corrected scaling
+        pm.xform(ellipse, scale=(perspective_factor_y, 1, 1))  # Apply elliptical scaling
 
-        # Create a NURBS circle as the profile curve
-        profile = pm.circle(radius=thickness / 2, normal=(1, 0, 0), sections=20, name=f'Profile_{i}')[0]
-        
-        # Extrude profile along the ellipse path to form a pipe-like structure
-        ring = pm.extrude(profile, ellipse, et=2, ucp=True, fixedPath=True, name=f'Ring_{i}')[0]
-        pm.delete(profile)  # Cleanup profile curve after extrusion
+        # Create a polyPlane as the base for our square profile.
+        profile_poly = pm.polyPlane(width=height, height=height, subdivisionsX=1, subdivisionsY=1,
+                                    name=f'ProfilePoly_{i}')[0]
+        pm.xform(profile_poly, scale=(extrusion_thickness, 1, 1))  # Apply elliptical scaling
+        # Ensure the polyPlane is oriented properly.
+        pm.xform(profile_poly, rotation=(90, 90, 0))
 
-        pm.parent(ring, group)
-        
-        
-        # Planet Creation (if needed)
-        # if False:  # Set to True if planets should be created
-        #     start_angle = math.pi
-        #     theta = start_angle + p * math.radians(45)  # Spiral angle
-            
-        #     planet1 = pm.polySphere(radius=ring_radius * 0.2, subdivisionsX=20, subdivisionsY=20, name=f'Planet_0_{i}')[0]
-        #     pm.xform(planet1, translation=(
-        #         math.cos(theta) * ring_radius,
-        #         math.sin(theta) * ring_radius * perspective_factor_y,
-        #         0
-        #     ))
-        #     pm.parent(planet1, ring)
-        #     planets.append(planet1)
-            
-        #     theta += math.pi
-        #     planet2 = pm.polySphere(radius=ring_radius * 0.2, subdivisionsX=20, subdivisionsY=20, name=f'Planet_1_{i}')[0]
-        #     pm.xform(planet2, translation=(
-        #         math.cos(theta) * ring_radius,
-        #         math.sin(theta) * ring_radius * perspective_factor_y,
-        #         0
-        #     ))
-        #     pm.parent(planet2, ring)
-        #     planets.append(planet2)
+        # Convert the polyPlane to a NURBS curve (a "nurb square").
+        edges = pm.polyListComponentConversion(profile_poly, toEdge=True)
+        pm.select(edges, r=True)
+        profile_curve = pm.polyToCurve(form=2, degree=1, name=f'ProfileCurve_{i}')[0]
+        pm.delete(profile_poly)  # Remove the original polygon.
+        pm.select(clear=True)
+
+        # Extrude the square profile (NURBS curve) along the ellipse path.
+        # fpt=False allows the profile to follow the path's twist.
+        extruded_ring = pm.extrude(profile_curve, ellipse, et=2, ucp=True, fpt=False, name=f'Ring_{i}')[0]
+        pm.delete(profile_curve)  # Clean up the temporary profile curve.
+
+        # Convert the NURBS extruded surface to a polygon mesh.
+        ring_mesh = pm.nurbsToPoly(extruded_ring, mnd=0, ch=0)[0]
+        pm.delete(extruded_ring)  # Optionally remove the original NURBS surface.
+
+
+        pm.select(ring_mesh)
+        pm.polyNormal(ring_mesh, normalMode=0, userNormalMode=0)
+        pm.polySoftEdge(ring_mesh, angle=0, ch=1)
+
+        # Center the extruded (and converted) ring mesh.
+        bbox = pm.exactWorldBoundingBox(ring_mesh)
+        center = ((bbox[0] + bbox[3]) / 2.0,
+                  (bbox[1] + bbox[4]) / 2.0,
+                  (bbox[2] + bbox[5]) / 2.0)
+        pm.move(-center[0], -center[1], -center[2], ring_mesh, r=True)
+
+        pm.xform(ring_mesh, centerPivots=True)
+        pm.rotate(ring_mesh, lerp(-45, -90, p), 0, 0)
+
+        pm.delete(ellipse)
+        orbit_meshes.append(ring_mesh)
+        pm.parent(ring_mesh, group)
+
+        # Planet creation code can go here if needed.
     
-    # return orbit_meshes, ring_speeds, planets
+    return orbit_meshes, ring_speeds, planets
 
 
 
 # Run the full process.
-# create_outline(create_motion_orbit_sculpture(), total=5)
+create_outline(create_motion_orbit_sculpture(), total=5)
 create_orbit()
-# create_hypatia()
+create_hypatia()
