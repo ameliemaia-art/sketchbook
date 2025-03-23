@@ -1,8 +1,19 @@
 import pymel.core as pm
 import math
 
-TORUS_RADIUS = 25
-TORUS_SUBDIVISIONS = 200
+RADIUS = 25.0
+TORUS_SUBDIVISIONS = 200.0
+
+# Outline
+OUTLINE_RADIUS = 1
+ORBIT_PROFILE_RADIUS = 1
+
+# Hypatia
+HYPATIA_RADIUS = 0.05
+
+# Orbit
+ORBIT_THICKNESS = 0.05
+ORBIT_HEIGHT = HYPATIA_RADIUS*2
 
 # ----------------------------------------------------
 # Utility Function: Linear Interpolation (lerp)
@@ -85,6 +96,8 @@ def create_quadrant_profile(circle_radius=1.0, cross_thickness=0.5, arc_sections
 # Function: Sweep a Profile Along a Circular Path
 # ----------------------------------------------------
 def sweep_profile(profile_curve, torus_radius=10, path_divisions=50):
+
+    print(torus_radius)
     """
     Sweeps the provided profile curve along a circular path to create a torus-like mesh.
     
@@ -112,8 +125,9 @@ def sweep_profile(profile_curve, torus_radius=10, path_divisions=50):
 # MAIN PROCESS: Duplicate, Sweep, and Combine Quadrants
 # ----------------------------------------------------
 def create_motion_orbit_sculpture():
+    circle_radius = OUTLINE_RADIUS*ORBIT_PROFILE_RADIUS
     # Create the original quadrant profile.
-    original_profile = create_quadrant_profile(circle_radius=1.0, cross_thickness=0.25, arc_sections=8)
+    original_profile = create_quadrant_profile(circle_radius=circle_radius, cross_thickness=circle_radius*0.25, arc_sections=8)
     
     swept_meshes = []
     # Define the rotation angles for the four quadrants.
@@ -124,7 +138,7 @@ def create_motion_orbit_sculpture():
         pm.xform(profile_dup, rotation=(0, 0, angle), relative=True, worldSpace=True)
         pm.makeIdentity(profile_dup, apply=True, translate=True, rotate=True, scale=True)
         # Sweep the rotated profile along the torus path.
-        swept = sweep_profile(profile_dup, torus_radius=TORUS_RADIUS, path_divisions=TORUS_SUBDIVISIONS)
+        swept = sweep_profile(profile_dup, torus_radius=OUTLINE_RADIUS*RADIUS, path_divisions=TORUS_SUBDIVISIONS)
         # swept_meshes.append(swept)
 
         poly_mesh = pm.nurbsToPoly(swept, format=3, polygonType=1, name="polySweptTorus")[0]
@@ -141,7 +155,7 @@ def create_motion_orbit_sculpture():
     print("✅ Successfully created a full torus from individual quadrant sweeps!")
 
 
-    light = create_light_torus(TORUS_RADIUS, 0.1, TORUS_SUBDIVISIONS, 25, "motion_structure_light")
+    light = create_light_torus(OUTLINE_RADIUS*RADIUS, 0.1, TORUS_SUBDIVISIONS, 25, "motion_structure_light")
 
     group = pm.group(em=True, name="motion_structure_group")
     pm.parent(full_torus, group)
@@ -153,7 +167,7 @@ def create_motion_orbit_sculpture():
 
 
 
-def create_outline_from_group(group, total=1):
+def create_outline(group, total=1):
     groupX = pm.group(em=True, name="structure_x_group")
     groupY = pm.group(em=True, name="structure_y_group")
     groupZ = pm.group(em=True, name="structure_z_group")
@@ -184,6 +198,76 @@ def create_outline_from_group(group, total=1):
     pm.parent(groupZ, group2)
     return group2
 
+def create_hypatia():
+    radius = float(RADIUS * HYPATIA_RADIUS)
+    print(radius)
+    sphere = pm.polySphere(name="hypatia", radius=radius, subdivisionsX=100, subdivisionsY=50)
+    return sphere
+
+
+
+
+def create_orbit():
+    total = 7
+    thickness = RADIUS * ORBIT_THICKNESS
+    height = RADIUS * ORBIT_HEIGHT
+    min_radius = RADIUS / 5
+    max_radius = RADIUS * (6/7)
+    SM_AXIS_RATIO = 1 / math.sqrt(3)  # ~0.577
+    group = pm.group(em=True, name="orbit_group")
+
+    orbit_meshes = []
+    ring_speeds = []
+    planets = []
+
+    for i in range(total):
+        p = i / (total - 1) if total > 1 else 0
+        ring_radius = min_radius + p * (max_radius - min_radius)
+        perspective_factor_y = SM_AXIS_RATIO + p * (SM_AXIS_RATIO * (1 + SM_AXIS_RATIO) - SM_AXIS_RATIO)
+
+        # Create an ellipse curve
+        ellipse = pm.circle(radius=ring_radius, normal=(0, 1, 0), sections=100, name=f'Ellipse_{i}')[0]
+        pm.xform(ellipse, scale=(perspective_factor_y, 1, 1))  # Corrected scaling
+
+        # Create a NURBS circle as the profile curve
+        profile = pm.circle(radius=thickness / 2, normal=(1, 0, 0), sections=20, name=f'Profile_{i}')[0]
+        
+        # Extrude profile along the ellipse path to form a pipe-like structure
+        ring = pm.extrude(profile, ellipse, et=2, ucp=True, fixedPath=True, name=f'Ring_{i}')[0]
+        pm.delete(profile)  # Cleanup profile curve after extrusion
+
+        pm.parent(ring, group)
+        
+        
+        # Planet Creation (if needed)
+        # if False:  # Set to True if planets should be created
+        #     start_angle = math.pi
+        #     theta = start_angle + p * math.radians(45)  # Spiral angle
+            
+        #     planet1 = pm.polySphere(radius=ring_radius * 0.2, subdivisionsX=20, subdivisionsY=20, name=f'Planet_0_{i}')[0]
+        #     pm.xform(planet1, translation=(
+        #         math.cos(theta) * ring_radius,
+        #         math.sin(theta) * ring_radius * perspective_factor_y,
+        #         0
+        #     ))
+        #     pm.parent(planet1, ring)
+        #     planets.append(planet1)
+            
+        #     theta += math.pi
+        #     planet2 = pm.polySphere(radius=ring_radius * 0.2, subdivisionsX=20, subdivisionsY=20, name=f'Planet_1_{i}')[0]
+        #     pm.xform(planet2, translation=(
+        #         math.cos(theta) * ring_radius,
+        #         math.sin(theta) * ring_radius * perspective_factor_y,
+        #         0
+        #     ))
+        #     pm.parent(planet2, ring)
+        #     planets.append(planet2)
+    
+    # return orbit_meshes, ring_speeds, planets
+
+
 
 # Run the full process.
-create_outline_from_group(create_motion_orbit_sculpture(), total=5)
+# create_outline(create_motion_orbit_sculpture(), total=5)
+create_orbit()
+# create_hypatia()
