@@ -38,7 +38,6 @@ def create_light_torus(major_radius=10, minor_radius=1, subdivisions_major=20, s
     """
     torus_mesh = pm.polyTorus(r=major_radius, sr=minor_radius, sx=subdivisions_major, sy=subdivisions_minor, name=name)[0]
     pm.select(torus_mesh)
-    print("Regular torus mesh created successfully!")
     return torus_mesh
 
 
@@ -88,8 +87,6 @@ def create_quadrant_profile(circle_radius=1.0, cross_thickness=0.5, arc_sections
     quadrant_curve = pm.curve(d=1, p=points, name="quadrantProfile")
     pm.makeIdentity(quadrant_curve, apply=True, translate=True, rotate=True, scale=True)
     pm.delete(quadrant_curve, constructionHistory=True)
-    
-    print("✅ Fully closed quadrant curve created successfully!")
     return quadrant_curve
 
 # ----------------------------------------------------
@@ -97,7 +94,6 @@ def create_quadrant_profile(circle_radius=1.0, cross_thickness=0.5, arc_sections
 # ----------------------------------------------------
 def sweep_profile(profile_curve, torus_radius=10, path_divisions=50):
 
-    print(torus_radius)
     """
     Sweeps the provided profile curve along a circular path to create a torus-like mesh.
     
@@ -120,6 +116,7 @@ def sweep_profile(profile_curve, torus_radius=10, path_divisions=50):
     # Cleanup the construction curves.
     pm.delete(profile_curve, circle_path)
     return swept
+
 
 # ----------------------------------------------------
 # MAIN PROCESS: Duplicate, Sweep, and Combine Quadrants
@@ -152,8 +149,6 @@ def create_motion_orbit_sculpture():
     pm.delete(full_torus, constructionHistory=True)
     pm.select(full_torus)
     pm.polyNormal(full_torus, normalMode=0, userNormalMode=0)
-    print("✅ Successfully created a full torus from individual quadrant sweeps!")
-
 
     light = create_light_torus(OUTLINE_RADIUS*RADIUS, 0.1, TORUS_SUBDIVISIONS, 25, "motion_structure_light")
 
@@ -200,11 +195,8 @@ def create_outline(group, total=1):
 
 def create_hypatia():
     radius = float(RADIUS * HYPATIA_RADIUS)
-    print(radius)
     sphere = pm.polySphere(name="hypatia", radius=radius, subdivisionsX=100, subdivisionsY=50)
     return sphere
-
-
 
 
 def create_orbit():
@@ -226,53 +218,55 @@ def create_orbit():
         ring_radius = min_radius + p * (max_radius - min_radius)
         perspective_factor_y = SM_AXIS_RATIO + p * (SM_AXIS_RATIO * (1 + SM_AXIS_RATIO) - SM_AXIS_RATIO)
 
-        # Create an ellipse curve (NURBS) as the extrusion path.
-        ellipse = pm.circle(radius=ring_radius, normal=(0, 1, 0), sections=100, name=f'Ellipse_{i}')[0]
-        pm.xform(ellipse, scale=(perspective_factor_y, 1, 1))  # Apply elliptical scaling
-
         # Create a polyPlane as the base for our square profile.
         profile_poly = pm.polyPlane(width=height, height=height, subdivisionsX=1, subdivisionsY=1,
                                     name=f'ProfilePoly_{i}')[0]
-        pm.xform(profile_poly, scale=(extrusion_thickness, 1, 1))  # Apply elliptical scaling
-        # Ensure the polyPlane is oriented properly.
+        # Scale the plane to get the desired extrusion thickness.
+        pm.xform(profile_poly, scale=(extrusion_thickness, 1, 1))
+        # Rotate it so the face is oriented correctly for the sweep.
         pm.xform(profile_poly, rotation=(90, 90, 0))
 
-        # Convert the polyPlane to a NURBS curve (a "nurb square").
+        # Convert the polyPlane to a NURBS curve ("nurb square") by converting its border edges.
         edges = pm.polyListComponentConversion(profile_poly, toEdge=True)
         pm.select(edges, r=True)
         profile_curve = pm.polyToCurve(form=2, degree=1, name=f'ProfileCurve_{i}')[0]
-        pm.delete(profile_poly)  # Remove the original polygon.
+        pm.delete(profile_poly)
         pm.select(clear=True)
 
-        # Extrude the square profile (NURBS curve) along the ellipse path.
-        # fpt=False allows the profile to follow the path's twist.
-        extruded_ring = pm.extrude(profile_curve, ellipse, et=2, ucp=True, fpt=False, name=f'Ring_{i}')[0]
-        pm.delete(profile_curve)  # Clean up the temporary profile curve.
+        circle_path = pm.circle(radius=ring_radius, normal=(0, 1, 0), 
+                                sections=TORUS_SUBDIVISIONS, name="torusPath")[0]
+        pm.xform(circle_path, scale=(perspective_factor_y, 1, 1))  # Apply elliptical scaling
+        
+        # Align the profile: move it so its origin sits at the torus edge.
+        pm.xform(profile_curve, translation=(ring_radius, 0, 0))
+        # Rotate the profile so that it's perpendicular to the path.
+        pm.xform(profile_curve, rotation=(0, 90, 0), worldSpace=True)
+        
+        # Perform the sweep (extrude in pipe mode).
+        swept = pm.extrude(profile_curve, circle_path, et=2, upn=True, 
+                        fixedPath=True, scale=1, useComponentPivot=True, 
+                        name="sweptTorus")[0]
+        
+        poly_mesh = pm.nurbsToPoly(swept, format=3, polygonType=1, name="polySweptTorus")[0]
+        pm.polySoftEdge(poly_mesh, angle=0, ch=1)
 
-        # Convert the NURBS extruded surface to a polygon mesh.
-        ring_mesh = pm.nurbsToPoly(extruded_ring, mnd=0, ch=0)[0]
-        pm.delete(extruded_ring)  # Optionally remove the original NURBS surface.
+        pm.delete(swept)
+    
+        # Cleanup the construction curves.
+        pm.delete(profile_curve, circle_path)
 
-
-        pm.select(ring_mesh)
-        pm.polyNormal(ring_mesh, normalMode=0, userNormalMode=0)
-        pm.polySoftEdge(ring_mesh, angle=0, ch=1)
-
-        # Center the extruded (and converted) ring mesh.
-        bbox = pm.exactWorldBoundingBox(ring_mesh)
+        # Center the resulting swept mesh.
+        bbox = pm.exactWorldBoundingBox(poly_mesh)
         center = ((bbox[0] + bbox[3]) / 2.0,
                   (bbox[1] + bbox[4]) / 2.0,
                   (bbox[2] + bbox[5]) / 2.0)
-        pm.move(-center[0], -center[1], -center[2], ring_mesh, r=True)
+        pm.move(-center[0], -center[1], -center[2], poly_mesh, r=True)
+        pm.xform(poly_mesh, centerPivots=True)
+        pm.rotate(poly_mesh, lerp(-45, -90, p), 0, 0)
 
-        pm.xform(ring_mesh, centerPivots=True)
-        pm.rotate(ring_mesh, lerp(-45, -90, p), 0, 0)
+        orbit_meshes.append(poly_mesh)
+        pm.parent(poly_mesh, group)
 
-        pm.delete(ellipse)
-        orbit_meshes.append(ring_mesh)
-        pm.parent(ring_mesh, group)
-
-        # Planet creation code can go here if needed.
     
     return orbit_meshes, ring_speeds, planets
 
