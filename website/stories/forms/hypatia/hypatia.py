@@ -1,4 +1,5 @@
 import pymel.core as pm
+import pymel.core.datatypes as dt
 import math
 
 RADIUS = 25.0
@@ -6,14 +7,14 @@ TORUS_SUBDIVISIONS = 200.0
 
 # Outline
 OUTLINE_RADIUS = 1
-ORBIT_PROFILE_RADIUS = 1
+ORBIT_PROFILE_RADIUS = 0.5
 
 # Hypatia
 HYPATIA_RADIUS = 0.05
 
 # Orbit
-ORBIT_THICKNESS = 0.005
-ORBIT_HEIGHT = HYPATIA_RADIUS
+ORBIT_THICKNESS = 0.0025
+ORBIT_HEIGHT = HYPATIA_RADIUS*2
 
 # ----------------------------------------------------
 # Utility Function: Linear Interpolation (lerp)
@@ -21,6 +22,10 @@ ORBIT_HEIGHT = HYPATIA_RADIUS
 def lerp(a, b, t):
     """Linearly interpolate between a and b by t."""
     return a + (b - a) * t
+
+ # Define the mapLinear equivalent function
+def mapLinear(value, in_min, in_max, out_min, out_max):
+    return out_min + (value - in_min) * (out_max - out_min) / (in_max - in_min)
 
 def create_light_torus(major_radius=10, minor_radius=1, subdivisions_major=20, subdivisions_minor=10, name="regularTorus"):
     """
@@ -39,6 +44,42 @@ def create_light_torus(major_radius=10, minor_radius=1, subdivisions_major=20, s
     torus_mesh = pm.polyTorus(r=major_radius, sr=minor_radius, sx=subdivisions_major, sy=subdivisions_minor, name=name)[0]
     pm.select(torus_mesh)
     return torus_mesh
+
+
+def adjust_uvs_to_range(mesh, projection_scale_u=1, projection_scale_v=1):
+    """
+    Adjusts the UVs of a given mesh to ensure they fit within the 0-1 range using cylindrical mapping.
+    
+    Parameters:
+    - mesh: The mesh to adjust the UVs for.
+    - projection_scale_u: Scaling factor for U-axis in cylindrical projection (default is 1).
+    - projection_scale_v: Scaling factor for V-axis in cylindrical projection (default is 1).
+    """
+    # Perform cylindrical projection
+    pm.select(mesh)
+    pm.polyCylindricalProjection(mesh, projectionScaleU=projection_scale_u, projectionScaleV=projection_scale_v, smartFit=True)
+    
+    # Now adjust the UV coordinates to ensure they fit in the 0-1 range.
+    uvs = pm.polyListComponentConversion(mesh, toUV=True)
+    uvs = pm.ls(uvs, flatten=True)
+
+    # Calculate the range of UVs along U-axis
+    min_u = float('inf')
+    max_u = float('-inf')
+
+    # Loop through each UV and calculate its U value
+    for uv in uvs:
+        u_value = pm.polyEditUV(uv, query=True, u=True)[0]
+        min_u = min(min_u, u_value)
+        max_u = max(max_u, u_value)
+
+    # Apply mapLinear and clamp the values to the range [0, 1]
+    for uv in uvs:
+        u_value = pm.polyEditUV(uv, query=True, u=True)[0]
+        mapped_u = mapLinear(u_value, min_u, max_u, 0.0, 1.0)
+        clamped_u = max(0.0, min(1.0, mapped_u))  # Clamp the value to [0, 1]
+        pm.select(uv)  # Select the individual UV
+        pm.polyEditUV(pivotU=0.5, pivotV=0.5, uValue=clamped_u, relative=False)  # Apply the new UV value
 
 
 # ----------------------------------------------------
@@ -262,17 +303,50 @@ def create_orbit():
                   (bbox[2] + bbox[5]) / 2.0)
         pm.move(-center[0], -center[1], -center[2], poly_mesh, r=True)
         pm.xform(poly_mesh, centerPivots=True)
-        pm.rotate(poly_mesh, lerp(-45, -90, p), 0, 0)
+        # pm.rotate(poly_mesh, lerp(45, 270, p), 0, lerp(0, 270, p))
 
-        orbit_meshes.append(poly_mesh)
-        pm.parent(poly_mesh, group)
+            # --- Separate the inner side of poly_mesh ---
+        # Here we calculate the full 3D distance from (0,0,0) for each face's center.
 
-    
+        mm = pm.PyNode(poly_mesh)
+
+        # Duplicate the mesh
+        inner_side = pm.duplicate(mm, name="inner")[0]
+        outer_side = pm.duplicate(mm, name="outer")[0]
+
+        # Define face range (adjust dynamically if needed)
+        face_count = len(mm.faces)-1
+
+        # Delete inner faces from the outer mesh
+        pm.delete(outer_side.f[0:599])
+
+        # Delete outer faces from the inner mesh
+        pm.delete(inner_side.f[600:face_count])
+
+        ringGroup = pm.group(em=True, name="orbit")
+
+        # Parent both parts to the group
+        pm.parent(inner_side, ringGroup)
+        pm.parent(outer_side, ringGroup)
+
+        pm.parent(ringGroup, group)
+
+        # Cleanup
+        pm.delete(mm)  
+                
+        # orbit_meshes.append(poly_mesh)
+        # pm.parent(poly_mesh, group)
+
+        # UV Mapping using Cylindrical Projection
+        adjust_uvs_to_range(outer_side, projection_scale_u=1, projection_scale_v=1)
+        adjust_uvs_to_range(inner_side, projection_scale_u=1, projection_scale_v=1)
+
+    pm.select(clear=True)
     return orbit_meshes, ring_speeds, planets
 
 
 
-# Run the full process.
-create_outline(create_motion_orbit_sculpture(), total=5)
+# distribute_cubes_on_cube(big_size=500, grid=10, small_dims=(1, 1, 50.0))
+# create_outline(create_motion_orbit_sculpture(), total=5)
 create_orbit()
-create_hypatia()
+# create_hypatia()
