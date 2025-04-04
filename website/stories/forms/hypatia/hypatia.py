@@ -186,14 +186,14 @@ def create_motion_orbit_sculpture():
     
     
     # Combine all the swept meshes into one final torus.
-    full_torus = pm.polyUnite(swept_meshes, ch=False, mergeUVSets=True, name="motion_structure")[0]
+    full_torus = pm.polyUnite(swept_meshes, ch=False, mergeUVSets=True, name="SM_Motion_Structure")[0]
     pm.delete(full_torus, constructionHistory=True)
     pm.select(full_torus)
     pm.polyNormal(full_torus, normalMode=0, userNormalMode=0)
 
-    light = create_light_torus(OUTLINE_RADIUS*RADIUS, 0.1, TORUS_SUBDIVISIONS, 25, "motion_structure_light")
+    light = create_light_torus(OUTLINE_RADIUS*RADIUS, 0.1, TORUS_SUBDIVISIONS, 25, "SM_Motion_Structure_Light")
 
-    group = pm.group(em=True, name="motion_structure_group")
+    group = pm.group(em=True, name="SM_Motion_Structure_Group")
     pm.parent(full_torus, group)
     pm.parent(light, group)
     pm.xform(group, centerPivots=True)
@@ -204,9 +204,9 @@ def create_motion_orbit_sculpture():
 
 
 def create_outline(group, total=1):
-    groupX = pm.group(em=True, name="structure_x_group")
-    groupY = pm.group(em=True, name="structure_y_group")
-    groupZ = pm.group(em=True, name="structure_z_group")
+    groupX = pm.group(em=True, name="SM_Structure_X_Group")
+    groupY = pm.group(em=True, name="SM_Structure_Y_Group")
+    groupZ = pm.group(em=True, name="SM_Structure_Z_Group")
     for i in range(total):
           theta = i * (360 / total)
           
@@ -215,20 +215,20 @@ def create_outline(group, total=1):
           pm.parent(meshX, groupX)
           pm.parent(meshZ, groupZ)
 
-          meshX.rename("motion_structure_X")
-          meshZ.rename("motion_structure_Z")
+          meshX.rename("SM_Motion_Structure_X%s" % i)
+          meshZ.rename("SM_Motion_Structure_Z%s" % i)
 
           meshX.rotateX.set(theta)
           meshZ.rotate.set(0, 90, theta)
 
           if i != 0:
             meshY = pm.duplicate(group)[0]
-            meshY.rename("motion_structure_Y")
+            meshY.rename("SM_Motion_Structure_Y%s" % i)
             meshY.rotate.set(90, theta, 0)
             pm.parent(meshY, groupY)
 
     pm.delete(group)
-    group2 = pm.group(em=True, name="motion_structure")
+    group2 = pm.group(em=True, name="SM_Motion_Structure%s" % i)
     pm.parent(groupX, group2)
     pm.parent(groupY, group2)
     pm.parent(groupZ, group2)
@@ -236,7 +236,7 @@ def create_outline(group, total=1):
 
 def create_hypatia():
     radius = float(RADIUS * HYPATIA_RADIUS)
-    sphere = pm.polySphere(name="hypatia", radius=radius, subdivisionsX=100, subdivisionsY=50)
+    sphere = pm.polySphere(name="SM_Hypatia", radius=radius, subdivisionsX=100, subdivisionsY=50)
     return sphere
 
 
@@ -248,7 +248,7 @@ def create_orbit():
     min_radius = RADIUS / 5
     max_radius = RADIUS * (6/7)
     SM_AXIS_RATIO = 1 / math.sqrt(3)  # ~0.577
-    group = pm.group(em=True, name="orbit_group")
+    group = pm.group(em=True, name="SM_Orbit_Group")
 
     orbit_meshes = []
     ring_speeds = []
@@ -303,7 +303,7 @@ def create_orbit():
                   (bbox[2] + bbox[5]) / 2.0)
         pm.move(-center[0], -center[1], -center[2], poly_mesh, r=True)
         pm.xform(poly_mesh, centerPivots=True)
-        # pm.rotate(poly_mesh, lerp(45, 270, p), 0, lerp(0, 270, p))
+        # pm.rotate(poly_mesh, lerp(-45, 45, p), 0, lerp(0, 270, p))
 
             # --- Separate the inner side of poly_mesh ---
         # Here we calculate the full 3D distance from (0,0,0) for each face's center.
@@ -311,8 +311,8 @@ def create_orbit():
         mm = pm.PyNode(poly_mesh)
 
         # Duplicate the mesh
-        inner_side = pm.duplicate(mm, name="inner")[0]
-        outer_side = pm.duplicate(mm, name="outer")[0]
+        inner_side = pm.duplicate(mm, name="SM_Inner%s" % i)[0]
+        outer_side = pm.duplicate(mm, name="SM_Outer%s" % i)[0]
 
         # Define face range (adjust dynamically if needed)
         face_count = len(mm.faces)-1
@@ -323,7 +323,7 @@ def create_orbit():
         # Delete outer faces from the inner mesh
         pm.delete(inner_side.f[600:face_count])
 
-        ringGroup = pm.group(em=True, name="orbit")
+        ringGroup = pm.group(em=True, name="SM_Orbit%s" % i)
 
         # Parent both parts to the group
         pm.parent(inner_side, ringGroup)
@@ -347,6 +347,6 @@ def create_orbit():
 
 
 # distribute_cubes_on_cube(big_size=500, grid=10, small_dims=(1, 1, 50.0))
-# create_outline(create_motion_orbit_sculpture(), total=5)
+create_outline(create_motion_orbit_sculpture(), total=5)
 create_orbit()
-# create_hypatia()
+create_hypatia()
