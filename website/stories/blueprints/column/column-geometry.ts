@@ -1,4 +1,5 @@
 import paper from "paper";
+import { MathUtils } from "three";
 
 import { createCircle } from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
@@ -40,7 +41,12 @@ function drawGreekColumnShaft(
     );
 
     // Midpoint between p1 and p2
-    const mid = p1.add(p2).divide(2);
+    const midAngle = MathUtils.lerp(angle2, angle1, 0.5);
+
+    const mid = new paper.Point(
+      center.x + radius * Math.cos(midAngle),
+      center.y + radius * Math.sin(midAngle),
+    );
 
     // Inward control point for curvature
     const normal = mid.subtract(center).normalize();
