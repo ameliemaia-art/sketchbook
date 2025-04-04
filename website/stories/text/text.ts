@@ -111,8 +111,6 @@ export default class Text {
     const textHeight =
       metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
 
-    console.log(textWidth, width);
-
     this.textCtx.fillStyle = this.settings.text.color;
     this.textCtx.fillText(
       this.title,

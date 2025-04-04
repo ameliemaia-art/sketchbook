@@ -41,7 +41,7 @@ export default class Sketch {
   group?: paper.Group;
   layers: { blueprint?: paper.Group; form?: paper.Group } = {};
   frame: Frame;
-  frameEnabled = true;
+  frameEnabled = false;
 
   constructor(
     public root: HTMLElement,
