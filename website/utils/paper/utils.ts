@@ -165,3 +165,14 @@ export function createGrid(
 
   return group;
 }
+
+export function createPointOnCircle(
+  center: paper.Point,
+  radius: number,
+  angle: number,
+) {
+  return new paper.Point(
+    center.x + radius * Math.cos(angle),
+    center.y + radius * Math.sin(angle),
+  );
+}

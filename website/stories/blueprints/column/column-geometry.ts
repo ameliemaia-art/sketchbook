@@ -1,7 +1,13 @@
 import paper from "paper";
 import { CatmullRomCurve3, MathUtils, Vector3 } from "three";
 
-import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
+import { DebugLineColor, DebugPointColor } from "@utils/paper/constants";
+import {
+  createCircle,
+  createLine,
+  createPointOnCircle,
+  lerp,
+} from "../../../utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
 export type ColumnSettings = {
@@ -12,20 +18,9 @@ export type ColumnSettings = {
     fluteGap: number;
     inset: number;
     insetCurveFactor: number;
-    midCurveFactor: number;
+    debug: boolean;
   };
 };
-
-function createPointOnCircle(
-  center: paper.Point,
-  radius: number,
-  angle: number,
-) {
-  return new paper.Point(
-    center.x + radius * Math.cos(angle),
-    center.y + radius * Math.sin(angle),
-  );
-}
 
 function createFluteIndent(
   center: paper.Point,
@@ -34,6 +29,10 @@ function createFluteIndent(
   angle2: number,
   theta: number,
   curveFactor: number,
+  debug: boolean,
+  strokeWidth: number,
+  strokeColor: paper.Color,
+  form: paper.Group,
 ) {
   const p1ControlPoint2Angle = MathUtils.lerp(angle1, angle2, theta);
   const p1ControlPoint2Point = createPointOnCircle(
@@ -48,12 +47,15 @@ function createFluteIndent(
   const p1ControlPoint2 = p1ControlPoint2Point
     .clone()
     .subtract(p1ControlPoint2Normal.multiply(radius * curveFactor));
-  // createCircle(p1ControlPoint2, 2, new paper.Color(1, 1, 0, 1), 1);
-  // createLine(
-  //   [p1ControlPoint2Point, p1ControlPoint2],
-  //   new paper.Color(1, 0, 0, 1),
-  //   1,
-  // );
+  if (debug) {
+    createCircle(p1ControlPoint2, 2, DebugPointColor, 1, undefined, form);
+    createLine(
+      [p1ControlPoint2Point, p1ControlPoint2],
+      DebugLineColor,
+      strokeWidth,
+      form,
+    );
+  }
   return p1ControlPoint2;
 }
 
@@ -63,16 +65,20 @@ function createFluteStart(
   radius: number,
   theta: number,
   curveFactor: number,
+  debug: boolean,
+  strokeWidth: number,
+  strokeColor: paper.Color,
+  form: paper.Group,
 ) {
   // Lets create the start point for the curve on the left
   const p1Normal = p1.clone().subtract(center).normalize();
   const p1Depth = p1.clone().subtract(p1Normal.multiply(radius * curveFactor));
   const p1ControlPoint0 = lerp(p1, p1Depth, theta);
-  // Debug
-  // const color = new paper.Color(1, 1, 0, 1);
-  // createLine([p1, p1Depth], new paper.Color(1, 0, 0, 1), 1);
-  // createCircle(p1Depth, 2, color, 1);
-  // createCircle(p1ControlPoint0, 2, color, 1);
+  if (debug) {
+    createLine([p1, p1Depth], DebugLineColor, 1, form);
+    createCircle(p1Depth, 2, DebugPointColor, 1, undefined, form);
+    createCircle(p1ControlPoint0, 2, DebugPointColor, 1, undefined, form);
+  }
   return p1ControlPoint0;
 }
 
@@ -84,7 +90,10 @@ function drawGreekColumnShaft(
   curveFactor: number,
   inset: number = 0.15,
   insetCurveFactor: number = 0.5,
-  midCurveFactor: number = 1.25,
+  debug: boolean = false,
+  strokeWidth: number,
+  strokeColor: paper.Color,
+  form: paper.Group,
 ) {
   const angleStep = (2 * Math.PI) / divisions;
 
@@ -99,10 +108,18 @@ function drawGreekColumnShaft(
     const p1 = createPointOnCircle(center, radius, angle1);
     const p2 = createPointOnCircle(center, radius, angle2);
 
-    const start = 0;
-
     const controlPoints = [
-      createFluteStart(p1, center, radius, start, curveFactor),
+      createFluteStart(
+        p1,
+        center,
+        radius,
+        0,
+        curveFactor,
+        debug,
+        strokeWidth,
+        strokeColor,
+        form,
+      ),
       createFluteIndent(
         center,
         radius,
@@ -110,14 +127,10 @@ function drawGreekColumnShaft(
         angle2,
         inset,
         curveFactor * insetCurveFactor,
-      ),
-      createFluteIndent(
-        center,
-        radius,
-        angle1,
-        angle2,
-        0.5,
-        curveFactor * midCurveFactor,
+        debug,
+        strokeWidth,
+        strokeColor,
+        form,
       ),
       createFluteIndent(
         center,
@@ -126,8 +139,22 @@ function drawGreekColumnShaft(
         angle2,
         1 - inset,
         curveFactor * insetCurveFactor,
+        debug,
+        strokeWidth,
+        strokeColor,
+        form,
       ),
-      createFluteStart(p2, center, radius, start, curveFactor),
+      createFluteStart(
+        p2,
+        center,
+        radius,
+        0,
+        curveFactor,
+        debug,
+        strokeWidth,
+        strokeColor,
+        form,
+      ),
     ];
 
     const spline = controlPoints.map(
@@ -137,28 +164,13 @@ function drawGreekColumnShaft(
     const curve = new CatmullRomCurve3(spline, false, "catmullrom", 0.5);
     const points = curve.getPoints(20);
     const path = new paper.Path();
-    path.strokeColor = new paper.Color(1, 1, 1, 1);
-    path.strokeWidth = 1;
+    path.strokeColor = strokeColor;
+    path.strokeWidth = strokeWidth;
     path.add(new paper.Point(points[0].x, points[0].y));
     for (let j = 1; j < points.length; j++) {
       path.add(new paper.Point(points[j].x, points[j].y));
     }
-    path.smooth();
-    path.fullySelected = false;
-
-    // // Midpoint between p1 and p2
-    // const midAngle = MathUtils.lerp(angle2, angle1, 0.5);
-
-    // const mid = createPointOnCircle(center, radius, midAngle);
-
-    // // Inward control point for curvature
-    // const normal = mid.subtract(center).normalize();
-    // const control = mid.subtract(normal.multiply(radius * curveFactor));
-
-    // const segment = new paper.Path();
-    // segment.add(p1);
-    // segment.quadraticCurveTo(control, p2);
-    // segment.strokeColor = new paper.Color(1, 1, 1, 1);
+    form.addChild(path);
 
     // Compute end point of current flute (already available as p2)
     // Compute start point of next flute
@@ -171,8 +183,9 @@ function drawGreekColumnShaft(
 
     // Draw a short line between current p2 and next p1
     const gapLine = new paper.Path.Line(p2, p1Next);
-    gapLine.strokeColor = new paper.Color(1, 1, 1, 1); // solid white
-    gapLine.strokeWidth = 1;
+    gapLine.strokeColor = strokeColor;
+    gapLine.strokeWidth = strokeWidth;
+    form.addChild(gapLine);
   }
 }
 
@@ -201,6 +214,9 @@ export function column(
     settings.form.fluteDepth,
     settings.form.inset,
     settings.form.insetCurveFactor,
-    settings.form.midCurveFactor,
+    settings.form.debug,
+    settings.strokeWidth,
+    settings.strokeColor,
+    form,
   );
 }
