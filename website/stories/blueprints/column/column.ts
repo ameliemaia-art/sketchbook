@@ -1,6 +1,7 @@
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
+import { GUIType } from "@utils/gui/gui-types";
 import Sketch, {
   GUISketch,
   sketchSettings,
@@ -8,27 +9,33 @@ import Sketch, {
 } from "../sketch/sketch";
 import { column, ColumnSettings } from "./column-geometry";
 
-export default class Column extends Sketch {
-  settings: SketchSettings & ColumnSettings = {
-    ...sketchSettings,
-    darkness: true,
-    blueprint: {
-      visible: true,
-      opacity: 0.5,
-      cosmos: true,
-    },
-    form: {
-      visible: true,
-      opacity: 1,
-      flutes: 12,
-      fluteDepth: 0.1,
-      fluteGap: 0.02,
-      inset: 0.3,
-      insetCurveFactor: 0.75,
-      debug: false,
-    },
-  };
+export const ColumnDefaultSettings: SketchSettings & ColumnSettings = {
+  ...sketchSettings,
+  darkness: true,
+  blueprint: {
+    visible: false,
+    opacity: 0.5,
+    cosmos: true,
+  },
+  form: {
+    visible: true,
+    opacity: 1,
+    flutes: 12,
+    fluteDepth: 0.1,
+    fluteGap: 0.02,
+    inset: 0.3,
+    insetCurveFactor: 0.75,
+    debug: false,
+  },
+  grid: {
+    visible: true,
+    divisions: 25,
+    opacity: 0.1,
+  },
+};
 
+export default class Column extends Sketch {
+  settings = ColumnDefaultSettings;
   constructor(
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
@@ -45,6 +52,7 @@ export default class Column extends Sketch {
       this.layers.blueprint,
       this.layers.form,
       center,
+      paper.view.size,
       radius,
       this.settings,
     );
@@ -53,44 +61,65 @@ export default class Column extends Sketch {
 
 export class GUIColumn extends GUISketch {
   constructor(
-    gui: FolderApi,
+    gui: GUIType,
     public target: Column,
+    onChange: () => void = () => {},
   ) {
     super(gui, target, target.name());
 
-    this.folders.form
-      .addBinding(target.settings.form, "flutes", {
-        min: 4,
-        max: 24,
-        step: 1,
-      })
+    columnBindings(this.folders.form, target.settings, () => {
+      this.target.draw();
+      onChange();
+    });
+
+    this.folders.grid = this.addFolder(this.gui, { title: "Grid", index: 5 });
+    this.folders.grid
+      .addBinding(target.settings.grid, "visible")
       .on("change", this.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "fluteGap", {
+    this.folders.grid
+      .addBinding(target.settings.grid, "opacity", {
         min: 0,
         max: 1,
       })
-      .on("change", this.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "fluteDepth", {
-        min: 0,
-        max: 1,
-      })
-      .on("change", this.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "inset", {
-        min: 0,
-        max: 1,
-      })
-      .on("change", this.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "insetCurveFactor", {
-        min: 0,
-        max: 2,
-      })
-      .on("change", this.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "debug")
       .on("change", this.draw);
   }
+}
+
+export function columnBindings(
+  gui: GUIType,
+  settings: ColumnSettings,
+  onChange: () => void = () => {},
+) {
+  gui
+    .addBinding(settings.form, "flutes", {
+      min: 4,
+      max: 24,
+      step: 1,
+    })
+    .on("change", onChange);
+  gui
+    .addBinding(settings.form, "fluteGap", {
+      min: 0,
+      max: 1,
+    })
+    .on("change", onChange);
+  gui
+    .addBinding(settings.form, "fluteDepth", {
+      min: 0,
+      max: 1,
+    })
+    .on("change", onChange);
+  gui
+    .addBinding(settings.form, "inset", {
+      min: 0,
+      max: 1,
+    })
+    .on("change", onChange);
+  gui
+    .addBinding(settings.form, "insetCurveFactor", {
+      min: 0,
+      max: 2,
+    })
+    .on("change", onChange);
+  gui.addBinding(settings.form, "debug").on("change", onChange);
 }

@@ -4,6 +4,7 @@ import { FolderApi } from "tweakpane";
 
 import { composite, saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/gui/gui";
+import { GUIType } from "@utils/gui/gui-types";
 import mathSeeded from "@utils/math-seeded";
 
 export type SketchSettings = {
@@ -145,7 +146,7 @@ export class GUISketch extends GUIController {
   gui: FolderApi;
 
   constructor(
-    gui: FolderApi,
+    gui: GUIType,
     public target: Sketch,
     title: string,
   ) {

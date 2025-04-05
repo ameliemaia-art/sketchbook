@@ -3,6 +3,7 @@ import {
   AxesHelper,
   CameraHelper,
   Clock,
+  EventDispatcher,
   GridHelper,
   NeutralToneMapping,
   Object3D,
@@ -38,7 +39,7 @@ import { resetCamera } from "@utils/three/camera";
 import { getRenderBufferSize } from "@utils/three/rendering";
 import Screenshot, { GUIScreenshot } from "@utils/three/screenshot";
 
-export default class WebGLApp {
+export default class WebGLApp extends EventDispatcher {
   renderer: WebGLRenderer;
   postProcessing: EffectComposer;
   cameras = {
@@ -78,8 +79,10 @@ export default class WebGLApp {
   scene = new Scene();
 
   screenshot: Screenshot;
+  parent: HTMLDivElement | null = null;
 
   constructor() {
+    super();
     // Renderer
     this.renderer = new WebGLRenderer({
       antialias: false,
@@ -112,7 +115,7 @@ export default class WebGLApp {
     this.aoPass.configuration.gammaCorrection = false;
     this.aoPass.enabled = false;
     this.aoPass.setQualityMode("High");
-    // this.aoPass.configuration.accumulate = true;
+    this.aoPass.configuration.accumulate = true;
     this.aoPass.configuration.aoRadius = 5;
     this.aoPass.configuration.distanceFalloff = 5;
     this.aoPass.configuration.intensity = 10;
@@ -120,7 +123,7 @@ export default class WebGLApp {
     this.copyPassToRenderTarget = new ShaderPass(CopyShader);
 
     this.postProcessing.addPass(this.renderPass);
-    // this.postProcessing.addPass(this.aoPass);
+    this.postProcessing.addPass(this.aoPass);
     this.postProcessing.addPass(this.bloomPass);
     this.postProcessing.addPass(this.fxaaPass);
     this.postProcessing.addPass(this.outputPass);
@@ -179,6 +182,7 @@ export default class WebGLApp {
   }
 
   async setup(parent: HTMLDivElement) {
+    this.parent = parent;
     parent.appendChild(this.renderer.domElement);
 
     await this.loadAssets();
