@@ -22,7 +22,10 @@ export default class Column extends Sketch {
       opacity: 1,
       flutes: 12,
       fluteDepth: 0.1,
-      fluteGap: 0.1,
+      fluteGap: 0.02,
+      inset: 0.25,
+      insetCurveFactor: 0.65,
+      midCurveFactor: 0.87,
     },
   };
 
@@ -72,6 +75,24 @@ export class GUIColumn extends GUISketch {
       .addBinding(target.settings.form, "fluteDepth", {
         min: 0,
         max: 1,
+      })
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "inset", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "insetCurveFactor", {
+        min: 0,
+        max: 2,
+      })
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "midCurveFactor", {
+        min: 0,
+        max: 2,
       })
       .on("change", this.draw);
   }
