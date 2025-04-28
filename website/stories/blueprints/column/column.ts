@@ -21,10 +21,8 @@ export const ColumnDefaultSettings: SketchSettings & ColumnSettings = {
     visible: true,
     opacity: 1,
     flutes: 12,
-    fluteDepth: 0.1,
-    fluteGap: 0.02,
-    inset: 0.3,
-    insetCurveFactor: 0.75,
+    inset: 0.15,
+    insetCurveLength: 0.65,
     debug: false,
   },
   grid: {
@@ -98,27 +96,15 @@ export function columnBindings(
     })
     .on("change", onChange);
   gui
-    .addBinding(settings.form, "fluteGap", {
-      min: 0,
-      max: 1,
-    })
-    .on("change", onChange);
-  gui
-    .addBinding(settings.form, "fluteDepth", {
-      min: 0,
-      max: 1,
-    })
-    .on("change", onChange);
-  gui
     .addBinding(settings.form, "inset", {
       min: 0,
       max: 1,
     })
     .on("change", onChange);
   gui
-    .addBinding(settings.form, "insetCurveFactor", {
+    .addBinding(settings.form, "insetCurveLength", {
       min: 0,
-      max: 2,
+      max: 1,
     })
     .on("change", onChange);
   gui.addBinding(settings.form, "debug").on("change", onChange);

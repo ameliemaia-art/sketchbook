@@ -5,6 +5,7 @@ import {
 import paper from "paper";
 import { CatmullRomCurve3, MathUtils, Vector3 } from "three";
 
+import { TWO_PI } from "@utils/three/math";
 import {
   createCircle,
   createGrid,
@@ -18,10 +19,8 @@ export type ColumnSettings = {
   blueprint: {};
   form: {
     flutes: number;
-    fluteDepth: number;
-    fluteGap: number;
     inset: number;
-    insetCurveFactor: number;
+    insetCurveLength: number;
     debug: boolean;
   };
   grid: {
@@ -224,21 +223,65 @@ export function column(
     blueprint.addChild(outlinePath);
   }
 
-  const curveData = computeGreekColumnShaftCurveData(
-    center,
-    radius,
-    settings.form.flutes,
-    settings.form.fluteGap * radius,
-    settings.form.fluteDepth,
-    settings.form.inset,
-    settings.form.insetCurveFactor,
-    settings.form.debug,
-    form,
+  const points = [];
+  const angleStep = (2 * Math.PI) / settings.form.flutes;
+  const flutePaths = [];
+
+  for (let i = 0; i < settings.form.flutes; i++) {
+    const angle = i * angleStep;
+    const point = createPointOnCircle(center, radius, angle);
+    points.push(point);
+
+    const angle1 = i * angleStep;
+    const angle2 = (i + 1) * angleStep;
+
+    const p1 = createPointOnCircle(center, radius, angle1);
+    const p2 = createPointOnCircle(center, radius, angle2);
+
+    const midPoint = p1.add(p2).divide(2);
+    const vector = p2.subtract(p1);
+    const length = vector.length * settings.form.insetCurveLength;
+    const thickness = settings.form.inset * radius;
+
+    const rect = new paper.Path.Rectangle({
+      point: [-length / 2, -thickness / 2],
+      size: [length, thickness],
+      radius: thickness / 2,
+    });
+
+    rect.position = midPoint;
+    rect.rotate(MathUtils.radToDeg(Math.atan2(vector.y, vector.x)));
+
+    flutePaths.push(rect);
+  }
+
+  // 1. Build your path manually
+  const path = new paper.Path();
+  path.strokeColor = settings.strokeColor;
+  path.strokeWidth = settings.strokeWidth;
+
+  for (const point of points) {
+    path.add(point);
+  }
+  path.closed = true; // Important: properly close the shape
+
+  // 2. Combine all flute shapes into one
+  const combinedFlutes = flutePaths.reduce(
+    (acc, path) => acc.unite(path) as paper.Path,
+    new paper.Path(),
   );
-  drawGreekColumnShaftFromData(
-    curveData,
-    settings.strokeWidth,
-    settings.strokeColor,
-    form,
-  );
+
+  // 3. Subtract the flutes from your path
+  const finalPath = path.subtract(combinedFlutes);
+
+  // 4. Cleanup
+  path.remove();
+  combinedFlutes.remove();
+
+  // 5. Add finalPath to your form
+  form.addChild(finalPath);
+
+  // 6. (Optional) Style finalPath
+  finalPath.strokeColor = settings.strokeColor;
+  finalPath.strokeWidth = settings.strokeWidth;
 }
