@@ -1,6 +1,9 @@
 import Column, { GUIColumn } from "@/stories/blueprints/column/column";
 import { computeGreekColumnShaftCurveData } from "@/stories/blueprints/column/column-geometry";
-import { CSGCylinder } from "@/stories/blueprints/csg-cylinder/csg-cylinder";
+import {
+  CSGCylinder,
+  GUICSGCylinder,
+} from "@/stories/blueprints/csg-cylinder/csg-cylinder";
 import paper from "paper";
 import { doc } from "prettier";
 import {
@@ -266,11 +269,18 @@ export class GUIColumnForm extends GUIWebGLApp {
   }
 
   onCreate = () => {
-    this.controllers.column = new GUIColumn(
-      this.gui,
-      this.target.sketch,
-      this.target.generate,
-    );
+    // this.controllers.column = new GUIColumn(
+    //   this.gui,
+    //   this.target.sketch,
+    //   this.target.generate,
+    // );
+
+    if (this.target.csgCylinder) {
+      this.controllers.csgCylinder = new GUICSGCylinder(
+        this.gui,
+        this.target.csgCylinder,
+      );
+    }
   };
 }
 /// #endif

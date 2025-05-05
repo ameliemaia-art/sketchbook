@@ -18,6 +18,9 @@ import {
   SUBTRACTION,
 } from "three-bvh-csg";
 
+import GUIController from "@utils/gui/gui";
+import { GUIType } from "@utils/gui/gui-types";
+
 export interface CSGCylinderSettings {
   height: number;
   mainRadius: number;
@@ -30,10 +33,10 @@ export interface CSGCylinderSettings {
 
 export const defaultCSGCylinderSettings: CSGCylinderSettings = {
   height: 100,
-  mainRadius: 25,
+  mainRadius: 10,
   holeRadiusScalar: 0.25, // 50% of main radius
-  numHoles: 8,
-  holeHeightRatio: 0.85,
+  numHoles: 10,
+  holeHeightRatio: 0.95,
   holeDistanceScalar: 0.5,
   holeScale: 0.5, // Scale to 50% along normal
 };
@@ -42,11 +45,11 @@ export class CSGCylinder {
   private scene: Scene;
   private mainCylinder!: Brush;
   private smallCylinders: Brush[];
-  private result!: Mesh;
+  private result: Mesh | undefined;
   private evaluator: Evaluator;
   private debugGroup: Group = new Group();
   private showDebug: boolean = false;
-  private settings: CSGCylinderSettings;
+  public settings: CSGCylinderSettings;
 
   constructor(scene: Scene, settings: Partial<CSGCylinderSettings> = {}) {
     this.scene = scene;
@@ -54,17 +57,22 @@ export class CSGCylinder {
     this.smallCylinders = [];
     this.settings = { ...defaultCSGCylinderSettings, ...settings };
     this.scene.add(this.debugGroup);
+    this.generate();
+  }
+
+  generate = () => {
+    this.dispose();
     this.createMainCylinder();
     this.createSmallCylinders();
     this.performCSG();
-  }
+  };
 
   private createMainCylinder() {
     const geometry = new CylinderGeometry(
       this.settings.mainRadius,
       this.settings.mainRadius,
       this.settings.height,
-      32,
+      16,
     );
     this.mainCylinder = new Brush(geometry);
     this.mainCylinder.position.y = this.settings.height / 2;
@@ -92,8 +100,8 @@ export class CSGCylinder {
     const smallGeometry = new CapsuleGeometry(
       holeRadius,
       holeHeight - holeRadius * 2,
-      32,
       16,
+      8,
     );
 
     // Calculate the actual hole distance from the center
@@ -173,12 +181,18 @@ export class CSGCylinder {
   }
 
   public dispose() {
-    this.scene.remove(this.result);
-    this.scene.remove(this.debugGroup);
-    this.result.geometry.dispose();
-    if (this.result.material instanceof Material) {
-      this.result.material.dispose();
+    // Remove and dispose of the result mesh
+    if (this.result) {
+      this.scene.remove(this.result);
+      this.result.geometry.dispose();
+      if (this.result.material instanceof Material) {
+        this.result.material.dispose();
+      }
+      this.result = undefined;
     }
+
+    // Remove and dispose of the debug group
+    this.scene.remove(this.debugGroup);
     this.debugGroup.traverse((child) => {
       if (child instanceof Mesh) {
         child.geometry.dispose();
@@ -187,6 +201,10 @@ export class CSGCylinder {
         }
       }
     });
+    this.debugGroup.clear();
+
+    // Clear the small cylinders array
+    this.smallCylinders = [];
   }
 
   public toggleDebug() {
@@ -194,3 +212,59 @@ export class CSGCylinder {
     this.debugGroup.visible = this.showDebug;
   }
 }
+
+/// #if DEBUG
+export class GUICSGCylinder extends GUIController {
+  constructor(
+    gui: GUIType,
+    public target: CSGCylinder,
+  ) {
+    super(gui);
+    this.gui = gui;
+
+    // Add tweakpane settings to the GUI
+    this.gui
+      .addBinding(this.target.settings, "height", {
+        min: 0,
+        max: 1000,
+      })
+      .on("change", target.generate);
+
+    this.gui
+      .addBinding(this.target.settings, "mainRadius", {
+        min: 0,
+        max: 100,
+      })
+      .on("change", target.generate);
+
+    this.gui
+      .addBinding(this.target.settings, "holeRadiusScalar", {
+        min: 0.1,
+        max: 0.9,
+      })
+      .on("change", target.generate);
+
+    this.gui
+      .addBinding(this.target.settings, "numHoles", {
+        min: 1,
+        max: 16,
+        step: 1,
+      })
+      .on("change", target.generate);
+
+    this.gui
+      .addBinding(this.target.settings, "holeHeightRatio", {
+        min: 0.1,
+        max: 0.95,
+      })
+      .on("change", target.generate);
+
+    this.gui
+      .addBinding(this.target.settings, "holeScale", {
+        min: 0.1,
+        max: 1.0,
+      })
+      .on("change", target.generate);
+  }
+}
+/// #endif
