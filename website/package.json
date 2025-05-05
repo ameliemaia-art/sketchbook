@@ -32,6 +32,7 @@
     "react-dom": "^18",
     "stats-gl": "^3.3.0",
     "three": "^0.164.1",
+    "three-bvh-csg": "^0.0.17",
     "tweakpane": "^4.0.4"
   },
   "devDependencies": {

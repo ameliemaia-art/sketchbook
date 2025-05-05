@@ -1,5 +1,6 @@
 import Column, { GUIColumn } from "@/stories/blueprints/column/column";
 import { computeGreekColumnShaftCurveData } from "@/stories/blueprints/column/column-geometry";
+import { CSGCylinder } from "@/stories/blueprints/csg-cylinder/csg-cylinder";
 import paper from "paper";
 import { doc } from "prettier";
 import {
@@ -43,6 +44,7 @@ export default class ColumnForm extends WebGLApp {
 
   sketch!: Column;
   columnMesh?: Mesh<ExtrudeGeometry, MeshStandardMaterial>;
+  csgCylinder?: CSGCylinder;
 
   create() {
     this.cameras.main.position.z = 750;
@@ -55,6 +57,9 @@ export default class ColumnForm extends WebGLApp {
     // Add soft natural lighting to the scene.
     this.createLights();
     this.createFloor();
+
+    // Create the CSG cylinder
+    this.csgCylinder = new CSGCylinder(this.scene);
 
     if (this.parent) {
       const canvas = document.createElement("canvas");
@@ -131,7 +136,7 @@ export default class ColumnForm extends WebGLApp {
     directionalLight.shadow.camera.right = 150;
     directionalLight.shadow.camera.top = 150;
     directionalLight.shadow.camera.bottom = -150;
-    directionalLight.shadow.bias = -0.02;
+    directionalLight.shadow.bias = -0.015;
 
     this.scene.add(directionalLight);
   }
@@ -228,7 +233,24 @@ export default class ColumnForm extends WebGLApp {
 
   createColumnCurve() {}
 
-  onUpdate(delta: number) {}
+  toggleCSGDebug() {
+    if (this.csgCylinder) {
+      this.csgCylinder.toggleDebug();
+    }
+  }
+
+  onUpdate(delta: number) {
+    if (this.csgCylinder) {
+      this.csgCylinder.update();
+    }
+  }
+
+  dispose() {
+    super.dispose();
+    if (this.csgCylinder) {
+      this.csgCylinder.dispose();
+    }
+  }
 }
 
 /// #if DEBUG
