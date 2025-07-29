@@ -1,0 +1,23 @@
+{
+  "files.associations": {
+    "*.context.md": "markdown",
+    "*.prompt.md": "markdown"
+  },
+  "editor.wordWrap": "on",
+  "markdown.preview.fontSize": 14,
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": false,
+    "**/.context": false
+  },
+  "search.exclude": {
+    "**/node_modules": true
+  },
+  "editor.rulers": [80, 120],
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Be extremely detailed with the file changes and the reason for the change. Use lots of emojis."
+    }
+  ]
+}
