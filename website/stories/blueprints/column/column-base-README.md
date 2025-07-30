@@ -7,13 +7,15 @@ A parametric 2D blueprint for creating classical column base profiles using Pape
 The column base consists of five stackable elements that build from bottom to top:
 
 ### 1. Square Plinth
+
 - **Purpose**: Rectangular foundation providing stability and visual weight
-- **Parameters**: 
+- **Parameters**:
   - Height: Relative to column radius (default: 0.2)
   - Width: Relative to column radius (default: 1.3)
 - **Form**: Clean rectangular base without complex bevels
 
 ### 2. Lower Torus
+
 - **Purpose**: Primary convex molding creating visual transition from plinth
 - **Parameters**:
   - Height: Vertical dimension (default: 0.15)
@@ -21,6 +23,7 @@ The column base consists of five stackable elements that build from bottom to to
 - **Form**: Quarter-circle bulging outward
 
 ### 3. Middle Torus
+
 - **Purpose**: Secondary convex molding adding visual richness
 - **Parameters**:
   - Height: Vertical dimension (default: 0.12)
@@ -28,6 +31,7 @@ The column base consists of five stackable elements that build from bottom to to
 - **Form**: Smaller quarter-circle profile
 
 ### 4. Upper Torus
+
 - **Purpose**: Tertiary convex molding creating layered detail
 - **Parameters**:
   - Height: Vertical dimension (default: 0.1)
@@ -35,6 +39,7 @@ The column base consists of five stackable elements that build from bottom to to
 - **Form**: Progressively smaller torus
 
 ### 5. Shaft Torus
+
 - **Purpose**: Final transition molding connecting base to column shaft
 - **Parameters**:
   - Height: Vertical dimension (default: 0.08)
@@ -62,6 +67,7 @@ The profile uses a straightforward stacking system:
 ## Torus Geometry
 
 Each torus uses a quarter-circle that:
+
 - Starts from the current profile edge
 - Bulges outward by the specified radius
 - Creates smooth convex curves
@@ -86,6 +92,7 @@ This simplified blueprint translates efficiently to 3D:
 ## Design Philosophy
 
 This implementation prioritizes:
+
 - **Clarity**: Simple, understandable geometry
 - **Flexibility**: Easy parameter adjustment
 - **Classical Accuracy**: Proper proportional relationships

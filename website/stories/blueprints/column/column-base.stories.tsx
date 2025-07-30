@@ -1,5 +1,5 @@
-import { Meta, StoryObj } from "@storybook/react";
 import { useEffect, useRef } from "react";
+import { Meta, StoryObj } from "@storybook/react";
 import { Pane } from "tweakpane";
 
 import ColumnBase, { GUIColumnBase } from "./column-base";
@@ -55,13 +55,13 @@ export const PlinthOnly: Story = {
 
       const pane = new Pane({ title: "Column Base - Plinth Only" });
       const sketch = new ColumnBase(containerRef.current, canvasRef.current);
-      
+
       // Configure to show only plinth
       sketch.settings.form.layers.lowerTorus.visible = false;
       sketch.settings.form.layers.middleTorus.visible = false;
       sketch.settings.form.layers.upperTorus.visible = false;
       sketch.settings.form.layers.shaftTorus.visible = false;
-      
+
       const gui = new GUIColumnBase(pane, sketch);
 
       return () => {
@@ -93,12 +93,12 @@ export const TorusStudy: Story = {
 
       const pane = new Pane({ title: "Column Base - Torus Study" });
       const sketch = new ColumnBase(containerRef.current, canvasRef.current);
-      
+
       // Configure to show only torus elements
       sketch.settings.form.layers.plinth.visible = false;
       sketch.settings.form.layers.shaftTorus.visible = false;
       sketch.settings.form.debug = true;
-      
+
       const gui = new GUIColumnBase(pane, sketch);
 
       return () => {
@@ -130,10 +130,10 @@ export const DebugMode: Story = {
 
       const pane = new Pane({ title: "Column Base - Debug Mode" });
       const sketch = new ColumnBase(containerRef.current, canvasRef.current);
-      
+
       // Enable debug mode
       sketch.settings.form.debug = true;
-      
+
       const gui = new GUIColumnBase(pane, sketch);
 
       return () => {
