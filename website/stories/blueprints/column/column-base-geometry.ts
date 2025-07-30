@@ -27,6 +27,11 @@ export type ColumnBaseSettings = {
         radius: number;
         startX: number; // Starting x position relative to column radius (0 = at column edge, negative = inward, positive = outward)
       };
+      fillet: {
+        visible: boolean;
+        height: number;
+        startX: number; // Thin separating band between layers
+      };
       middleTorus: {
         visible: boolean;
         height: number;
@@ -85,8 +90,18 @@ export function columnBase(
   
   createTorus(center, currentY, radius, settings.form.layers.lowerTorus, settings.form.opacity, settings.form.debug, form);
 
+  if (settings.form.layers.lowerTorus.visible) {
+    currentY -= radius * settings.form.layers.lowerTorus.height;
+  }
+
+  createFillet(center, currentY, radius, settings.form.layers.fillet, settings.form.opacity, form);
+
+  if (settings.form.layers.fillet.visible) {
+    currentY -= radius * settings.form.layers.fillet.height;
+  }
+
   // Draw revolution lines to show 3D form
-  if (settings.form.layers.plinth.visible || settings.form.layers.lowerTorus.visible) {
+  if (settings.form.layers.plinth.visible || settings.form.layers.lowerTorus.visible || settings.form.layers.fillet.visible) {
     drawRevolutionLines(
       center, 
       radius, 
@@ -230,6 +245,49 @@ function createTorus(
 }
 
 /**
+ * Creates a separate fillet (thin separating band) shape
+ */
+function createFillet(
+  center: paper.Point,
+  startY: number,
+  columnRadius: number,
+  filletSettings: ColumnBaseSettings["form"]["layers"]["fillet"],
+  opacity: number,
+  form: paper.Group,
+) {
+  if (!filletSettings.visible) return;
+
+  const filletHeight = columnRadius * filletSettings.height;
+  const startXOffset = columnRadius * filletSettings.startX;
+
+  // Define key points (similar to plinth structure)
+  const topLeft = new paper.Point(center.x, startY);
+  const topRight = new paper.Point(center.x + columnRadius + startXOffset, startY);
+  const bottomRight = new paper.Point(center.x + columnRadius + startXOffset, startY - filletHeight);
+  const bottomCenter = new paper.Point(center.x, startY - filletHeight);
+
+  // Top edge line
+  const topLine = new paper.Path.Line(topLeft, topRight);
+  topLine.strokeColor = new paper.Color(1, 1, 1, opacity);
+  topLine.strokeWidth = 2;
+  form.addChild(topLine);
+
+  // Right edge line (vertical) - only if there's meaningful height
+  if (filletHeight > 0.01) {
+    const rightLine = new paper.Path.Line(topRight, bottomRight);
+    rightLine.strokeColor = new paper.Color(1, 1, 1, opacity);
+    rightLine.strokeWidth = 2;
+    form.addChild(rightLine);
+  }
+
+  // Bottom edge line (back to center)
+  const bottomLine = new paper.Path.Line(bottomRight, bottomCenter);
+  bottomLine.strokeColor = new paper.Color(1, 1, 1, opacity);
+  bottomLine.strokeWidth = 2;
+  form.addChild(bottomLine);
+}
+
+/**
  * Creates profile points for a classical torus (convex molding).
  * Simple quarter circle that bulges outward from the starting point.
  */
@@ -281,18 +339,18 @@ function drawRevolutionLines(
     const plinthWidth = columnRadius * layers.plinth.width;
     const plinthHeight = columnRadius * layers.plinth.height;
     
-    // Bottom line at full plinth width
+    // Bottom line at full plinth width (only right side from center)
     const bottomLine = new paper.Path.Line(
-      new paper.Point(center.x - plinthWidth, currentY),
+      new paper.Point(center.x, currentY),
       new paper.Point(center.x + plinthWidth, currentY)
     );
     bottomLine.strokeColor = lineColor;
     bottomLine.strokeWidth = 0.5;
     form.addChild(bottomLine);
     
-    // Top line at column radius
+    // Top line at column radius (only right side from center)
     const topLine = new paper.Path.Line(
-      new paper.Point(center.x - columnRadius, currentY - plinthHeight),
+      new paper.Point(center.x, currentY - plinthHeight),
       new paper.Point(center.x + columnRadius, currentY - plinthHeight)
     );
     topLine.strokeColor = lineColor;
@@ -307,14 +365,14 @@ function drawRevolutionLines(
     const torusHeight = columnRadius * layers.lowerTorus.height;
     const torusRadius = columnRadius * layers.lowerTorus.radius;
     
-    // Draw several horizontal lines to show torus bulge
+    // Draw several horizontal lines to show torus bulge (only right side from center)
     for (let i = 0; i <= 4; i++) {
       const t = i / 4;
       const y = currentY - (torusHeight * t);
       const radius = columnRadius + (torusRadius * Math.sin(t * Math.PI));
       
       const line = new paper.Path.Line(
-        new paper.Point(center.x - radius, y),
+        new paper.Point(center.x, y),
         new paper.Point(center.x + radius, y)
       );
       line.strokeColor = lineColor;

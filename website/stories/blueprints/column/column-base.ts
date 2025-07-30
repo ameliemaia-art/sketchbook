@@ -32,6 +32,11 @@ export const ColumnBaseDefaultSettings: SketchSettings & ColumnBaseSettings = {
         radius: 0.15, // Larger bulge for main torus
         startX: 0.05,  // Start slightly outward to see the connecting lines
       },
+      fillet: {
+        visible: true,
+        height: 0.05, // Thin separating band
+        startX: 0.0,  // Usually flush with column
+      },
       middleTorus: {
         visible: false, // Disable for now
         height: 0.15,
@@ -154,6 +159,26 @@ export class GUIColumnBase extends GUISketch {
       .addBinding(this.target.settings.form.layers.lowerTorus, "startX", {
         min: -0.2,
         max: 0.2,
+        step: 0.01,
+      })
+      .on("change", this.onChange(onChange));
+
+    // Fillet controls
+    const filletFolder = this.folders.form.addFolder({ title: "Fillet (Separator)" });
+    filletFolder
+      .addBinding(this.target.settings.form.layers.fillet, "visible")
+      .on("change", this.onChange(onChange));
+    filletFolder
+      .addBinding(this.target.settings.form.layers.fillet, "height", {
+        min: 0.02,
+        max: 0.1,
+        step: 0.01,
+      })
+      .on("change", this.onChange(onChange));
+    filletFolder
+      .addBinding(this.target.settings.form.layers.fillet, "startX", {
+        min: -0.1,
+        max: 0.1,
         step: 0.01,
       })
       .on("change", this.onChange(onChange));
