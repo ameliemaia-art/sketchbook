@@ -1,8 +1,18 @@
 import paper from "paper";
 import { MathUtils } from "three";
 
+import GUIController from "@utils/gui/gui";
+import { GUIType } from "@utils/gui/gui-types";
+import { generateBindingOptions } from "@utils/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
+import { GUIScotia, Scotia, scotia } from "./scotia-geometry";
+import { GUITorus, torus, Torus } from "./torus-geometry";
+
+export enum LatheProfile {
+  Torus = "Torus",
+  Scotia = "Scotia",
+}
 
 export type LatheSettings = {
   blueprint: {};
@@ -17,40 +27,11 @@ export type LatheSettings = {
     outline: boolean;
   };
   lathe: {
-    height: number;
-    divisions: number;
-    scaleX: number;
+    profile: string;
   };
+  torus: Torus;
+  scotia: Scotia;
 };
-
-function setDashLength(path: paper.Path, dash: number) {
-  let pathLength = path.length;
-  let numDashes = Math.ceil(pathLength / (dash * 2));
-  let adjustedDash = pathLength / (numDashes * 2);
-  path.dashOffset = adjustedDash;
-  path.dashArray = [adjustedDash, adjustedDash];
-}
-
-function createLathe(
-  radius: number,
-  center: paper.Point,
-  perspectiveFactorX: number,
-  perspectiveFactorY: number,
-  strokeColor: paper.Color,
-  strokeWidth: number,
-  dash: number,
-  group: paper.Group,
-) {
-  const path = new paper.Path.Ellipse({
-    center: center,
-    size: [radius * 2 * perspectiveFactorX, radius * 2 * perspectiveFactorY], // Making Y-axis shorter
-    strokeColor,
-    strokeWidth,
-  });
-  group.addChild(path);
-  setDashLength(path, dash);
-  return path;
-}
 
 export function lathe(
   blueprint: paper.Group,
@@ -81,19 +62,19 @@ export function lathe(
     createGrid(center, size, gridColor, settings.strokeWidth, 5, form);
   }
 
-  const points: paper.Point[] = [];
-  for (let i = 0; i < settings.lathe.divisions; i++) {
-    const t = i / (settings.lathe.divisions - 1);
-    const theta = MathUtils.lerp(-90, 90, t);
-    const x =
-      radius * settings.lathe.scaleX * Math.cos(MathUtils.degToRad(theta));
-    const y = radius + radius * Math.sin(MathUtils.degToRad(theta));
-    const point = new paper.Point(x, y);
-    dot(point, 1, form, settings.strokeColor);
-    points.push(point);
+  let points: paper.Point[] = [];
+
+  switch (settings.lathe.profile) {
+    case LatheProfile.Torus:
+      points = torus(radius, settings.torus);
+      break;
+    case LatheProfile.Scotia:
+      points = scotia(radius, settings.scotia);
+      break;
+    default:
+      break;
   }
 
-  // Draw line between points
   points.forEach((point, i) => {
     if (i > 0) {
       createLine(
@@ -102,15 +83,37 @@ export function lathe(
         settings.strokeWidth,
         form,
       );
+      dot(point, 2.5, form);
     }
   });
-
-  // points.forEach((point) => {
-  //   createLine(
-  //     [new paper.Point(0, 10), center],
-  //     settings.strokeColor,
-  //     settings.strokeWidth,
-  //     blueprint,
-  //   );
-  // });
 }
+
+/// #if DEBUG
+export class GUILatheGeometry extends GUIController {
+  constructor(
+    gui: GUIType,
+    public target: LatheSettings,
+  ) {
+    super(gui);
+    this.gui = this.addFolder(gui, { title: "lathe" });
+
+    this.gui
+      .addBinding(target.lathe, "profile", {
+        options: generateBindingOptions(Object.values(LatheProfile)),
+      })
+      .on("change", this.onChange);
+
+    this.controllers.torus = new GUITorus(this.gui, target.torus);
+    this.controllers.torus.addEventListener("change", this.onChange);
+
+    this.controllers.scotia = new GUIScotia(this.gui, target.scotia);
+    this.controllers.scotia.addEventListener("change", this.onChange);
+  }
+
+  onChange = () => {
+    console.log("xx");
+
+    this.dispatchEvent({ type: "change" } as never);
+  };
+}
+/// #endif

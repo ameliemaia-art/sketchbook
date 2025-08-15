@@ -1,13 +1,17 @@
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
-import mathSeeded from "@utils/math-seeded";
 import Sketch, {
   GUISketch,
   SketchSettings,
   sketchSettings,
 } from "../sketch/sketch";
-import { lathe, LatheSettings } from "./lathe-geometry";
+import {
+  GUILatheGeometry,
+  lathe,
+  LatheProfile,
+  LatheSettings,
+} from "./lathe-geometry";
 
 export const latheSettings: SketchSettings & LatheSettings = {
   ...sketchSettings,
@@ -29,20 +33,25 @@ export const latheSettings: SketchSettings & LatheSettings = {
     outline: true,
   },
   lathe: {
-    height: 1,
+    profile: LatheProfile.Scotia,
+  },
+  torus: {
     divisions: 25,
     scaleX: 1,
   },
+  scotia: {
+    divisions: 25,
+  },
 };
 
-export default class Hypatia extends Sketch {
+export default class Lathe extends Sketch {
   settings: SketchSettings & LatheSettings = latheSettings;
 
   constructor(
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
   ) {
-    super(root, canvas, "Hypatia");
+    super(root, canvas, "Lathe");
   }
 
   draw() {
@@ -50,8 +59,6 @@ export default class Hypatia extends Sketch {
     if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    mathSeeded.setSeed(this.settings.seed);
-
     lathe(
       this.layers.blueprint,
       this.layers.form,
@@ -66,7 +73,7 @@ export default class Hypatia extends Sketch {
 export class GUILathe extends GUISketch {
   constructor(
     gui: FolderApi,
-    public target: Hypatia,
+    public target: Lathe,
   ) {
     super(gui, target, target.name());
 
@@ -85,26 +92,7 @@ export class GUILathe extends GUISketch {
       })
       .on("change", this.draw);
 
-    this.folders.lathe = this.addFolder(this.folders.form, {
-      title: "lathe",
-    });
-    this.folders.lathe
-      .addBinding(target.settings.lathe, "height", {
-        min: 0,
-        max: 1,
-      })
-      .on("change", this.draw);
-    this.folders.lathe
-      .addBinding(target.settings.lathe, "divisions", {
-        min: 1,
-        max: 100,
-      })
-      .on("change", this.draw);
-    this.folders.lathe
-      .addBinding(target.settings.lathe, "scaleX", {
-        min: 0,
-        max: 2,
-      })
-      .on("change", this.draw);
+    this.controllers.lathe = new GUILatheGeometry(this.gui, target.settings);
+    this.controllers.lathe.addEventListener("change", this.draw);
   }
 }
