@@ -1,152 +1,73 @@
-import {
-  BoxGeometry,
-  BufferGeometry,
-  CylinderGeometry,
-  Group,
-  LatheGeometry,
-  Material,
-  Matrix4,
-  Mesh,
-  Vector2,
-  Vector3,
-} from "three";
+import { Group, Material } from "three";
 
+import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
+import {
+  columnFillet,
+  ColumnFillet,
+  columnFilletBindings,
+} from "./column-fillet-geometry";
+import {
+  columnPlinth,
+  ColumnPlinth,
+  columnPlinthBindings,
+} from "./column-plinth-geometry";
+import {
+  columnTorus,
+  ColumnTorus,
+  columnTorusBindings,
+} from "./column-torus-geometry";
 
-type ColumnPlinth = {
-  height: number;
-  width: number;
-};
-
-type ColumnTorus = {
-  height: number;
-  buldge: number;
-  radius: number;
-  heightSegments: number;
-  radialSegments: number;
-};
-
-type ColumnFillet = {
-  height: number;
-  radius: number;
-  radialSegments: number;
-};
-
-export type ColumnBaseSettings = {
+export type ColumnBaseTuscanSettings = {
   plinth: ColumnPlinth;
   torus: ColumnTorus;
   fillet: ColumnFillet;
 };
 
-export function columnPlinth(settings: ColumnPlinth, material: Material) {
-  const geometry = new BoxGeometry(
-    settings.width,
-    settings.height,
-    settings.width,
-  );
-  geometry.applyMatrix4(
-    new Matrix4().makeTranslation(0, settings.height / 2, 0),
-  );
-  return new Mesh(geometry, material);
-}
-
-export function columnTorus(settings: ColumnTorus, material: Material) {
-  // Calculate dimensions
-  const actualHeight = settings.height;
-  const bulgeRadius = settings.buldge;
-  const baseRadius = settings.radius;
-
-  const geometry = new CylinderGeometry(
-    baseRadius,
-    baseRadius,
-    actualHeight,
-    settings.radialSegments,
-    settings.heightSegments,
-    false,
-  );
-
-  // Get position attribute for vertex manipulation
-  const positionAttribute = geometry.getAttribute("position");
-  const vertex = new Vector3();
-
-  // Apply bulge modifier to vertices
-  for (let i = 0; i < positionAttribute.count; i++) {
-    vertex.fromBufferAttribute(positionAttribute, i);
-
-    // Calculate normalized height position (0 to 1)
-    const normalizedY = (vertex.y + actualHeight / 2) / actualHeight;
-
-    // Calculate bulge factor using semicircle function (0 to π)
-    const angle = normalizedY * Math.PI;
-    const bulgeFactor = Math.sin(angle); // 0 at ends, 1 at middle
-
-    // Calculate distance from center (for radial displacement)
-    const distanceFromCenter = Math.sqrt(
-      vertex.x * vertex.x + vertex.z * vertex.z,
-    );
-
-    // Apply bulge displacement only if vertex is on the outer surface
-    if (distanceFromCenter > 0) {
-      const bulgeAmount = bulgeRadius * bulgeFactor;
-      const normalizedDirection = new Vector3(
-        vertex.x,
-        0,
-        vertex.z,
-      ).normalize();
-
-      // Displace vertex outward by bulge amount
-      vertex.x += normalizedDirection.x * bulgeAmount;
-      vertex.z += normalizedDirection.z * bulgeAmount;
-    }
-
-    // Update the position
-    positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
-  }
-
-  // Recalculate normals for proper lighting
-  geometry.computeVertexNormals();
-
-  // Position at the specified height
-  geometry.applyMatrix4(new Matrix4().makeTranslation(0, actualHeight / 2, 0));
-
-  return new Mesh(geometry, material);
-}
-
-export function columnFillet(settings: ColumnFillet, material: Material) {
-  const geometry = new CylinderGeometry(
-    settings.radius,
-    settings.radius,
-    settings.height,
-    settings.radialSegments,
-    1,
-    false,
-  );
-  geometry.applyMatrix4(
-    new Matrix4().makeTranslation(0, settings.height / 2, 0),
-  );
-  return new Mesh(geometry, material);
-}
-
-export function columnBase(settings: ColumnBaseSettings, material: Material) {
+export function columnBaseTuscan(
+  settings: ColumnBaseTuscanSettings,
+  material: Material,
+) {
   const group = new Group();
-  group.name = "column-base";
+  group.name = "column-tuscan";
   const plinth = columnPlinth(settings.plinth, material);
-  // const torus = columnTorus(settings.torus, material);
   const fillet = columnFillet(settings.fillet, material);
-  // torus.position.y = settings.plinth.height;
+  const torus = columnTorus(settings.torus, material);
   fillet.position.y = settings.plinth.height;
+  torus.position.y = settings.plinth.height + settings.fillet.height;
 
-  // group.add(torus);
   group.add(plinth);
   group.add(fillet);
+  group.add(torus);
+
   return group;
 }
 
-export function columnTorusBindings(gui: GUIType, settings: ColumnTorus) {
-  const folder = gui.addFolder({ title: "Column Torus" });
-  folder.addBinding(settings, "height", { min: 0 });
-  folder.addBinding(settings, "radius", { min: 0 });
-  folder.addBinding(settings, "buldge", { min: 0 });
+/// #if DEBUG
+export class GUIBaseTuscan extends GUIController {
+  constructor(
+    gui: GUIType,
+    public target: ColumnBaseTuscanSettings,
+  ) {
+    super(gui);
+    this.gui = gui;
 
-  return folder;
+    this.folders.columnPlinth = columnPlinthBindings(gui, target.plinth).on(
+      "change",
+      this.onChange,
+    );
+    this.folders.columnTorus = columnTorusBindings(gui, target.torus).on(
+      "change",
+      this.onChange,
+    );
+    this.folders.columnFillet = columnFilletBindings(gui, target.fillet).on(
+      "change",
+      this.onChange,
+    );
+  }
+
+  onChange = () => {
+    this.dispatchEvent({ type: "change" } as never);
+  };
 }
+/// #endif

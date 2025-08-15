@@ -19,13 +19,13 @@ import { resetCamera } from "@utils/three/camera";
 import { dispose } from "@utils/three/dispose";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 import {
-  columnBase,
-  ColumnBaseSettings,
-  columnTorusBindings,
+  columnBaseTuscan,
+  ColumnBaseTuscanSettings,
+  GUIBaseTuscan,
 } from "./column-base-geometry";
 
 type ColumnSettings = {
-  base: ColumnBaseSettings;
+  base: ColumnBaseTuscanSettings;
 };
 
 export default class ColumnForm extends WebGLApp {
@@ -136,7 +136,11 @@ export default class ColumnForm extends WebGLApp {
     if (this.columnBase) {
       this.scene.remove(this.columnBase);
     }
-    this.columnBase = columnBase(this.blueprint.base, this.wireframeMaterial);
+
+    this.columnBase = columnBaseTuscan(
+      this.blueprint.base,
+      this.wireframeMaterial,
+    );
     this.scene.add(this.columnBase);
   };
 
@@ -150,14 +154,12 @@ export class GUIColumnForm extends GUIWebGLApp {
     public target: ColumnForm,
   ) {
     super(gui, target);
-    this.gui = gui;
+    this.gui = gui.addFolder({ title: "Column" });
 
     target.addEventListener("create", this.onCreate);
 
-    this.folders.columnTorus = columnTorusBindings(
-      gui,
-      target.blueprint.base.torus,
-    ).on("change", target.generate);
+    this.controllers.base = new GUIBaseTuscan(this.gui, target.blueprint.base);
+    this.controllers.base.addEventListener("change", target.generate);
   }
 
   onCreate = () => {};
