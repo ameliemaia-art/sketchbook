@@ -3,31 +3,30 @@ import { Group, Material } from "three";
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 import {
-  columnFillet,
-  ColumnFillet,
-  GUIFillet,
-} from "./column-fillet-geometry";
-import {
   columnPlinth,
   ColumnPlinth,
   GUIPlinth,
-} from "./column-plinth-geometry";
+} from "../geometry/column-plinth-geometry";
 import {
   columnScotia,
   ColumnScotia,
   GUIScotia,
-} from "./column-scotia-geometry";
-import { ColumnTorus, columnTorus, GUITorus } from "./column-torus-geometry";
+} from "../geometry/column-scotia-geometry";
+import {
+  ColumnTorus,
+  columnTorus,
+  GUITorus,
+} from "../geometry/column-torus-geometry";
 
-export type ColumnBaseDoricSettings = {
+export type DoricColumnBaseSettings = {
   plinth: ColumnPlinth;
   torus: ColumnTorus;
   scotia: ColumnScotia;
   torus2: ColumnTorus;
 };
 
-export function columnBaseDoric(
-  settings: ColumnBaseDoricSettings,
+export function doricColumnBase(
+  settings: DoricColumnBaseSettings,
   material: Material,
 ) {
   const group = new Group();
@@ -50,10 +49,10 @@ export function columnBaseDoric(
 }
 
 /// #if DEBUG
-export class GUIBaseDoric extends GUIController {
+export class GUIDoricBase extends GUIController {
   constructor(
     gui: GUIType,
-    public target: ColumnBaseDoricSettings,
+    public target: DoricColumnBaseSettings,
   ) {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Doric Base" });

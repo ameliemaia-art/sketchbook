@@ -1,20 +1,20 @@
 import { useEffect, useRef } from "react";
 import { Pane } from "tweakpane";
 
-import "../../global.css";
+import "../../../global.css";
 
-import ColumnIonicForm, { GUIColumnIonicForm } from "./column-ionic";
+import ColumnTuscanForm, { GUIColumnTuscanForm } from "./tuscan-column";
 
-export default { title: "Sketchbook/Forms/Ionic Column" };
+export default { title: "Sketchbook/Forms/Tuscan Column" };
 
-export const IonicColumn = () => {
+export const TuscanColumn = () => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!rootRef.current) return () => {};
     const root = rootRef.current;
 
-    const app = new ColumnIonicForm();
+    const app = new ColumnTuscanForm();
     app
       .setup(root)
       .then(() => {})
@@ -23,9 +23,9 @@ export const IonicColumn = () => {
       });
 
     const gui = new Pane({
-      title: "Metaphysical Form - Ionic Column",
+      title: "Metaphysical Form - Tuscan Column",
     });
-    new GUIColumnIonicForm(gui, app);
+    new GUIColumnTuscanForm(gui, app);
 
     const resize = () => {
       app.resize(window.innerWidth, window.innerHeight);

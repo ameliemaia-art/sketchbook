@@ -6,27 +6,31 @@ import {
   columnPlinth,
   ColumnPlinth,
   GUIPlinth,
-} from "./column-plinth-geometry";
+} from "../geometry/column-plinth-geometry";
 import {
   columnScotia,
   ColumnScotia,
   GUIScotia,
-} from "./column-scotia-geometry";
-import { ColumnTorus, columnTorus, GUITorus } from "./column-torus-geometry";
+} from "../geometry/column-scotia-geometry";
+import {
+  ColumnTorus,
+  columnTorus,
+  GUITorus,
+} from "../geometry/column-torus-geometry";
 
-export type ColumnBaseIonicSettings = {
+export type CorinthianColumnBaseSettings = {
   plinth: ColumnPlinth;
   torus: ColumnTorus;
   scotia: ColumnScotia;
   torus2: ColumnTorus;
 };
 
-export function columnBaseIonic(
-  settings: ColumnBaseIonicSettings,
+export function corinthianColumnBase(
+  settings: CorinthianColumnBaseSettings,
   material: Material,
 ) {
   const group = new Group();
-  group.name = "column-ionic";
+  group.name = "column-corinthian";
   const plinth = columnPlinth(settings.plinth, material);
   const torus = columnTorus(settings.torus, material);
   const scotia = columnScotia(settings.scotia, material);
@@ -45,13 +49,13 @@ export function columnBaseIonic(
 }
 
 /// #if DEBUG
-export class GUIBaseIonic extends GUIController {
+export class GUICorinthianBase extends GUIController {
   constructor(
     gui: GUIType,
-    public target: ColumnBaseIonicSettings,
+    public target: CorinthianColumnBaseSettings,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Ionic Base" });
+    this.gui = this.addFolder(gui, { title: "Corinthian Base" });
 
     this.controllers.plinth = new GUIPlinth(this.gui, target.plinth);
     this.controllers.plinth.addEventListener("change", this.onChange);

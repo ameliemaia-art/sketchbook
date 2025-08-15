@@ -6,16 +6,20 @@ import {
   columnPlinth,
   ColumnPlinth,
   GUIPlinth,
-} from "./column-plinth-geometry";
-import { columnTorus, ColumnTorus, GUITorus } from "./column-torus-geometry";
+} from "../geometry/column-plinth-geometry";
+import {
+  columnTorus,
+  ColumnTorus,
+  GUITorus,
+} from "../geometry/column-torus-geometry";
 
-export type ColumnBaseTuscanSettings = {
+export type TuscanColumnBaseSettings = {
   plinth: ColumnPlinth;
   torus: ColumnTorus;
 };
 
-export function columnBaseTuscan(
-  settings: ColumnBaseTuscanSettings,
+export function tuscanColumnBase(
+  settings: TuscanColumnBaseSettings,
   material: Material,
 ) {
   const group = new Group();
@@ -31,10 +35,10 @@ export function columnBaseTuscan(
 }
 
 /// #if DEBUG
-export class GUIBaseTuscan extends GUIController {
+export class GUITuscanBase extends GUIController {
   constructor(
     gui: GUIType,
-    public target: ColumnBaseTuscanSettings,
+    public target: TuscanColumnBaseSettings,
   ) {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Tuscan Base" });

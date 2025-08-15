@@ -1,18 +1,18 @@
 import { Group, Mesh } from "three";
 
 import { GUIType } from "@utils/gui/gui-types";
-import { floor, FloorSettings, GUIFloor } from "../geometry/floor-geometry";
-import { SketchSettings } from "../webgl-app";
-import ColumnForm, { GUIColumnForm } from "./column";
+import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
+import { SketchSettings } from "../../webgl-app";
+import ColumnForm, { GUIColumnForm } from "../column";
 import {
-  columnBaseCorinthian,
-  ColumnBaseCorinthianSettings,
-  GUIBaseCorinthian,
-} from "./geometry/column-base-corinthian-geometry";
+  corinthianColumnBase,
+  CorinthianColumnBaseSettings,
+  GUICorinthianBase,
+} from "./corinthian-column-base-geometry";
 
 type ColumnSettings = {
   floor: FloorSettings;
-  base: ColumnBaseCorinthianSettings;
+  base: CorinthianColumnBaseSettings;
 };
 
 export default class ColumnCorinthianForm extends ColumnForm {
@@ -75,7 +75,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
       this.form.wireframe ? this.wireframeMaterial : this.floorMaterial,
     );
 
-    this.columnBase = columnBaseCorinthian(
+    this.columnBase = corinthianColumnBase(
       this.form.base,
       this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
     );
@@ -110,7 +110,7 @@ export class GUICorinthianForm extends GUIColumnForm {
     this.controllers.floor = new GUIFloor(this.gui, target.form.floor);
     this.controllers.floor.addEventListener("change", target.generate);
 
-    this.controllers.base = new GUIBaseCorinthian(this.gui, target.form.base);
+    this.controllers.base = new GUICorinthianBase(this.gui, target.form.base);
     this.controllers.base.addEventListener("change", target.generate);
   }
 

@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { Pane } from "tweakpane";
 
-import "../../global.css";
+import "../../../global.css";
 
-import ColumnDoricForm, { GUIColumnDoricForm } from "./column-doric";
+import ColumnDoricForm, { GUIColumnDoricForm } from "./doric-column";
 
 export default { title: "Sketchbook/Forms/Doric Column" };
 

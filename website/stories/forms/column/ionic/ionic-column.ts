@@ -1,21 +1,21 @@
 import { Group, Mesh } from "three";
 
 import { GUIType } from "@utils/gui/gui-types";
-import { floor, FloorSettings, GUIFloor } from "../geometry/floor-geometry";
-import { SketchSettings } from "../webgl-app";
-import ColumnForm, { GUIColumnForm } from "./column";
+import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
+import { SketchSettings } from "../../webgl-app";
+import ColumnForm, { GUIColumnForm } from "../column";
 import {
-  columnBaseTuscan,
-  ColumnBaseTuscanSettings,
-  GUIBaseTuscan,
-} from "./geometry/column-base-tuscan-geometry";
+  GUIIonicBase,
+  ionicColumnBase,
+  IonicColumnBaseSettings,
+} from "./ionic-column-base-geometry";
 
 type ColumnSettings = {
   floor: FloorSettings;
-  base: ColumnBaseTuscanSettings;
+  base: IonicColumnBaseSettings;
 };
 
-export default class ColumnTuscanForm extends ColumnForm {
+export default class ColumnIonicForm extends ColumnForm {
   // Settings
   form: SketchSettings & ColumnSettings = {
     wireframe: false,
@@ -34,7 +34,23 @@ export default class ColumnTuscanForm extends ColumnForm {
       },
       torus: {
         height: 2.5,
-        radius: 10.5,
+        radius: 11.5,
+        buldge: 1,
+        heightSegments: 32,
+        radialSegments: 64,
+      },
+      scotia: {
+        topHeight: 0,
+        bottomRadius: 11.5,
+        topRadius: 8.5,
+        bottomHeight: 0,
+        height: 3,
+        divisions: 25,
+        radialSegments: 32,
+      },
+      torus2: {
+        height: 2.5,
+        radius: 8.5,
         buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
@@ -59,7 +75,7 @@ export default class ColumnTuscanForm extends ColumnForm {
       this.form.wireframe ? this.wireframeMaterial : this.floorMaterial,
     );
 
-    this.columnBase = columnBaseTuscan(
+    this.columnBase = ionicColumnBase(
       this.form.base,
       this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
     );
@@ -79,13 +95,13 @@ export default class ColumnTuscanForm extends ColumnForm {
 }
 
 /// #if DEBUG
-export class GUIColumnTuscanForm extends GUIColumnForm {
+export class GUIColumnIonicForm extends GUIColumnForm {
   constructor(
     gui: GUIType,
-    public target: ColumnTuscanForm,
+    public target: ColumnIonicForm,
   ) {
     super(gui, target);
-    this.gui = gui.addFolder({ title: "Tuscan Column" });
+    this.gui = gui.addFolder({ title: "Ionic Column" });
 
     target.addEventListener("create", this.onCreate);
 
@@ -94,7 +110,7 @@ export class GUIColumnTuscanForm extends GUIColumnForm {
     this.controllers.floor = new GUIFloor(this.gui, target.form.floor);
     this.controllers.floor.addEventListener("change", target.generate);
 
-    this.controllers.base = new GUIBaseTuscan(this.gui, target.form.base);
+    this.controllers.base = new GUIIonicBase(this.gui, target.form.base);
     this.controllers.base.addEventListener("change", target.generate);
   }
 
