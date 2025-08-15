@@ -66,10 +66,10 @@ export function lathe(
 
   switch (settings.lathe.profile) {
     case LatheProfile.Torus:
-      points = torus(radius, settings.torus);
+      points = torus(center, size, radius, settings.scotia);
       break;
     case LatheProfile.Scotia:
-      points = scotia(radius, settings.scotia);
+      points = scotia(center, size, radius, settings.scotia);
       break;
     default:
       break;

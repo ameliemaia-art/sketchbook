@@ -9,7 +9,12 @@ export type Torus = {
   scaleX: number;
 };
 
-export function torus(radius: number, settings: Torus) {
+export function torus(
+  center: paper.Point,
+  size: paper.Size,
+  radius: number,
+  settings: Torus,
+) {
   const points: paper.Point[] = [];
   for (let i = 0; i < settings.divisions; i++) {
     const t = i / (settings.divisions - 1);
