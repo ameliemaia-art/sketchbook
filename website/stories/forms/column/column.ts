@@ -1,36 +1,28 @@
-import Column, { GUIColumn } from "@/stories/blueprints/column/column";
-import { computeGreekColumnShaftCurveData } from "@/stories/blueprints/column/column-geometry";
-import {
-  CSGCylinder,
-  GUICSGCylinder,
-} from "@/stories/blueprints/csg-cylinder/csg-cylinder";
-import paper from "paper";
-import { doc } from "prettier";
 import {
   AmbientLight,
   BoxGeometry,
-  BufferGeometry,
   DirectionalLight,
   DoubleSide,
   ExtrudeGeometry,
+  Group,
   HemisphereLight,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
   PCFSoftShadowMap,
-  Shape,
   Vector2,
   Vector3,
 } from "three";
 
 import { GUIType } from "@utils/gui/gui-types";
 import { resetCamera } from "@utils/three/camera";
+import { dispose } from "@utils/three/dispose";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
+import { columnBase, ColumnBaseSettings } from "./column-base-geometry";
 
-export interface CurveSegment {
-  curvePoints: Vector2[];
-  gapLine: { start: Vector2; end: Vector2 };
-}
+type ColumnSettings = {
+  base: ColumnBaseSettings;
+};
 
 export default class ColumnForm extends WebGLApp {
   up!: Mesh<ExtrudeGeometry, MeshBasicMaterial>;
@@ -45,9 +37,22 @@ export default class ColumnForm extends WebGLApp {
     side: DoubleSide,
   });
 
-  sketch!: Column;
-  columnMesh?: Mesh<ExtrudeGeometry, MeshStandardMaterial>;
-  csgCylinder?: CSGCylinder;
+  columnBase!: Group;
+
+  blueprint: ColumnSettings = {
+    base: {
+      plinth: {
+        height: 5,
+        width: 25,
+      },
+      torus: {
+        height: 5,
+        radius: 2,
+        columnRadius: 10,
+        startX: 0,
+      },
+    },
+  };
 
   create() {
     this.cameras.main.position.z = 750;
@@ -57,38 +62,13 @@ export default class ColumnForm extends WebGLApp {
 
     this.settings.helpers = false;
     this.bloomPass.enabled = false;
-    // Add soft natural lighting to the scene.
     this.createLights();
     this.createFloor();
 
-    // Create the CSG cylinder
-    this.csgCylinder = new CSGCylinder(this.scene);
-
-    if (this.parent) {
-      const canvas = document.createElement("canvas");
-      Object.assign(canvas.style, {
-        position: "absolute",
-        top: "0px",
-        left: "0px",
-        zIndex: "100",
-      });
-      document.body.appendChild(canvas);
-      this.sketch = new Column(this.parent, canvas);
-
-      this.dispatchEvent({ type: "create" });
-
-      this.generate();
-    }
+    this.generate();
   }
 
-  /**
-   * Creates a box floor that receives shadows.
-   * The floor is a large, flat box with a small thickness.
-   *
-   * @returns A Mesh representing the floor.
-   */
   createFloor() {
-    // Create a box geometry: width, height, depth.
     const width = 150;
     const height = 1;
     const depth = 150;
@@ -98,13 +78,11 @@ export default class ColumnForm extends WebGLApp {
     const material = new MeshStandardMaterial({ color: 0xffffff });
 
     // Create the mesh.
-    const floor = new Mesh(geometry, material);
+    const floor = new Mesh(geometry, this.wireframeMaterial);
 
     // Enable the floor to receive shadows.
     floor.receiveShadow = true;
 
-    // Position the floor so that its top is at y = 0.
-    // (Since BoxGeometry is centered, move it up by half its height.)
     floor.position.y = -height / 2;
 
     this.scene.add(floor);
@@ -144,116 +122,15 @@ export default class ColumnForm extends WebGLApp {
     this.scene.add(directionalLight);
   }
 
-  createGreekColumnShape(curveData: CurveSegment[]): Shape {
-    const shape = new Shape();
-
-    if (!curveData || curveData.length === 0) {
-      return shape;
-    }
-
-    // Start at the first point of the first segment.
-    const firstPoint = curveData[0].curvePoints[0];
-    shape.moveTo(firstPoint.x, firstPoint.y);
-
-    // Loop over each segment to create the outer contour.
-    for (const segment of curveData) {
-      // Add the computed curve points.
-      // (Assuming the first point is already added, so start from index 1)
-      for (let i = 1; i < segment.curvePoints.length; i++) {
-        const pt = segment.curvePoints[i];
-        shape.lineTo(pt.x, pt.y);
-      }
-      // Add the gap line endpoint (connecting to the next segment).
-      shape.lineTo(segment.gapLine.end.x, segment.gapLine.end.y);
-    }
-
-    // Ensure the shape is closed.
-    shape.closePath();
-    return shape;
-  }
-
-  createGreekColumnExtrudedMesh(
-    curveData: CurveSegment[],
-    depth: number,
-  ): Mesh<ExtrudeGeometry, MeshStandardMaterial> {
-    // Create the shape.
-    const shape = this.createGreekColumnShape(curveData);
-
-    // Define the extrusion settings.
-    const extrudeSettings = {
-      steps: 1,
-      depth: depth,
-      bevelEnabled: false,
-    };
-
-    // Create the extruded geometry.
-    const geometry = new ExtrudeGeometry(shape, extrudeSettings);
-
-    // Create and return the mesh.
-    return new Mesh(geometry, this.material);
-  }
-
   generate = () => {
-    if (this.columnMesh) {
-      this.scene.remove(this.columnMesh);
-      this.columnMesh.geometry.dispose();
-      this.columnMesh = undefined;
+    if (this.columnBase) {
+      dispose(this.columnBase);
     }
-
-    const radius = 25;
-    const rawCurveData = computeGreekColumnShaftCurveData(
-      new paper.Point(0, 0),
-      radius,
-      this.sketch.settings.form.flutes,
-      this.sketch.settings.form.fluteGap * radius,
-      this.sketch.settings.form.fluteDepth,
-      this.sketch.settings.form.inset,
-      this.sketch.settings.form.insetCurveFactor,
-      false,
-      this.sketch.layers.form,
-    );
-
-    const curveData: CurveSegment[] = rawCurveData.map((segment) => ({
-      curvePoints: segment.curvePoints.map((pt) => new Vector2(pt.x, pt.y)),
-      gapLine: {
-        start: new Vector2(segment.gapLine.start.x, segment.gapLine.start.y),
-        end: new Vector2(segment.gapLine.end.x, segment.gapLine.end.y),
-      },
-    }));
-
-    // Create the extruded mesh with a specified depth.
-    const depth = 25;
-
-    this.columnMesh = this.createGreekColumnExtrudedMesh(curveData, depth);
-    if (this.columnMesh) {
-      this.columnMesh.receiveShadow = true;
-      this.columnMesh.castShadow = true;
-      this.columnMesh.rotateX(-Math.PI / 2);
-    }
-
-    this.scene.add(this.columnMesh);
+    this.columnBase = columnBase(this.blueprint.base, this.wireframeMaterial);
+    this.scene.add(this.columnBase);
   };
 
-  createColumnCurve() {}
-
-  toggleCSGDebug() {
-    if (this.csgCylinder) {
-      this.csgCylinder.toggleDebug();
-    }
-  }
-
-  onUpdate(delta: number) {
-    if (this.csgCylinder) {
-      this.csgCylinder.update();
-    }
-  }
-
-  dispose() {
-    super.dispose();
-    if (this.csgCylinder) {
-      this.csgCylinder.dispose();
-    }
-  }
+  dispose() {}
 }
 
 /// #if DEBUG
@@ -268,19 +145,6 @@ export class GUIColumnForm extends GUIWebGLApp {
     target.addEventListener("create", this.onCreate);
   }
 
-  onCreate = () => {
-    // this.controllers.column = new GUIColumn(
-    //   this.gui,
-    //   this.target.sketch,
-    //   this.target.generate,
-    // );
-
-    if (this.target.csgCylinder) {
-      this.controllers.csgCylinder = new GUICSGCylinder(
-        this.gui,
-        this.target.csgCylinder,
-      );
-    }
-  };
+  onCreate = () => {};
 }
 /// #endif
