@@ -3,11 +3,6 @@ import { Group, Material } from "three";
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 import {
-  columnFillet,
-  ColumnFillet,
-  GUIFillet,
-} from "./column-fillet-geometry";
-import {
   columnPlinth,
   ColumnPlinth,
   GUIPlinth,
@@ -19,19 +14,19 @@ import {
 } from "./column-scotia-geometry";
 import { ColumnTorus, columnTorus, GUITorus } from "./column-torus-geometry";
 
-export type ColumnBaseDoricSettings = {
+export type ColumnBaseIonicSettings = {
   plinth: ColumnPlinth;
   torus: ColumnTorus;
   scotia: ColumnScotia;
   torus2: ColumnTorus;
 };
 
-export function columnBaseDoric(
-  settings: ColumnBaseDoricSettings,
+export function columnBaseIonic(
+  settings: ColumnBaseIonicSettings,
   material: Material,
 ) {
   const group = new Group();
-  group.name = "column-doric";
+  group.name = "column-ionic";
   const plinth = columnPlinth(settings.plinth, material);
   const torus = columnTorus(settings.torus, material);
   const scotia = columnScotia(settings.scotia, material);
@@ -50,13 +45,13 @@ export function columnBaseDoric(
 }
 
 /// #if DEBUG
-export class GUIBaseDoric extends GUIController {
+export class GUIBaseIonic extends GUIController {
   constructor(
     gui: GUIType,
-    public target: ColumnBaseDoricSettings,
+    public target: ColumnBaseIonicSettings,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Doric Base" });
+    this.gui = this.addFolder(gui, { title: "Ionic Base" });
 
     this.controllers.plinth = new GUIPlinth(this.gui, target.plinth);
     this.controllers.plinth.addEventListener("change", this.onChange);

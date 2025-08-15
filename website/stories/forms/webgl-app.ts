@@ -341,6 +341,11 @@ export class GUIWebGLApp extends GUIController {
     super(gui);
     this.gui = gui;
 
+    this.gui.containerElem_.classList.add(
+      "gui-webgl-left-panel",
+      "gui-webgl-scrollbar",
+    );
+
     this.folders.settings = this.addFolder(this.gui, { title: "Settings" });
     this.addBinding(this.folders.settings, target.settings, "debugCamera");
     this.addBinding(this.folders.settings, target.settings, "orthCamera");

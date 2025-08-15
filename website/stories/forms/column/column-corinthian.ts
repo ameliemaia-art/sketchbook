@@ -5,17 +5,17 @@ import { floor, FloorSettings, GUIFloor } from "../geometry/floor-geometry";
 import { SketchSettings } from "../webgl-app";
 import ColumnForm, { GUIColumnForm } from "./column";
 import {
-  columnBaseDoric,
-  ColumnBaseDoricSettings,
-  GUIBaseDoric,
-} from "./geometry/column-base-doric-geometry";
+  columnBaseCorinthian,
+  ColumnBaseCorinthianSettings,
+  GUIBaseCorinthian,
+} from "./geometry/column-base-corinthian-geometry";
 
 type ColumnSettings = {
   floor: FloorSettings;
-  base: ColumnBaseDoricSettings;
+  base: ColumnBaseCorinthianSettings;
 };
 
-export default class ColumnDoricForm extends ColumnForm {
+export default class ColumnCorinthianForm extends ColumnForm {
   // Settings
   form: SketchSettings & ColumnSettings = {
     wireframe: false,
@@ -75,7 +75,7 @@ export default class ColumnDoricForm extends ColumnForm {
       this.form.wireframe ? this.wireframeMaterial : this.floorMaterial,
     );
 
-    this.columnBase = columnBaseDoric(
+    this.columnBase = columnBaseCorinthian(
       this.form.base,
       this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
     );
@@ -95,13 +95,13 @@ export default class ColumnDoricForm extends ColumnForm {
 }
 
 /// #if DEBUG
-export class GUIColumnDoricForm extends GUIColumnForm {
+export class GUICorinthianForm extends GUIColumnForm {
   constructor(
     gui: GUIType,
-    public target: ColumnDoricForm,
+    public target: ColumnCorinthianForm,
   ) {
     super(gui, target);
-    this.gui = gui.addFolder({ title: "Doric Column" });
+    this.gui = gui.addFolder({ title: "Corinthian Column" });
 
     target.addEventListener("create", this.onCreate);
 
@@ -110,7 +110,7 @@ export class GUIColumnDoricForm extends GUIColumnForm {
     this.controllers.floor = new GUIFloor(this.gui, target.form.floor);
     this.controllers.floor.addEventListener("change", target.generate);
 
-    this.controllers.base = new GUIBaseDoric(this.gui, target.form.base);
+    this.controllers.base = new GUIBaseCorinthian(this.gui, target.form.base);
     this.controllers.base.addEventListener("change", target.generate);
   }
 

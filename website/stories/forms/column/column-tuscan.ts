@@ -32,21 +32,11 @@ export default class ColumnTuscanForm extends ColumnForm {
         heightSegments: 1,
         depthSegments: 1,
       },
-      fillet: {
-        height: 2.5,
-        radius: 11.5,
-        radialSegments: 64,
-      },
       torus: {
         height: 2.5,
         radius: 10.5,
         buldge: 1,
         heightSegments: 32,
-        radialSegments: 64,
-      },
-      fillet2: {
-        height: 1.25,
-        radius: 10,
         radialSegments: 64,
       },
     },

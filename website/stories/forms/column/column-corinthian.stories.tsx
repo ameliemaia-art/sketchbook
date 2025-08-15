@@ -3,18 +3,18 @@ import { Pane } from "tweakpane";
 
 import "../../global.css";
 
-import ColumnDoricForm, { GUIColumnDoricForm } from "./column-doric";
+import ColumnCorinthianForm, { GUICorinthianForm } from "./column-corinthian";
 
-export default { title: "Sketchbook/Forms/Doric Column" };
+export default { title: "Sketchbook/Forms/Corinthian Column" };
 
-export const DoricColumn = () => {
+export const CorinthianColumn = () => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!rootRef.current) return () => {};
     const root = rootRef.current;
 
-    const app = new ColumnDoricForm();
+    const app = new ColumnCorinthianForm();
     app
       .setup(root)
       .then(() => {})
@@ -23,9 +23,9 @@ export const DoricColumn = () => {
       });
 
     const gui = new Pane({
-      title: "Metaphysical Form - Doric Column",
+      title: "Metaphysical Form - Corinthian Column",
     });
-    new GUIColumnDoricForm(gui, app);
+    new GUICorinthianForm(gui, app);
 
     const resize = () => {
       app.resize(window.innerWidth, window.innerHeight);

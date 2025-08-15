@@ -5,9 +5,9 @@ import "../../global.css";
 
 import ColumnTuscanForm, { GUIColumnTuscanForm } from "./column-tuscan";
 
-export default { title: "Sketchbook/Forms/ColumnTuscan" };
+export default { title: "Sketchbook/Forms/Tuscan Column" };
 
-export const ColumnTuscan = () => {
+export const TuscanColumn = () => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export const ColumnTuscan = () => {
       });
 
     const gui = new Pane({
-      title: "Metaphysical Form - Column Tuscan",
+      title: "Metaphysical Form - Tuscan Column",
     });
     new GUIColumnTuscanForm(gui, app);
 
