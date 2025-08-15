@@ -18,7 +18,6 @@ export type ColumnBaseTuscanSettings = {
   plinth: ColumnPlinth;
   fillet: ColumnFillet;
   torus: ColumnTorus;
-  fillet2: ColumnFillet;
 };
 
 export function columnBaseTuscan(
@@ -30,16 +29,12 @@ export function columnBaseTuscan(
   const plinth = columnPlinth(settings.plinth, material);
   const fillet = columnFillet(settings.fillet, material);
   const torus = columnTorus(settings.torus, material);
-  const fillet2 = columnFillet(settings.fillet2, material);
   fillet.position.y = settings.plinth.height;
   torus.position.y = settings.plinth.height + settings.fillet.height;
-  fillet2.position.y =
-    settings.plinth.height + settings.fillet.height + settings.torus.height;
 
   group.add(plinth);
   group.add(fillet);
   group.add(torus);
-  group.add(fillet2);
 
   return group;
 }
