@@ -1,6 +1,7 @@
 import paper from "paper";
+import { MathUtils } from "three";
 
-import { createGrid } from "@utils/paper/utils";
+import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 
 export type LatheSettings = {
@@ -14,6 +15,11 @@ export type LatheSettings = {
     visible: boolean;
     opacity: number;
     outline: boolean;
+  };
+  lathe: {
+    height: number;
+    divisions: number;
+    scaleX: number;
   };
 };
 
@@ -75,5 +81,36 @@ export function lathe(
     createGrid(center, size, gridColor, settings.strokeWidth, 5, form);
   }
 
-  // createLathe();
+  const points: paper.Point[] = [];
+  for (let i = 0; i < settings.lathe.divisions; i++) {
+    const t = i / (settings.lathe.divisions - 1);
+    const theta = MathUtils.lerp(-90, 90, t);
+    const x =
+      radius * settings.lathe.scaleX * Math.cos(MathUtils.degToRad(theta));
+    const y = radius + radius * Math.sin(MathUtils.degToRad(theta));
+    const point = new paper.Point(x, y);
+    dot(point, 1, form, settings.strokeColor);
+    points.push(point);
+  }
+
+  // Draw line between points
+  points.forEach((point, i) => {
+    if (i > 0) {
+      createLine(
+        [points[i - 1], point],
+        settings.strokeColor,
+        settings.strokeWidth,
+        form,
+      );
+    }
+  });
+
+  // points.forEach((point) => {
+  //   createLine(
+  //     [new paper.Point(0, 10), center],
+  //     settings.strokeColor,
+  //     settings.strokeWidth,
+  //     blueprint,
+  //   );
+  // });
 }

@@ -9,10 +9,9 @@ import Sketch, {
 } from "../sketch/sketch";
 import { lathe, LatheSettings } from "./lathe-geometry";
 
-export const hypatiaSettings: SketchSettings & LatheSettings = {
+export const latheSettings: SketchSettings & LatheSettings = {
   ...sketchSettings,
-  scale: 0.85,
-  seed: 25,
+  scale: 1,
   darkness: true,
   grid: {
     visible: true,
@@ -29,10 +28,15 @@ export const hypatiaSettings: SketchSettings & LatheSettings = {
     opacity: 1,
     outline: true,
   },
+  lathe: {
+    height: 1,
+    divisions: 25,
+    scaleX: 1,
+  },
 };
 
 export default class Hypatia extends Sketch {
-  settings: SketchSettings & LatheSettings = hypatiaSettings;
+  settings: SketchSettings & LatheSettings = latheSettings;
 
   constructor(
     public root: HTMLElement,
@@ -84,5 +88,23 @@ export class GUILathe extends GUISketch {
     this.folders.lathe = this.addFolder(this.folders.form, {
       title: "lathe",
     });
+    this.folders.lathe
+      .addBinding(target.settings.lathe, "height", {
+        min: 0,
+        max: 1,
+      })
+      .on("change", this.draw);
+    this.folders.lathe
+      .addBinding(target.settings.lathe, "divisions", {
+        min: 1,
+        max: 100,
+      })
+      .on("change", this.draw);
+    this.folders.lathe
+      .addBinding(target.settings.lathe, "scaleX", {
+        min: 0,
+        max: 2,
+      })
+      .on("change", this.draw);
   }
 }
