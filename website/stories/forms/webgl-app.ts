@@ -35,6 +35,9 @@ import {
   vignettePassBinding,
 } from "@utils/gui/gui-post-processing-bindings";
 import { GUIType } from "@utils/gui/gui-types";
+import BookmarkManager, {
+  GUIBookmarkManager,
+} from "@utils/three/bookmark-manager";
 import { resetCamera } from "@utils/three/camera";
 import { getRenderBufferSize } from "@utils/three/rendering";
 import Screenshot, { GUIScreenshot } from "@utils/three/screenshot";
@@ -85,8 +88,11 @@ export default class WebGLApp extends EventDispatcher {
   screenshot: Screenshot;
   parent: HTMLDivElement | null = null;
 
+  bookmarkManager: BookmarkManager;
+
   constructor() {
     super();
+
     // Renderer
     this.renderer = new WebGLRenderer({
       antialias: false,
@@ -177,6 +183,12 @@ export default class WebGLApp extends EventDispatcher {
     if (element) {
       element.style.padding = "0px";
     }
+
+    this.bookmarkManager = new BookmarkManager(
+      "app",
+      this.cameras.dev,
+      this.controls,
+    );
   }
 
   async loadAssets() {
@@ -380,6 +392,10 @@ export class GUIWebGLApp extends GUIController {
     n8AOPassBinding(this.folders.ao, target.aoPass);
 
     this.controllers.screenshot = new GUIScreenshot(gui, target.screenshot);
+    this.controllers.bookmarkManager = new GUIBookmarkManager(
+      gui,
+      target.bookmarkManager,
+    );
   }
 }
 /// #endif

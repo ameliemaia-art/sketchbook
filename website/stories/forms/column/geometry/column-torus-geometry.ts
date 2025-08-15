@@ -3,16 +3,6 @@ import { CylinderGeometry, Material, Matrix4, Mesh, Vector3 } from "three";
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 
-/**
- * Torus profile types found in classical architecture
- */
-export enum TorusProfileType {
-  SEMICIRCULAR = "semicircular",
-  CUSHION = "cushion",
-  ELLIPTICAL = "elliptical",
-  PARABOLIC = "parabolic",
-}
-
 export type ColumnTorus = {
   height: number;
   radius: number;

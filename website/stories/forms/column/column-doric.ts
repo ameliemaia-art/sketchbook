@@ -18,7 +18,7 @@ type ColumnSettings = {
 export default class ColumnDoricForm extends ColumnForm {
   // Settings
   form: SketchSettings & ColumnSettings = {
-    wireframe: false,
+    wireframe: true,
     floor: {
       width: 150,
       height: 1,

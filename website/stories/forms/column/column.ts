@@ -31,10 +31,8 @@ export default class ColumnForm extends WebGLApp {
   });
 
   create() {
-    this.cameras.main.position.z = 750;
-    this.cameras.main.lookAt(0, 0, 0);
-
-    resetCamera(this.cameras.dev, 150, new Vector3(0, 0.5, 1));
+    // this.cameras.main.position.z = 750;
+    // this.cameras.main.lookAt(0, 0, 0);
 
     this.settings.helpers = false;
     this.bloomPass.enabled = false;
