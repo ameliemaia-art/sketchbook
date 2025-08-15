@@ -61,12 +61,11 @@ export default class ColumnForm extends WebGLApp {
       torus: {
         height: 2.5,
         radius: 10,
-        buldge: 1.25,
+        buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
-        profileType: TorusProfileType.CUSHION,
-        profileSharpness: 3,
-        verticalCompression: 1,
+        profileSharpness: 1.5,
+        verticalCompression: 0.5,
       },
       fillet2: {
         height: 1,

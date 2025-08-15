@@ -14,15 +14,11 @@ export enum TorusProfileType {
 
 export type ColumnTorus = {
   height: number;
-  buldge: number;
   radius: number;
   heightSegments: number;
   radialSegments: number;
-  /** Profile type - determines the mathematical curve used */
-  profileType: TorusProfileType;
-  /** Profile sharpness - controls how "stubby" or round the profile appears (0.1-3.0) */
+  buldge: number; // Bulge radius factor
   profileSharpness: number;
-  /** Vertical compression - flattens the profile vertically (0.1-1.0) */
   verticalCompression: number;
 };
 
@@ -35,45 +31,15 @@ export type ColumnTorus = {
  */
 function calculateBulgeFactor(
   normalizedY: number,
-  profileType: TorusProfileType,
   sharpness: number,
   compression: number,
 ): number {
   // Convert to symmetric range (-1 to 1) for profile calculations
   const symmetricY = (normalizedY - 0.5) * 2;
 
-  let bulgeFactor: number;
-
-  switch (profileType) {
-    case "semicircular":
-      // Classic semicircular profile - perfect torus cross-section
-      const angle = normalizedY * Math.PI;
-      bulgeFactor = Math.sin(angle);
-      break;
-
-    case "cushion":
-      // Rounded rectangle profile - flatter with rounded edges
-      // Uses a modified cosine function with power adjustment
-      const cushionAngle = normalizedY * Math.PI;
-      const baseCushion = Math.sin(cushionAngle);
-      bulgeFactor = Math.pow(baseCushion, 1 / sharpness);
-      break;
-
-    case "elliptical":
-      // Elliptical profile - more elongated vertically or horizontally
-      const ellipseY = symmetricY * compression;
-      bulgeFactor = Math.sqrt(Math.max(0, 1 - ellipseY * ellipseY));
-      break;
-
-    case "parabolic":
-      // Parabolic profile - sharper peak, flatter base
-      const parabolicBase = 4 * normalizedY * (1 - normalizedY);
-      bulgeFactor = Math.pow(parabolicBase, sharpness);
-      break;
-
-    default:
-      bulgeFactor = Math.sin(normalizedY * Math.PI);
-  }
+  const cushionAngle = normalizedY * Math.PI;
+  const baseCushion = Math.sin(cushionAngle);
+  let bulgeFactor = Math.pow(baseCushion, 1 / sharpness);
 
   // Apply vertical compression to flatten the profile
   bulgeFactor *= compression;
@@ -84,7 +50,6 @@ function calculateBulgeFactor(
 export function columnTorus(settings: ColumnTorus, material: Material) {
   // Calculate dimensions
   const actualHeight = settings.height;
-  const bulgeRadius = settings.buldge;
   const baseRadius = settings.radius;
 
   const geometry = new CylinderGeometry(
@@ -110,7 +75,6 @@ export function columnTorus(settings: ColumnTorus, material: Material) {
     // Calculate bulge factor using selected profile type
     const bulgeFactor = calculateBulgeFactor(
       normalizedY,
-      settings.profileType,
       settings.profileSharpness,
       settings.verticalCompression,
     );
@@ -122,7 +86,7 @@ export function columnTorus(settings: ColumnTorus, material: Material) {
 
     // Apply bulge displacement only if vertex is on the outer surface
     if (distanceFromCenter > 0) {
-      const bulgeAmount = bulgeRadius * bulgeFactor;
+      const bulgeAmount = settings.buldge * bulgeFactor;
       const normalizedDirection = new Vector3(
         vertex.x,
         0,
@@ -172,29 +136,12 @@ export function columnTorusBindings(gui: GUIType, settings: ColumnTorus) {
     max: 64,
     step: 1,
   });
-
-  // Profile controls
-  folder.addBinding(settings, "profileType", {
-    options: {
-      "Semicircular (Classic)": "semicircular",
-      "Cushion (Rounded Rectangle)": "cushion",
-      Elliptical: "elliptical",
-      Parabolic: "parabolic",
-    },
-  });
-
   folder.addBinding(settings, "profileSharpness", {
-    min: 0.1,
-    max: 3.0,
-    step: 0.1,
-    label: "Sharpness",
+    min: 0,
   });
 
   folder.addBinding(settings, "verticalCompression", {
-    min: 0.1,
-    max: 1.0,
-    step: 0.05,
-    label: "Compression",
+    min: 0,
   });
 
   return folder;
