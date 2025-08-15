@@ -66,7 +66,7 @@ export function lathe(
 
   switch (settings.lathe.profile) {
     case LatheProfile.Torus:
-      points = torus(center, size, radius, settings.scotia);
+      points = torus(center, size, radius, settings.torus);
       break;
     case LatheProfile.Scotia:
       points = scotia(center, size, radius, settings.scotia);
@@ -111,8 +111,6 @@ export class GUILatheGeometry extends GUIController {
   }
 
   onChange = () => {
-    console.log("xx");
-
     this.dispatchEvent({ type: "change" } as never);
   };
 }

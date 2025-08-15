@@ -41,9 +41,10 @@ export const latheSettings: SketchSettings & LatheSettings = {
   },
   scotia: {
     divisions: 25,
-    baseBottomLength: 0.8,
-    baseTopLength: 0.1,
-    baseHeight: 0.1,
+    bottomLength: 0.8,
+    topLength: 0.1,
+    bottomHeight: 0.1,
+    topHeight: 0.1,
   },
 };
 

@@ -6,9 +6,10 @@ import { GUIType } from "@utils/gui/gui-types";
 
 export type Scotia = {
   divisions: number;
-  baseBottomLength: number;
-  baseTopLength: number;
-  baseHeight: number;
+  bottomLength: number;
+  topLength: number;
+  bottomHeight: number;
+  topHeight: number;
 };
 
 export function scotia(
@@ -17,39 +18,47 @@ export function scotia(
   radius: number,
   settings: Scotia,
 ) {
+  // Bottom left
+  const p0 = new paper.Point(0, size.height);
+  // Bottom left end
+  const p1 = new paper.Point(size.width * settings.bottomLength, size.height);
+  // Move up
+  const p2 = new paper.Point(
+    size.width * settings.bottomLength,
+    size.height - size.height * settings.bottomHeight,
+  );
+  // Top left end
+  const p3 = new paper.Point(
+    size.width * settings.topLength,
+    size.height * settings.topHeight,
+  );
+  // Top left end top
+  const p4 = new paper.Point(size.width * settings.topLength, 0);
+  // Top left
+  const p5 = new paper.Point(0, 0);
+
   const points: paper.Point[] = [];
-  points.push(new paper.Point(0, size.height)); // Start at the top
-  points.push(
-    new paper.Point(size.width * settings.baseBottomLength, size.height),
-  );
+  points.push(p0);
+  points.push(p1);
+  points.push(p2);
 
-  // Moves up a bit
-  points.push(
-    new paper.Point(
-      size.width * settings.baseBottomLength,
-      size.height - size.height * settings.baseHeight,
-    ),
-  );
+  const arcCenter = new paper.Point(p2.x, p3.y);
+  const radiusX = p2.x - p3.x;
+  const radiusY = p2.y - p3.y;
 
-  points.push(
-    new paper.Point(
-      size.width * settings.baseTopLength,
-      size.height * settings.baseHeight,
-    ),
-  );
-  points.push(new paper.Point(size.width * settings.baseTopLength, 0));
-  points.push(new paper.Point(0, 0)); // Start at the top
+  for (let i = 0; i < settings.divisions; i++) {
+    const t = i / (settings.divisions - 1);
+    const theta = MathUtils.lerp(90, 180, t);
+    const x = arcCenter.x + radiusX * Math.cos(MathUtils.degToRad(theta));
+    const y = arcCenter.y + radiusY * Math.sin(MathUtils.degToRad(theta));
+    const point = new paper.Point(x, y);
+    points.push(point);
+  }
 
-  // const arcCenter = new paper.Point()
+  points.push(p3);
+  points.push(p4);
+  points.push(p5);
 
-  // for (let i = 0; i < settings.divisions; i++) {
-  //   const t = i / (settings.divisions - 1);
-  //   const theta = MathUtils.lerp(-90, 90, t);
-  //   const x = arcCenter.x * Math.cos(MathUtils.degToRad(theta));
-  //   const y = arcCenter.y + radius * Math.sin(MathUtils.degToRad(theta));
-  //   const point = new paper.Point(x, y);
-  //   points.push(point);
-  // }
   return points;
 }
 
@@ -64,14 +73,18 @@ export class GUIScotia extends GUIController {
 
     // Basic dimensions
     this.gui
-      .addBinding(target, "baseTopLength", { min: 0 })
+      .addBinding(target, "topLength", { min: 0 })
       .on("change", this.onChange);
     this.gui
-      .addBinding(target, "baseBottomLength", { min: 0 })
+      .addBinding(target, "topHeight", { min: 0 })
       .on("change", this.onChange);
     this.gui
-      .addBinding(target, "baseHeight", { min: 0 })
+      .addBinding(target, "bottomLength", { min: 0 })
       .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "bottomHeight", { min: 0 })
+      .on("change", this.onChange);
+
     this.gui
       .addBinding(target, "divisions", { min: 0 })
       .on("change", this.onChange);
