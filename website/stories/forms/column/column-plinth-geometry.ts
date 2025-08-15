@@ -5,6 +5,9 @@ import { GUIType } from "@utils/gui/gui-types";
 export type ColumnPlinth = {
   height: number;
   width: number;
+  widthSegments: number;
+  heightSegments: number;
+  depthSegments: number;
 };
 
 export function columnPlinth(settings: ColumnPlinth, material: Material) {
@@ -12,6 +15,9 @@ export function columnPlinth(settings: ColumnPlinth, material: Material) {
     settings.width,
     settings.height,
     settings.width,
+    settings.widthSegments,
+    settings.heightSegments,
+    settings.depthSegments,
   );
   geometry.applyMatrix4(
     new Matrix4().makeTranslation(0, settings.height / 2, 0),
@@ -23,5 +29,8 @@ export function columnPlinthBindings(gui: GUIType, settings: ColumnPlinth) {
   const folder = gui.addFolder({ title: "Column Plinth" });
   folder.addBinding(settings, "height", { min: 0 });
   folder.addBinding(settings, "width", { min: 0 });
+  folder.addBinding(settings, "widthSegments", { min: 1 });
+  folder.addBinding(settings, "heightSegments", { min: 1 });
+  folder.addBinding(settings, "depthSegments", { min: 1 });
   return folder;
 }

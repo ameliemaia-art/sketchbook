@@ -20,8 +20,9 @@ import {
 
 export type ColumnBaseTuscanSettings = {
   plinth: ColumnPlinth;
-  torus: ColumnTorus;
   fillet: ColumnFillet;
+  torus: ColumnTorus;
+  fillet2: ColumnFillet;
 };
 
 export function columnBaseTuscan(
@@ -33,12 +34,16 @@ export function columnBaseTuscan(
   const plinth = columnPlinth(settings.plinth, material);
   const fillet = columnFillet(settings.fillet, material);
   const torus = columnTorus(settings.torus, material);
+  const fillet2 = columnFillet(settings.fillet2, material);
   fillet.position.y = settings.plinth.height;
   torus.position.y = settings.plinth.height + settings.fillet.height;
+  fillet2.position.y =
+    settings.plinth.height + settings.fillet.height + settings.torus.height;
 
   group.add(plinth);
   group.add(fillet);
   group.add(torus);
+  group.add(fillet2);
 
   return group;
 }
@@ -56,11 +61,15 @@ export class GUIBaseTuscan extends GUIController {
       "change",
       this.onChange,
     );
+    this.folders.columnFillet = columnFilletBindings(gui, target.fillet).on(
+      "change",
+      this.onChange,
+    );
     this.folders.columnTorus = columnTorusBindings(gui, target.torus).on(
       "change",
       this.onChange,
     );
-    this.folders.columnFillet = columnFilletBindings(gui, target.fillet).on(
+    this.folders.columnFillet2 = columnFilletBindings(gui, target.fillet2).on(
       "change",
       this.onChange,
     );

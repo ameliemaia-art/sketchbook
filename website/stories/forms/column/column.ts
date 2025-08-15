@@ -23,6 +23,7 @@ import {
   ColumnBaseTuscanSettings,
   GUIBaseTuscan,
 } from "./column-base-geometry";
+import { TorusProfileType } from "./column-torus-geometry";
 
 type ColumnSettings = {
   base: ColumnBaseTuscanSettings;
@@ -48,18 +49,29 @@ export default class ColumnForm extends WebGLApp {
       plinth: {
         height: 5,
         width: 25,
-      },
-      torus: {
-        height: 5,
-        radius: 10,
-        buldge: 1.25,
-        heightSegments: 32,
-        radialSegments: 32,
+        widthSegments: 1,
+        heightSegments: 1,
+        depthSegments: 1,
       },
       fillet: {
         height: 1,
         radius: 11.5,
-        radialSegments: 32,
+        radialSegments: 64,
+      },
+      torus: {
+        height: 2.5,
+        radius: 10,
+        buldge: 1.25,
+        heightSegments: 32,
+        radialSegments: 64,
+        profileType: TorusProfileType.CUSHION,
+        profileSharpness: 3,
+        verticalCompression: 1,
+      },
+      fillet2: {
+        height: 1,
+        radius: 10,
+        radialSegments: 64,
       },
     },
   };
