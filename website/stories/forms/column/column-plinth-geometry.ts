@@ -1,6 +1,8 @@
 import { BoxGeometry, Material, Matrix4, Mesh } from "three";
 
+import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
+import { ColumnFillet } from "./column-fillet-geometry";
 
 export type ColumnPlinth = {
   height: number;
@@ -25,12 +27,34 @@ export function columnPlinth(settings: ColumnPlinth, material: Material) {
   return new Mesh(geometry, material);
 }
 
-export function columnPlinthBindings(gui: GUIType, settings: ColumnPlinth) {
-  const folder = gui.addFolder({ title: "Column Plinth" });
-  folder.addBinding(settings, "height", { min: 0 });
-  folder.addBinding(settings, "width", { min: 0 });
-  folder.addBinding(settings, "widthSegments", { min: 1 });
-  folder.addBinding(settings, "heightSegments", { min: 1 });
-  folder.addBinding(settings, "depthSegments", { min: 1 });
-  return folder;
+/// #if DEBUG
+export class GUIPlinth extends GUIController {
+  constructor(
+    gui: GUIType,
+    public target: ColumnPlinth,
+  ) {
+    super(gui);
+    this.gui = this.addFolder(gui, { title: "Plinth" });
+
+    this.gui
+      .addBinding(target, "width", { min: 0 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "height", { min: 0 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "widthSegments", { min: 1 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "heightSegments", { min: 1 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "depthSegments", { min: 1 })
+      .on("change", this.onChange);
+  }
+
+  onChange = () => {
+    this.dispatchEvent({ type: "change" } as never);
+  };
 }
+/// #endif

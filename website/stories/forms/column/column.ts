@@ -16,23 +16,36 @@ import {
 
 import { GUIType } from "@utils/gui/gui-types";
 import { resetCamera } from "@utils/three/camera";
-import { dispose } from "@utils/three/dispose";
+import {
+  floor,
+  floorBindings,
+  FloorSettings,
+} from "../geometry/floor-geometry";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 import {
   columnBaseTuscan,
   ColumnBaseTuscanSettings,
   GUIBaseTuscan,
 } from "./column-base-geometry";
-import { TorusProfileType } from "./column-torus-geometry";
 
 type ColumnSettings = {
+  floor: FloorSettings;
   base: ColumnBaseTuscanSettings;
+};
+
+type SketchSettings = {
+  wireframe: boolean;
 };
 
 export default class ColumnForm extends WebGLApp {
   up!: Mesh<ExtrudeGeometry, MeshBasicMaterial>;
-  material = new MeshStandardMaterial({
+  columnMaterial = new MeshStandardMaterial({
     color: 0xffffff,
+    side: DoubleSide,
+    wireframe: false,
+  });
+  floorMaterial = new MeshStandardMaterial({
+    color: 0xcccccc,
     side: DoubleSide,
     wireframe: false,
   });
@@ -42,9 +55,13 @@ export default class ColumnForm extends WebGLApp {
     side: DoubleSide,
   });
 
-  columnBase!: Group;
-
-  blueprint: ColumnSettings = {
+  form: SketchSettings & ColumnSettings = {
+    wireframe: false,
+    floor: {
+      width: 150,
+      height: 1,
+      depth: 150,
+    },
     base: {
       plinth: {
         height: 5,
@@ -54,13 +71,13 @@ export default class ColumnForm extends WebGLApp {
         depthSegments: 1,
       },
       fillet: {
-        height: 1,
+        height: 2.5,
         radius: 11.5,
         radialSegments: 64,
       },
       torus: {
         height: 2.5,
-        radius: 10,
+        radius: 10.5,
         buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
@@ -68,12 +85,15 @@ export default class ColumnForm extends WebGLApp {
         verticalCompression: 0.5,
       },
       fillet2: {
-        height: 1,
+        height: 1.25,
         radius: 10,
         radialSegments: 64,
       },
     },
   };
+
+  columnBase!: Group;
+  floor!: Mesh;
 
   create() {
     this.cameras.main.position.z = 750;
@@ -84,29 +104,8 @@ export default class ColumnForm extends WebGLApp {
     this.settings.helpers = false;
     this.bloomPass.enabled = false;
     this.createLights();
-    this.createFloor();
 
     this.generate();
-  }
-
-  createFloor() {
-    const width = 150;
-    const height = 1;
-    const depth = 150;
-    const geometry = new BoxGeometry(width, height, depth);
-
-    // Create a material for the floor.
-    const material = new MeshStandardMaterial({ color: 0xffffff });
-
-    // Create the mesh.
-    const floor = new Mesh(geometry, this.wireframeMaterial);
-
-    // Enable the floor to receive shadows.
-    floor.receiveShadow = true;
-
-    floor.position.y = -height / 2;
-
-    this.scene.add(floor);
   }
 
   createLights() {
@@ -144,14 +143,31 @@ export default class ColumnForm extends WebGLApp {
   }
 
   generate = () => {
+    if (this.floor) {
+      this.scene.remove(this.floor);
+    }
     if (this.columnBase) {
       this.scene.remove(this.columnBase);
     }
 
-    this.columnBase = columnBaseTuscan(
-      this.blueprint.base,
-      this.wireframeMaterial,
+    this.floor = floor(
+      this.form.floor,
+      this.form.wireframe ? this.wireframeMaterial : this.floorMaterial,
     );
+
+    this.columnBase = columnBaseTuscan(
+      this.form.base,
+      this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+    );
+
+    this.columnBase.traverse((child) => {
+      if (child instanceof Mesh) {
+        child.receiveShadow = true;
+        child.castShadow = true;
+      }
+    });
+
+    this.scene.add(this.floor);
     this.scene.add(this.columnBase);
   };
 
@@ -169,7 +185,14 @@ export class GUIColumnForm extends GUIWebGLApp {
 
     target.addEventListener("create", this.onCreate);
 
-    this.controllers.base = new GUIBaseTuscan(this.gui, target.blueprint.base);
+    this.gui.addBinding(target.form, "wireframe").on("change", target.generate);
+
+    this.folders.floor = floorBindings(this.gui, target.form.floor).on(
+      "change",
+      target.generate,
+    );
+
+    this.controllers.base = new GUIBaseTuscan(this.gui, target.form.base);
     this.controllers.base.addEventListener("change", target.generate);
   }
 

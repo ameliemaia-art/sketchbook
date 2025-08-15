@@ -1,5 +1,6 @@
 import { CylinderGeometry, Material, Matrix4, Mesh } from "three";
 
+import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 
 export type ColumnFillet = {
@@ -23,10 +24,27 @@ export function columnFillet(settings: ColumnFillet, material: Material) {
   return new Mesh(geometry, material);
 }
 
-export function columnFilletBindings(gui: GUIType, settings: ColumnFillet) {
-  const folder = gui.addFolder({ title: "Column Fillet" });
-  folder.addBinding(settings, "height", { min: 0 });
-  folder.addBinding(settings, "radius", { min: 0 });
-  folder.addBinding(settings, "radialSegments", { min: 3 });
-  return folder;
+/// #if DEBUG
+export class GUIFillet extends GUIController {
+  constructor(
+    gui: GUIType,
+    public target: ColumnFillet,
+  ) {
+    super(gui);
+    this.gui = this.addFolder(gui, { title: "Fillet" });
+    this.gui
+      .addBinding(target, "height", { min: 0 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "radius", { min: 0 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "radialSegments", { min: 3 })
+      .on("change", this.onChange);
+  }
+
+  onChange = () => {
+    this.dispatchEvent({ type: "change" } as never);
+  };
 }
+/// #endif

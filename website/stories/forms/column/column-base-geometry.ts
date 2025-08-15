@@ -5,18 +5,14 @@ import { GUIType } from "@utils/gui/gui-types";
 import {
   columnFillet,
   ColumnFillet,
-  columnFilletBindings,
+  GUIFillet,
 } from "./column-fillet-geometry";
 import {
   columnPlinth,
   ColumnPlinth,
-  columnPlinthBindings,
+  GUIPlinth,
 } from "./column-plinth-geometry";
-import {
-  columnTorus,
-  ColumnTorus,
-  columnTorusBindings,
-} from "./column-torus-geometry";
+import { columnTorus, ColumnTorus, GUITorus } from "./column-torus-geometry";
 
 export type ColumnBaseTuscanSettings = {
   plinth: ColumnPlinth;
@@ -55,24 +51,16 @@ export class GUIBaseTuscan extends GUIController {
     public target: ColumnBaseTuscanSettings,
   ) {
     super(gui);
-    this.gui = gui;
+    this.gui = this.addFolder(gui, { title: "Tuscan Base" });
 
-    this.folders.columnPlinth = columnPlinthBindings(gui, target.plinth).on(
-      "change",
-      this.onChange,
-    );
-    this.folders.columnFillet = columnFilletBindings(gui, target.fillet).on(
-      "change",
-      this.onChange,
-    );
-    this.folders.columnTorus = columnTorusBindings(gui, target.torus).on(
-      "change",
-      this.onChange,
-    );
-    this.folders.columnFillet2 = columnFilletBindings(gui, target.fillet2).on(
-      "change",
-      this.onChange,
-    );
+    this.controllers.fillet = new GUIFillet(this.gui, target.fillet);
+    this.controllers.fillet.addEventListener("change", this.onChange);
+
+    this.controllers.plinth = new GUIPlinth(this.gui, target.plinth);
+    this.controllers.plinth.addEventListener("change", this.onChange);
+
+    this.controllers.torus = new GUITorus(this.gui, target.torus);
+    this.controllers.torus.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

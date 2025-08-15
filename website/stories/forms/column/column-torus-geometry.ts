@@ -1,5 +1,6 @@
 import { CylinderGeometry, Material, Matrix4, Mesh, Vector3 } from "three";
 
+import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 
 /**
@@ -117,32 +118,56 @@ export function columnTorus(settings: ColumnTorus, material: Material) {
   return new Mesh(geometry, material);
 }
 
-export function columnTorusBindings(gui: GUIType, settings: ColumnTorus) {
-  const folder = gui.addFolder({ title: "Column Torus" });
+/// #if DEBUG
+export class GUITorus extends GUIController {
+  constructor(
+    gui: GUIType,
+    public target: ColumnTorus,
+  ) {
+    super(gui);
+    this.gui = this.addFolder(gui, { title: "Torus" });
 
-  // Basic dimensions
-  folder.addBinding(settings, "height", { min: 0, max: 10 });
-  folder.addBinding(settings, "radius", { min: 0, max: 20 });
-  folder.addBinding(settings, "buldge", { min: 0, max: 5 });
+    // Basic dimensions
+    this.gui
+      .addBinding(target, "height", { min: 0, max: 10 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "radius", { min: 0, max: 20 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "buldge", { min: 0, max: 5 })
+      .on("change", this.onChange);
 
-  // Geometry quality
-  folder.addBinding(settings, "heightSegments", {
-    min: 4,
-    max: 64,
-    step: 1,
-  });
-  folder.addBinding(settings, "radialSegments", {
-    min: 6,
-    max: 64,
-    step: 1,
-  });
-  folder.addBinding(settings, "profileSharpness", {
-    min: 0,
-  });
+    // Geometry quality
+    this.gui
+      .addBinding(target, "heightSegments", {
+        min: 4,
+        max: 64,
+        step: 1,
+      })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "radialSegments", {
+        min: 6,
+        max: 64,
+        step: 1,
+      })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "profileSharpness", {
+        min: 0,
+      })
+      .on("change", this.onChange);
 
-  folder.addBinding(settings, "verticalCompression", {
-    min: 0,
-  });
+    this.gui
+      .addBinding(target, "verticalCompression", {
+        min: 0,
+      })
+      .on("change", this.onChange);
+  }
 
-  return folder;
+  onChange = () => {
+    this.dispatchEvent({ type: "change" } as never);
+  };
 }
+/// #endif

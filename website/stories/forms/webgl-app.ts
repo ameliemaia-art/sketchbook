@@ -115,10 +115,10 @@ export default class WebGLApp extends EventDispatcher {
     this.aoPass.configuration.gammaCorrection = false;
     this.aoPass.enabled = false;
     this.aoPass.setQualityMode("Ultra");
-    this.aoPass.configuration.accumulate = true;
-    this.aoPass.configuration.aoRadius = 5;
-    this.aoPass.configuration.distanceFalloff = 5;
-    this.aoPass.configuration.intensity = 2.5;
+    // this.aoPass.configuration.accumulate = true;
+    // this.aoPass.configuration.aoRadius = 5;
+    // this.aoPass.configuration.distanceFalloff = 5;
+    this.aoPass.configuration.intensity = 1;
     // this.aoPass.setDisplayMode("AO"); // Or any other display mode
     this.copyPassToRenderTarget = new ShaderPass(CopyShader);
 
