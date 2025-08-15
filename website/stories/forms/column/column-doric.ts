@@ -37,20 +37,13 @@ export default class ColumnDoricForm extends ColumnForm {
         radius: 11.5,
         radialSegments: 64,
       },
-      // torus: {
-      //   height: 2.5,
-      //   radius: 10.5,
-      //   buldge: 1,
-      //   heightSegments: 32,
-      //   radialSegments: 64,
-      //   profileSharpness: 1.5,
-      //   verticalCompression: 0.5,
-      // },
-      // fillet2: {
-      //   height: 1.25,
-      //   radius: 10,
-      //   radialSegments: 64,
-      // },
+      scotia: {
+        height: 5,
+        width: 25,
+        widthSegments: 1,
+        heightSegments: 1,
+        depthSegments: 1,
+      },
     },
   };
 

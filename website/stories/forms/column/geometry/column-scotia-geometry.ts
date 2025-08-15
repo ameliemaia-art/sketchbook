@@ -3,7 +3,7 @@ import { BoxGeometry, Material, Matrix4, Mesh } from "three";
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 
-export type ColumnPlinth = {
+export type ColumnScotia = {
   height: number;
   width: number;
   widthSegments: number;
@@ -11,7 +11,7 @@ export type ColumnPlinth = {
   depthSegments: number;
 };
 
-export function columnPlinth(settings: ColumnPlinth, material: Material) {
+export function columnScotia(settings: ColumnScotia, material: Material) {
   const geometry = new BoxGeometry(
     settings.width,
     settings.height,
@@ -27,13 +27,13 @@ export function columnPlinth(settings: ColumnPlinth, material: Material) {
 }
 
 /// #if DEBUG
-export class GUIPlinth extends GUIController {
+export class GUIScotia extends GUIController {
   constructor(
     gui: GUIType,
-    public target: ColumnPlinth,
+    public target: ColumnScotia,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Plinth" });
+    this.gui = this.addFolder(gui, { title: "Scotia" });
 
     this.gui
       .addBinding(target, "width", { min: 0 })

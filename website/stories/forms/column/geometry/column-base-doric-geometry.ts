@@ -12,12 +12,16 @@ import {
   ColumnPlinth,
   GUIPlinth,
 } from "./column-plinth-geometry";
+import {
+  columnScotia,
+  ColumnScotia,
+  GUIScotia,
+} from "./column-scotia-geometry";
 
 export type ColumnBaseDoricSettings = {
   plinth: ColumnPlinth;
   fillet: ColumnFillet;
-  // torus: ColumnTorus;
-  // fillet2: ColumnFillet;
+  scotia: ColumnScotia;
 };
 
 export function columnBaseDoric(
@@ -28,15 +32,17 @@ export function columnBaseDoric(
   group.name = "column-tuscan";
   const plinth = columnPlinth(settings.plinth, material);
   const fillet = columnFillet(settings.fillet, material);
+  const scotia = columnScotia(settings.scotia, material);
   // const torus = columnTorus(settings.torus, material);
   // const fillet2 = columnFillet(settings.fillet2, material);
   fillet.position.y = settings.plinth.height;
-  // torus.position.y = settings.plinth.height + settings.fillet.height;
+  scotia.position.y = settings.plinth.height + settings.fillet.height;
   // fillet2.position.y =
   //   settings.plinth.height + settings.fillet.height + settings.torus.height;
 
   group.add(plinth);
   group.add(fillet);
+  group.add(scotia);
   // group.add(torus);
   // group.add(fillet2);
 
@@ -58,8 +64,8 @@ export class GUIBaseDoric extends GUIController {
     this.controllers.plinth = new GUIPlinth(this.gui, target.plinth);
     this.controllers.plinth.addEventListener("change", this.onChange);
 
-    // this.controllers.torus = new GUITorus(this.gui, target.torus);
-    // this.controllers.torus.addEventListener("change", this.onChange);
+    this.controllers.scotia = new GUIScotia(this.gui, target.scotia);
+    this.controllers.scotia.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

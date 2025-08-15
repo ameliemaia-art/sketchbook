@@ -88,7 +88,6 @@ export class GUIColumnForm extends GUIWebGLApp {
     public target: ColumnForm,
   ) {
     super(gui, target);
-    this.gui = gui.addFolder({ title: "Column" });
   }
 }
 /// #endif
