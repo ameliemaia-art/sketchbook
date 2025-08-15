@@ -18,7 +18,7 @@ type ColumnSettings = {
 export default class ColumnDoricForm extends ColumnForm {
   // Settings
   form: SketchSettings & ColumnSettings = {
-    wireframe: true,
+    wireframe: false,
     floor: {
       width: 150,
       height: 1,
@@ -38,15 +38,20 @@ export default class ColumnDoricForm extends ColumnForm {
         radialSegments: 64,
       },
       scotia: {
-        baseRadius: 12,
+        topHeight: 0.1,
+        bottomRadius: 11.5,
+        topRadius: 8.5,
+        bottomHeight: 0.1,
         height: 5,
-        bottomLength: 1,
-        bottomHeight: 0.15,
-        topLength: 0.75,
-        topHeight: 0.15,
-        divisions: 16,
+        divisions: 25,
         radialSegments: 32,
+      },
+      torus: {
+        height: 2.5,
+        radius: 8.5,
+        buldge: 1,
         heightSegments: 32,
+        radialSegments: 64,
       },
     },
   };

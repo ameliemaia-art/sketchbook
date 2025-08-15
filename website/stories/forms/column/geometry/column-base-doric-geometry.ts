@@ -17,11 +17,13 @@ import {
   ColumnScotia,
   GUIScotia,
 } from "./column-scotia-geometry";
+import { ColumnTorus, columnTorus } from "./column-torus-geometry";
 
 export type ColumnBaseDoricSettings = {
   plinth: ColumnPlinth;
   fillet: ColumnFillet;
   scotia: ColumnScotia;
+  torus: ColumnTorus;
 };
 
 export function columnBaseDoric(
@@ -33,17 +35,17 @@ export function columnBaseDoric(
   const plinth = columnPlinth(settings.plinth, material);
   const fillet = columnFillet(settings.fillet, material);
   const scotia = columnScotia(settings.scotia, material);
-  // const torus = columnTorus(settings.torus, material);
+  const torus = columnTorus(settings.torus, material);
   // const fillet2 = columnFillet(settings.fillet2, material);
   fillet.position.y = settings.plinth.height;
   scotia.position.y = settings.plinth.height + settings.fillet.height;
-  // fillet2.position.y =
-  //   settings.plinth.height + settings.fillet.height + settings.torus.height;
+  torus.position.y =
+    settings.plinth.height + settings.fillet.height + settings.scotia.height;
 
   group.add(plinth);
   group.add(fillet);
   group.add(scotia);
-  // group.add(torus);
+  group.add(torus);
   // group.add(fillet2);
 
   return group;

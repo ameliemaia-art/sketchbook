@@ -43,8 +43,6 @@ export default class ColumnTuscanForm extends ColumnForm {
         buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
-        profileSharpness: 1.5,
-        verticalCompression: 0.5,
       },
       fillet2: {
         height: 1.25,
