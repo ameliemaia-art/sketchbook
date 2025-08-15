@@ -2,7 +2,7 @@ import { BoxGeometry, Material, Matrix4, Mesh } from "three";
 
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
-import { ColumnFillet } from "./column-fillet-geometry";
+import { ColumnFillet } from "./geometry/column-fillet-geometry";
 
 export type ColumnPlinth = {
   height: number;

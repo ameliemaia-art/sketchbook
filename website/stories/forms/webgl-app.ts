@@ -39,6 +39,10 @@ import { resetCamera } from "@utils/three/camera";
 import { getRenderBufferSize } from "@utils/three/rendering";
 import Screenshot, { GUIScreenshot } from "@utils/three/screenshot";
 
+export type SketchSettings = {
+  wireframe: boolean;
+};
+
 export default class WebGLApp extends EventDispatcher {
   renderer: WebGLRenderer;
   postProcessing: EffectComposer;

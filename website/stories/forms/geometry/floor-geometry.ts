@@ -1,5 +1,6 @@
 import { BoxGeometry, CylinderGeometry, Material, Matrix4, Mesh } from "three";
 
+import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 
 export type FloorSettings = {
@@ -22,10 +23,25 @@ export function floor(settings: FloorSettings, material: Material) {
   return mesh;
 }
 
-export function floorBindings(gui: GUIType, settings: FloorSettings) {
-  const folder = gui.addFolder({ title: "Floor" });
-  folder.addBinding(settings, "height", { min: 0 });
-  folder.addBinding(settings, "width", { min: 0 });
-  folder.addBinding(settings, "depth", { min: 0 });
-  return folder;
+/// #if DEBUG
+export class GUIFloor extends GUIController {
+  constructor(
+    gui: GUIType,
+    public target: FloorSettings,
+  ) {
+    super(gui);
+    this.gui = this.addFolder(gui, { title: "Floor" });
+    this.gui.addBinding(target, "height", { min: 0 });
+    this.gui
+      .addBinding(target, "width", { min: 0 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "depth", { min: 0 })
+      .on("change", this.onChange);
+  }
+
+  onChange = () => {
+    this.dispatchEvent({ type: "change" } as never);
+  };
 }
+/// #endif
