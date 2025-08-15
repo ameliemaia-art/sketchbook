@@ -11,6 +11,8 @@ import {
   Vector3,
 } from "three";
 
+import { GUIType } from "@utils/gui/gui-types";
+
 type ColumnPlinth = {
   height: number;
   width: number;
@@ -18,14 +20,22 @@ type ColumnPlinth = {
 
 type ColumnTorus = {
   height: number;
-  radius: number; // How far the torus bulges from the column
-  columnRadius: number; // Base radius of the column
-  startX?: number; // Starting position offset (optional)
+  buldge: number;
+  radius: number;
+  heightSegments: number;
+  radialSegments: number;
+};
+
+type ColumnFillet = {
+  height: number;
+  radius: number;
+  radialSegments: number;
 };
 
 export type ColumnBaseSettings = {
   plinth: ColumnPlinth;
   torus: ColumnTorus;
+  fillet: ColumnFillet;
 };
 
 export function columnPlinth(settings: ColumnPlinth, material: Material) {
@@ -43,21 +53,16 @@ export function columnPlinth(settings: ColumnPlinth, material: Material) {
 export function columnTorus(settings: ColumnTorus, material: Material) {
   // Calculate dimensions
   const actualHeight = settings.height;
-  const bulgeRadius = settings.radius;
-  const baseRadius = settings.columnRadius;
-  const startOffset = settings.startX || 0;
-
-  // Create high-subdivision cylinder
-  const heightSegments = 32; // High subdivision for smooth curve
-  const radialSegments = 32; // Standard radial segments
+  const bulgeRadius = settings.buldge;
+  const baseRadius = settings.radius;
 
   const geometry = new CylinderGeometry(
-    baseRadius + startOffset, // Top radius (column edge)
-    baseRadius + startOffset, // Bottom radius (column edge)
+    baseRadius,
+    baseRadius,
     actualHeight,
-    radialSegments,
-    heightSegments,
-    false, // Not open ended
+    settings.radialSegments,
+    settings.heightSegments,
+    false,
   );
 
   // Get position attribute for vertex manipulation
@@ -107,10 +112,41 @@ export function columnTorus(settings: ColumnTorus, material: Material) {
   return new Mesh(geometry, material);
 }
 
+export function columnFillet(settings: ColumnFillet, material: Material) {
+  const geometry = new CylinderGeometry(
+    settings.radius,
+    settings.radius,
+    settings.height,
+    settings.radialSegments,
+    1,
+    false,
+  );
+  geometry.applyMatrix4(
+    new Matrix4().makeTranslation(0, settings.height / 2, 0),
+  );
+  return new Mesh(geometry, material);
+}
+
 export function columnBase(settings: ColumnBaseSettings, material: Material) {
   const group = new Group();
   group.name = "column-base";
-  group.add(columnTorus(settings.torus, material));
-  // group.add(columnPlinth(settings.plinth, material));
+  const plinth = columnPlinth(settings.plinth, material);
+  // const torus = columnTorus(settings.torus, material);
+  const fillet = columnFillet(settings.fillet, material);
+  // torus.position.y = settings.plinth.height;
+  fillet.position.y = settings.plinth.height;
+
+  // group.add(torus);
+  group.add(plinth);
+  group.add(fillet);
   return group;
+}
+
+export function columnTorusBindings(gui: GUIType, settings: ColumnTorus) {
+  const folder = gui.addFolder({ title: "Column Torus" });
+  folder.addBinding(settings, "height", { min: 0 });
+  folder.addBinding(settings, "radius", { min: 0 });
+  folder.addBinding(settings, "buldge", { min: 0 });
+
+  return folder;
 }

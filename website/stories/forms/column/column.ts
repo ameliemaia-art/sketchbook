@@ -18,7 +18,11 @@ import { GUIType } from "@utils/gui/gui-types";
 import { resetCamera } from "@utils/three/camera";
 import { dispose } from "@utils/three/dispose";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
-import { columnBase, ColumnBaseSettings } from "./column-base-geometry";
+import {
+  columnBase,
+  ColumnBaseSettings,
+  columnTorusBindings,
+} from "./column-base-geometry";
 
 type ColumnSettings = {
   base: ColumnBaseSettings;
@@ -47,9 +51,15 @@ export default class ColumnForm extends WebGLApp {
       },
       torus: {
         height: 5,
-        radius: 2,
-        columnRadius: 10,
-        startX: 0,
+        radius: 10,
+        buldge: 1.25,
+        heightSegments: 32,
+        radialSegments: 32,
+      },
+      fillet: {
+        height: 1,
+        radius: 11.5,
+        radialSegments: 32,
       },
     },
   };
@@ -124,7 +134,7 @@ export default class ColumnForm extends WebGLApp {
 
   generate = () => {
     if (this.columnBase) {
-      dispose(this.columnBase);
+      this.scene.remove(this.columnBase);
     }
     this.columnBase = columnBase(this.blueprint.base, this.wireframeMaterial);
     this.scene.add(this.columnBase);
@@ -143,6 +153,11 @@ export class GUIColumnForm extends GUIWebGLApp {
     this.gui = gui;
 
     target.addEventListener("create", this.onCreate);
+
+    this.folders.columnTorus = columnTorusBindings(
+      gui,
+      target.blueprint.base.torus,
+    ).on("change", target.generate);
   }
 
   onCreate = () => {};
