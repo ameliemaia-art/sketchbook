@@ -1,4 +1,4 @@
-import { Group, Mesh } from "three";
+import { Box3, Group, Mesh, Vector3 } from "three";
 
 import { GUIType } from "@utils/gui/gui-types";
 import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
@@ -9,10 +9,16 @@ import {
   CorinthianColumnBaseSettings,
   GUICorinthianBase,
 } from "./corinthian-column-base-geometry";
+import {
+  corinthianColumnShaft,
+  CorinthianColumnShaftSettings,
+  GUICorinthianShaft,
+} from "./corinthian-column-shaft-geometry";
 
 type ColumnSettings = {
   floor: FloorSettings;
   base: CorinthianColumnBaseSettings;
+  shaft: CorinthianColumnShaftSettings;
 };
 
 export default class ColumnCorinthianForm extends ColumnForm {
@@ -56,11 +62,24 @@ export default class ColumnCorinthianForm extends ColumnForm {
         radialSegments: 64,
       },
     },
+    shaft: {
+      flutes: 12,
+      radius: 8.5,
+      height: 50,
+      radialSegments: 32,
+      fluteRadius: 1.5,
+      fluteHeight: 45,
+    },
   };
 
   // Forms
   columnBase!: Group;
+  columnShaft!: Group;
   floor!: Mesh;
+
+  constructor() {
+    super();
+  }
 
   generate = () => {
     if (this.floor) {
@@ -68,6 +87,9 @@ export default class ColumnCorinthianForm extends ColumnForm {
     }
     if (this.columnBase) {
       this.scene.remove(this.columnBase);
+    }
+    if (this.columnShaft) {
+      this.scene.remove(this.columnShaft);
     }
 
     this.floor = floor(
@@ -80,7 +102,26 @@ export default class ColumnCorinthianForm extends ColumnForm {
       this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
     );
 
+    this.columnShaft = corinthianColumnShaft(
+      this.form.shaft,
+      this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+      this.scene,
+    );
+
+    const box = new Box3();
+    box.setFromObject(this.columnBase); // Replace yourObject3D with your actual object
+    const size = new Vector3();
+    box.getSize(size);
+
+    this.columnShaft.position.y = size.y;
+
     this.columnBase.traverse((child) => {
+      if (child instanceof Mesh) {
+        child.receiveShadow = true;
+        child.castShadow = true;
+      }
+    });
+    this.columnShaft.traverse((child) => {
       if (child instanceof Mesh) {
         child.receiveShadow = true;
         child.castShadow = true;
@@ -89,6 +130,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
 
     this.scene.add(this.floor);
     this.scene.add(this.columnBase);
+    this.scene.add(this.columnShaft);
   };
 
   dispose() {}
@@ -112,6 +154,12 @@ export class GUICorinthianForm extends GUIColumnForm {
 
     this.controllers.base = new GUICorinthianBase(this.gui, target.form.base);
     this.controllers.base.addEventListener("change", target.generate);
+
+    this.controllers.shaft = new GUICorinthianShaft(
+      this.gui,
+      target.form.shaft,
+    );
+    this.controllers.shaft.addEventListener("change", target.generate);
   }
 
   onCreate = () => {};
