@@ -17,13 +17,20 @@ import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 import { TWO_PI } from "@utils/three/math";
 
+export type Flutes = {
+  total: number;
+  radius: number;
+  height: number;
+  scale: number;
+  capSegments: number;
+  radialSegments: number;
+};
+
 export type ColumnShaft = {
   height: number;
   radius: number;
-  flutes: number;
-  fluteRadius: number;
-  fluteHeight: number;
   radialSegments: number;
+  flutes: Flutes;
 };
 
 const evaluator = new Evaluator();
@@ -31,19 +38,41 @@ const evaluator = new Evaluator();
 function performCSG(settings: ColumnShaft, geometry: BufferGeometry) {
   // Create capsules around the shaft
   const cylinders: Brush[] = [];
-  for (let i = 0; i < settings.flutes; i++) {
-    const theta = i * (TWO_PI / settings.flutes);
+
+  // Calculate the actual hole distance from the center
+  // const radius =
+  //   settings.radius - (settings.flutes.radius * settings.flutes.radius) / 2;
+
+  for (let i = 0; i < settings.flutes.total; i++) {
+    const theta = i * (TWO_PI / settings.flutes.total);
     const x = Math.cos(theta) * settings.radius;
     const z = Math.sin(theta) * settings.radius;
     const capsule = new Mesh(
       new CapsuleGeometry(
-        settings.fluteRadius,
-        settings.fluteHeight - settings.fluteRadius * 2,
-        16,
-        32,
+        settings.flutes.radius,
+        settings.flutes.height - settings.flutes.radius * 2,
+        settings.flutes.capSegments,
+        settings.flutes.radialSegments,
       ),
     );
     capsule.position.set(x, 0, z);
+
+    // Create the normal vector (direction from center to the capsule)
+    const normal = new Vector3(x, 0, z).normalize();
+
+    // Create a quaternion to rotate the capsule to face the normal
+    const quaternion = new Quaternion();
+    quaternion.setFromUnitVectors(new Vector3(0, 0, 1), normal);
+
+    // Create the transform matrix
+    const matrix = new Matrix4();
+    matrix.compose(
+      new Vector3(0, 0, 0), // position (will be set later)
+      quaternion, // rotation
+      new Vector3(1, 1, settings.flutes.scale), // scale
+    );
+
+    capsule.applyMatrix4(matrix);
     capsule.updateMatrixWorld();
 
     const cylinder = new Brush(capsule.geometry);
@@ -86,7 +115,7 @@ export function columnShaft(
 }
 
 /// #if DEBUG
-export class GUIShaft extends GUIController {
+export class GUIColumnShaft extends GUIController {
   constructor(
     gui: GUIType,
     public target: ColumnShaft,
@@ -100,11 +129,17 @@ export class GUIShaft extends GUIController {
       .addBinding(target, "radius", { min: 0.1 })
       .on("change", this.onChange);
     this.gui
-      .addBinding(target, "flutes", { min: 4 })
-      .on("change", this.onChange);
-    this.gui
       .addBinding(target, "radialSegments", { min: 3 })
       .on("change", this.onChange);
+
+    this.folders.flutes = this.addFolder(this.gui, { title: "Flutes" });
+    this.folders.flutes.addBinding(target.flutes, "total", { min: 4 });
+    this.folders.flutes.addBinding(target.flutes, "radialSegments", { min: 3 });
+    this.folders.flutes.addBinding(target.flutes, "capSegments", { min: 3 });
+    this.folders.flutes.addBinding(target.flutes, "scale", { min: 0 });
+    this.folders.flutes
+      .addButton({ title: "Rebuild" })
+      .on("click", this.onChange);
   }
 
   onChange = () => {

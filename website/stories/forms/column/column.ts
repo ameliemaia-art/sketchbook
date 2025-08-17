@@ -6,8 +6,13 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   PCFSoftShadowMap,
+  PMREMGenerator,
   Vector3,
 } from "three";
+import {
+  DebugEnvironment,
+  RoomEnvironment,
+} from "three/examples/jsm/Addons.js";
 
 import { GUIType } from "@utils/gui/gui-types";
 import { resetCamera } from "@utils/three/camera";
@@ -46,16 +51,16 @@ export default class ColumnForm extends WebGLApp {
     this.renderer.shadowMap.needsUpdate = true;
     this.renderer.shadowMap.autoUpdate = true;
 
-    // Soft ambient light for overall illumination.
-    const ambientLight = new AmbientLight(0xffffff, 0.6);
-    this.scene.add(ambientLight);
+    const pmremGenerator = new PMREMGenerator(this.renderer);
 
-    // Hemisphere light for natural outdoor lighting (sky and ground).
-    const hemisphereLight = new HemisphereLight(0xbfd1e5, 0xf5f5f5, 0.6);
-    this.scene.add(hemisphereLight);
+    const env = pmremGenerator.fromScene(new DebugEnvironment()).texture;
+
+    this.scene.background = env;
+    this.scene.backgroundBlurriness = 1;
+    this.scene.environment = env;
 
     // Directional light to cast soft shadows.
-    const directionalLight = new DirectionalLight(0xffffff, 1.5);
+    const directionalLight = new DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(50, 100, 50);
     directionalLight.castShadow = true;
 
@@ -64,7 +69,6 @@ export default class ColumnForm extends WebGLApp {
     directionalLight.shadow.mapSize.height = 2048;
     directionalLight.shadow.camera.near = 0.1;
     directionalLight.shadow.camera.far = 250;
-    // Optionally adjust the shadow camera frustum for better shadow coverage.
     directionalLight.shadow.camera.left = -150;
     directionalLight.shadow.camera.right = 150;
     directionalLight.shadow.camera.top = 150;
@@ -82,10 +86,10 @@ export default class ColumnForm extends WebGLApp {
 /// #if DEBUG
 export class GUIColumnForm extends GUIWebGLApp {
   constructor(
-    gui: GUIType,
+    title: string,
     public target: ColumnForm,
   ) {
-    super(gui, target);
+    super(title, target);
   }
 }
 /// #endif

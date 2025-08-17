@@ -4,15 +4,14 @@ import { GUIType } from "@utils/gui/gui-types";
 import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
 import { SketchSettings } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
+import { GUIColumnShaft } from "../geometry/column-shaft-geometry";
 import {
   corinthianColumnBase,
   CorinthianColumnBaseSettings,
-  GUICorinthianBase,
 } from "./corinthian-column-base-geometry";
 import {
   corinthianColumnShaft,
   CorinthianColumnShaftSettings,
-  GUICorinthianShaft,
 } from "./corinthian-column-shaft-geometry";
 
 type ColumnSettings = {
@@ -24,7 +23,7 @@ type ColumnSettings = {
 export default class ColumnCorinthianForm extends ColumnForm {
   // Settings
   form: SketchSettings & ColumnSettings = {
-    wireframe: false,
+    wireframe: true,
     floor: {
       width: 150,
       height: 1,
@@ -63,12 +62,17 @@ export default class ColumnCorinthianForm extends ColumnForm {
       },
     },
     shaft: {
-      flutes: 12,
       radius: 8.5,
       height: 50,
       radialSegments: 32,
-      fluteRadius: 1.5,
-      fluteHeight: 45,
+      flutes: {
+        total: 16,
+        radius: 1.5,
+        height: 45,
+        radialSegments: 32,
+        capSegments: 16,
+        scale: 0.5,
+      },
     },
   };
 
@@ -149,16 +153,13 @@ export class GUICorinthianForm extends GUIColumnForm {
 
     this.gui.addBinding(target.form, "wireframe").on("change", target.generate);
 
-    this.controllers.floor = new GUIFloor(this.gui, target.form.floor);
-    this.controllers.floor.addEventListener("change", target.generate);
+    // this.controllers.floor = new GUIFloor(this.gui, target.form.floor);
+    // this.controllers.floor.addEventListener("change", target.generate);
 
-    this.controllers.base = new GUICorinthianBase(this.gui, target.form.base);
-    this.controllers.base.addEventListener("change", target.generate);
+    // this.controllers.base = new GUICorinthianBase(this.gui, target.form.base);
+    // this.controllers.base.addEventListener("change", target.generate);
 
-    this.controllers.shaft = new GUICorinthianShaft(
-      this.gui,
-      target.form.shaft,
-    );
+    this.controllers.shaft = new GUIColumnShaft(this.gui, target.form.shaft);
     this.controllers.shaft.addEventListener("change", target.generate);
   }
 
