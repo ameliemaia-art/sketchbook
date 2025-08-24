@@ -20,7 +20,7 @@ export type ColumnScotia = {
   radialSegments: number;
 };
 
-export function generateScotiaProfilePoints(settings: ColumnScotia): Vector2[] {
+export function generateProfilePoints(settings: ColumnScotia): Vector2[] {
   const points: Vector2[] = [];
   // Bottom left
   points.push(new Vector2(0, 0));
@@ -62,7 +62,7 @@ export function generateScotiaProfilePoints(settings: ColumnScotia): Vector2[] {
 }
 
 export function columnScotia(settings: ColumnScotia, material: Material) {
-  const profile = generateScotiaProfilePoints(settings);
+  const profile = generateProfilePoints(settings);
 
   const geometry = new LatheGeometry(profile, settings.radialSegments);
   geometry.computeVertexNormals();

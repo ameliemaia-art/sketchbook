@@ -69,7 +69,7 @@ export default class WebGLApp extends EventDispatcher {
     debugCamera: true,
     orthCamera: false,
     stats: true,
-    helpers: false,
+    helpers: true,
     frustumSize: 750,
   };
 

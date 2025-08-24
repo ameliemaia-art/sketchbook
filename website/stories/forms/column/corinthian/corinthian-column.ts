@@ -1,29 +1,41 @@
-import { Box3, Group, Mesh, Vector3 } from "three";
+import { Box3, Group, Mesh, Object3D, Vector3 } from "three";
 
 import { GUIType } from "@utils/gui/gui-types";
+import { stack } from "@utils/three/object3d";
 import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
 import { SketchSettings } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
-import { GUIColumnShaft } from "../geometry/column-shaft-geometry";
 import {
   corinthianColumnBase,
   CorinthianColumnBaseSettings,
+  GUICorinthianBase,
 } from "./corinthian-column-base-geometry";
+import {
+  corinthianColumnCapital,
+  CorinthianColumnCaptitalSettings,
+  GUICorinthianCapital,
+} from "./corinthian-column-capital-geometry";
 import {
   corinthianColumnShaft,
   CorinthianColumnShaftSettings,
+  GUICorinthianShaft,
 } from "./corinthian-column-shaft-geometry";
 
 type ColumnSettings = {
   floor: FloorSettings;
   base: CorinthianColumnBaseSettings;
   shaft: CorinthianColumnShaftSettings;
+  captital: CorinthianColumnCaptitalSettings;
 };
+
+const CREATE_BASE = true;
+const CREATE_SHAFT = true;
+const CREATE_CAPITAL = true;
 
 export default class ColumnCorinthianForm extends ColumnForm {
   // Settings
   form: SketchSettings & ColumnSettings = {
-    wireframe: true,
+    wireframe: false,
     floor: {
       width: 150,
       height: 1,
@@ -74,15 +86,67 @@ export default class ColumnCorinthianForm extends ColumnForm {
         scale: 0.5,
       },
     },
+    captital: {
+      necking: {
+        topHeight: 0.1,
+        bottomRadius: 8.5,
+        topRadius: 11.5,
+        bottomHeight: 0,
+        height: 5,
+        divisions: 25,
+        radialSegments: 32,
+      },
+      torus: {
+        height: 2.5,
+        radius: 11.5,
+        buldge: 1,
+        heightSegments: 32,
+        radialSegments: 64,
+      },
+      echinus: {
+        topHeight: 0.1,
+        bottomRadius: 8.5,
+        topRadius: 15,
+        bottomHeight: 0.1,
+        height: 15,
+        divisions: 25,
+        radialSegments: 32,
+      },
+    },
   };
 
+  // Previous settings for change tracking
+  private previousSettings: Partial<ColumnSettings> = {};
+
   // Forms
+  column = new Group();
   columnBase!: Group;
   columnShaft!: Group;
+  columnCapital!: Group;
   floor!: Mesh;
 
   constructor() {
     super();
+    this.column.name = "Corinthium Column";
+    this.scene.add(this.column);
+  }
+
+  /**
+   * Deep compare two objects to detect changes
+   */
+  private hasChanged<T>(current: T, previous: T | undefined): boolean {
+    if (!previous) return true;
+    return JSON.stringify(current) !== JSON.stringify(previous);
+  }
+
+  /**
+   * Update stored settings for a component
+   */
+  private updateStoredSettings<K extends keyof ColumnSettings>(
+    key: K,
+    settings: ColumnSettings[K],
+  ) {
+    this.previousSettings[key] = JSON.parse(JSON.stringify(settings));
   }
 
   generate = () => {
@@ -90,10 +154,13 @@ export default class ColumnCorinthianForm extends ColumnForm {
       this.scene.remove(this.floor);
     }
     if (this.columnBase) {
-      this.scene.remove(this.columnBase);
+      this.column.remove(this.columnBase);
     }
     if (this.columnShaft) {
-      this.scene.remove(this.columnShaft);
+      this.column.remove(this.columnShaft);
+    }
+    if (this.columnCapital) {
+      this.column.remove(this.columnCapital);
     }
 
     this.floor = floor(
@@ -101,41 +168,47 @@ export default class ColumnCorinthianForm extends ColumnForm {
       this.form.wireframe ? this.wireframeMaterial : this.floorMaterial,
     );
 
-    this.columnBase = corinthianColumnBase(
-      this.form.base,
-      this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
-    );
+    if (CREATE_BASE) {
+      this.columnBase = corinthianColumnBase(
+        this.form.base,
+        this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+      );
+      this.enableShadows(this.columnBase);
+      this.column.add(this.columnBase);
+    }
 
-    this.columnShaft = corinthianColumnShaft(
-      this.form.shaft,
-      this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
-      this.scene,
-    );
+    if (CREATE_SHAFT) {
+      this.columnShaft = corinthianColumnShaft(
+        this.form.shaft,
+        this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+        this.scene,
+      );
+      this.enableShadows(this.columnShaft);
+      stack(this.column, this.columnShaft);
+      this.column.add(this.columnShaft);
+    }
 
-    const box = new Box3();
-    box.setFromObject(this.columnBase); // Replace yourObject3D with your actual object
-    const size = new Vector3();
-    box.getSize(size);
+    if (CREATE_CAPITAL) {
+      this.columnCapital = corinthianColumnCapital(
+        this.form.captital,
+        this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+      );
+      this.enableShadows(this.columnCapital);
+      stack(this.column, this.columnCapital);
+      this.column.add(this.columnCapital);
+    }
 
-    this.columnShaft.position.y = size.y;
-
-    this.columnBase.traverse((child) => {
-      if (child instanceof Mesh) {
-        child.receiveShadow = true;
-        child.castShadow = true;
-      }
-    });
-    this.columnShaft.traverse((child) => {
-      if (child instanceof Mesh) {
-        child.receiveShadow = true;
-        child.castShadow = true;
-      }
-    });
-
-    this.scene.add(this.floor);
-    this.scene.add(this.columnBase);
-    this.scene.add(this.columnShaft);
+    // this.scene.add(this.floor);
   };
+
+  enableShadows(object: Object3D) {
+    object.traverse((child) => {
+      if (child instanceof Mesh) {
+        child.receiveShadow = true;
+        child.castShadow = true;
+      }
+    });
+  }
 
   dispose() {}
 }
@@ -156,11 +229,26 @@ export class GUICorinthianForm extends GUIColumnForm {
     // this.controllers.floor = new GUIFloor(this.gui, target.form.floor);
     // this.controllers.floor.addEventListener("change", target.generate);
 
-    // this.controllers.base = new GUICorinthianBase(this.gui, target.form.base);
-    // this.controllers.base.addEventListener("change", target.generate);
+    if (CREATE_BASE) {
+      this.controllers.base = new GUICorinthianBase(this.gui, target.form.base);
+      this.controllers.base.addEventListener("change", target.generate);
+    }
 
-    this.controllers.shaft = new GUIColumnShaft(this.gui, target.form.shaft);
-    this.controllers.shaft.addEventListener("change", target.generate);
+    if (CREATE_SHAFT) {
+      this.controllers.shaft = new GUICorinthianShaft(
+        this.gui,
+        target.form.shaft,
+      );
+      this.controllers.shaft.addEventListener("change", target.generate);
+    }
+
+    if (CREATE_CAPITAL) {
+      this.controllers.shaft = new GUICorinthianCapital(
+        this.gui,
+        target.form.captital,
+      );
+      this.controllers.shaft.addEventListener("change", target.generate);
+    }
   }
 
   onCreate = () => {};

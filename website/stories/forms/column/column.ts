@@ -39,7 +39,6 @@ export default class ColumnForm extends WebGLApp {
     // this.cameras.main.position.z = 750;
     // this.cameras.main.lookAt(0, 0, 0);
 
-    this.settings.helpers = false;
     this.bloomPass.enabled = false;
     this.createLights();
     this.generate();
@@ -52,11 +51,7 @@ export default class ColumnForm extends WebGLApp {
     this.renderer.shadowMap.autoUpdate = true;
 
     const pmremGenerator = new PMREMGenerator(this.renderer);
-
     const env = pmremGenerator.fromScene(new DebugEnvironment()).texture;
-
-    this.scene.background = env;
-    this.scene.backgroundBlurriness = 1;
     this.scene.environment = env;
 
     // Directional light to cast soft shadows.
@@ -86,10 +81,10 @@ export default class ColumnForm extends WebGLApp {
 /// #if DEBUG
 export class GUIColumnForm extends GUIWebGLApp {
   constructor(
-    title: string,
+    gui: GUIType,
     public target: ColumnForm,
   ) {
-    super(title, target);
+    super(gui, target);
   }
 }
 /// #endif

@@ -89,20 +89,14 @@ body {
   position: relative;
 }
 
-/* Scrollbar */
-.gui-webgl-scrollbar {
-  scrollbar-color: var(--scrollbar-color-thumb) var(--scrollbar-color-track);
-  scrollbar-width: var(--scrollbar-width);
-}
-
 @supports selector(::-webkit-scrollbar) {
-  .gui-webgl-scrollbar::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     background: var(--scrollbar-color-thumb);
   }
-  .gui-webgl-scrollbar::-webkit-scrollbar-track {
+  ::-webkit-scrollbar-track {
     background: var(--scrollbar-color-track);
   }
-  .gui-webgl-scrollbar::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     width: 5px;
     max-width: var(--scrollbar-width-legacy);
     max-height: var(--scrollbar-width-legacy);
