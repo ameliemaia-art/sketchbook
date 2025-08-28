@@ -1,7 +1,7 @@
 import { AxesHelper, Box3, Box3Helper, Group, Material } from "three";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import { boundingBox, stack } from "@utils/three/object3d";
 import {
   ColumnAbacus,

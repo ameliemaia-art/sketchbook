@@ -3,7 +3,7 @@ import { MathUtils } from "three";
 import { FolderApi } from "tweakpane";
 
 import { MotionEase2D } from "@utils/common/motion-ease";
-import GUIController from "@utils/gui/gui";
+import GUIController from "@utils/editor/gui/gui";
 
 export default class EnergyVisualizer {
   settings = {

@@ -22,10 +22,7 @@ export const CorinthianColumn = () => {
         console.log("error setting up", error);
       });
 
-    const gui = new Pane({
-      title: "Metaphysical Form - Corinthian Column",
-    });
-    new GUICorinthianForm(gui, app);
+    new GUICorinthianForm("Metaphysical Form - Corinthian Column", app);
 
     const resize = () => {
       app.resize(window.innerWidth, window.innerHeight);

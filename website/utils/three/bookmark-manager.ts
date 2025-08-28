@@ -2,9 +2,9 @@ import * as ls from "local-storage";
 import { Euler, PerspectiveCamera, Vector3Tuple } from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
-import { generateBindingOptions } from "@utils/gui/gui-utils";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
+import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 
 export type Bookmark = {
   position: number[];

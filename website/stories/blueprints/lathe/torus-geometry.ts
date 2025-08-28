@@ -1,8 +1,8 @@
 import paper from "paper";
 import { MathUtils } from "three";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 
 export type Torus = {
   divisions: number;

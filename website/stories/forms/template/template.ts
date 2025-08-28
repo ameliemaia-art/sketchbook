@@ -1,5 +1,5 @@
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 
 export default class TemplateSketch extends WebGLApp {}

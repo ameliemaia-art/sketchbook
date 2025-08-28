@@ -1,9 +1,9 @@
 import { Box3, Group, Mesh, Object3D, Vector3 } from "three";
 
-import { GUIType } from "@utils/gui/gui-types";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import { stack } from "@utils/three/object3d";
 import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
-import { SketchSettings } from "../../webgl-app";
+import { GUIWebGLApp } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
 import {
   corinthianColumnBase,
@@ -235,13 +235,14 @@ export default class ColumnCorinthianForm extends ColumnForm {
 }
 
 /// #if DEBUG
-export class GUICorinthianForm extends GUIColumnForm {
+export class GUICorinthianForm extends GUIWebGLApp {
   constructor(
-    gui: GUIType,
+    title: string,
     public target: ColumnCorinthianForm,
   ) {
-    super(gui, target);
-    this.gui = gui.addFolder({ title: "Corinthian Column" });
+    super(title, target);
+
+    this.folders.sketch = this.gui.addFolder({ title: "Corinthian Column" });
 
     target.addEventListener("create", this.onCreate);
 
@@ -249,13 +250,16 @@ export class GUICorinthianForm extends GUIColumnForm {
     // this.controllers.floor.addEventListener("change", target.generate);
 
     if (CREATE_BASE) {
-      this.controllers.base = new GUICorinthianBase(this.gui, target.form.base);
+      this.controllers.base = new GUICorinthianBase(
+        this.folders.sketch,
+        target.form.base,
+      );
       this.controllers.base.addEventListener("change", target.generate);
     }
 
     if (CREATE_SHAFT) {
       this.controllers.shaft = new GUICorinthianShaft(
-        this.gui,
+        this.folders.sketch,
         target.form.shaft,
       );
       this.controllers.shaft.addEventListener("change", target.generate);
@@ -263,7 +267,7 @@ export class GUICorinthianForm extends GUIColumnForm {
 
     if (CREATE_CAPITAL) {
       this.controllers.shaft = new GUICorinthianCapital(
-        this.gui,
+        this.folders.sketch,
         target.form.captital,
       );
       this.controllers.shaft.addEventListener("change", target.generate);

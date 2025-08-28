@@ -26,15 +26,10 @@ import {
   UnrealBloomPass,
   VignetteShader,
 } from "three/examples/jsm/Addons.js";
+import { Pane } from "tweakpane";
 
-import GUIController from "@utils/gui/gui";
-import {
-  bloomPassBinding,
-  fxaaPassBinding,
-  n8AOPassBinding,
-  vignettePassBinding,
-} from "@utils/gui/gui-post-processing-bindings";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import GUISceneController from "@utils/editor/gui/scene/gui-scene";
 import BookmarkManager, {
   GUIBookmarkManager,
 } from "@utils/three/bookmark-manager";
@@ -333,70 +328,88 @@ export default class WebGLApp extends EventDispatcher {
 
 /// #if DEBUG
 export class GUIWebGLApp extends GUIController {
-  constructor(gui: GUIType, target: WebGLApp) {
-    super(gui);
-    this.gui = gui;
+  constructor(title: string, target: WebGLApp) {
+    const rightPanel = new Pane({
+      title: title,
+    });
 
-    this.gui.containerElem_.classList.add(
-      "gui-webgl-left-panel",
-      "gui-webgl-scrollbar",
-    );
+    super(rightPanel);
+
+    const leftPanel = new Pane({
+      title: "Editor",
+      expanded: true,
+    });
+
+    this.gui = rightPanel;
+
+    // @ts-expect-error ignore
+    Object.assign(rightPanel.containerElem_.style, {
+      zIndex: "10000",
+      position: "fixed",
+    }).position = "fixed";
+    // @ts-expect-error ignore
+    Object.assign(leftPanel.containerElem_.style, {
+      zIndex: "10000",
+      position: "fixed",
+    }).position = "fixed";
+
+    // @ts-expect-error ignore
+    leftPanel.containerElem_.classList.add("gui-webgl-left-panel");
+
+    // @ts-expect-error ignore
+    leftPanel.containerElem_.classList.add("gui-webgl-scrollbar");
+
+    // @ts-expect-error ignore
+    rightPanel.containerElem_.classList.add("gui-webgl-right-panel");
+
+    // @ts-expect-error ignore
+    rightPanel.containerElem_.classList.add("gui-webgl-scrollbar");
+
+    this.gui = rightPanel;
 
     this.folders.settings = this.addFolder(this.gui, { title: "Settings" });
-    this.addBinding(this.folders.settings, target.settings, "debugCamera");
-    this.addBinding(this.folders.settings, target.settings, "orthCamera");
-    this.addBinding(this.folders.settings, target.settings, "helpers");
+    this.gui.addBinding(target.settings, "debugCamera");
+    this.gui.addBinding(target.settings, "orthCamera");
+    this.gui.addBinding(target.settings, "helpers");
 
-    this.folders.cameras = this.addFolder(this.gui, { title: "Cameras" });
-    this.folders.mainCamera = this.addFolder(this.folders.cameras, {
-      title: "Main",
-    });
+    // this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
 
-    this.addBinding(this.folders.mainCamera, target.cameras.main.position, "z");
-    this.addBinding(this.folders.mainCamera, target.cameras.main, "fov", {
-      min: 1,
-    });
+    // this.folders.fxaa = this.addFolder(this.folders.passes, { title: "FXAA" });
+    // fxaaPassBinding(this.folders.fxaa, target.fxaaPass);
 
-    this.folders.orthCamera = this.addFolder(this.folders.cameras, {
-      title: "Orth",
-    });
-    this.addBinding(
-      this.folders.orthCamera,
-      target.orthographicCamera.position,
-      "z",
+    // this.folders.bloom = this.addFolder(this.folders.passes, {
+    //   title: "Bloom",
+    // });
+    // bloomPassBinding(this.folders.bloom, target.bloomPass);
+
+    // this.folders.vignette = this.addFolder(this.folders.passes, {
+    //   title: "Vignette",
+    // });
+    // vignettePassBinding(this.folders.vignette, target.vignettePass);
+
+    // this.folders.ao = this.addFolder(this.folders.passes, {
+    //   title: "Ambient Occlusion",
+    // });
+    // n8AOPassBinding(this.folders.ao, target.aoPass);
+
+    this.controllers.screenshot = new GUIScreenshot(
+      this.gui,
+      target.screenshot,
     );
-    this.addBinding(this.folders.orthCamera, target.settings, "frustumSize", {
-      min: 1,
-    }).on(
-      "change",
-      target.resize.bind(target, window.innerWidth, window.innerHeight),
-    );
-
-    this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
-
-    this.folders.fxaa = this.addFolder(this.folders.passes, { title: "FXAA" });
-    fxaaPassBinding(this.folders.fxaa, target.fxaaPass);
-
-    this.folders.bloom = this.addFolder(this.folders.passes, {
-      title: "Bloom",
-    });
-    bloomPassBinding(this.folders.bloom, target.bloomPass);
-
-    this.folders.vignette = this.addFolder(this.folders.passes, {
-      title: "Vignette",
-    });
-    vignettePassBinding(this.folders.vignette, target.vignettePass);
-
-    this.folders.ao = this.addFolder(this.folders.passes, {
-      title: "Ambient Occlusion",
-    });
-    n8AOPassBinding(this.folders.ao, target.aoPass);
-
-    this.controllers.screenshot = new GUIScreenshot(gui, target.screenshot);
     this.controllers.bookmarkManager = new GUIBookmarkManager(
-      gui,
+      this.gui,
       target.bookmarkManager,
     );
+
+    GUIController.state.renderer = target.renderer;
+    GUIController.state.camera = target.cameras.dev;
+    GUIController.state.scene = target.scene;
+    GUIController.state.controls = target.controls;
+    GUIController.state.activeObject = target.scene;
+
+    console.log("setting here", GUIController.state);
+
+    this.controllers.sceneController = new GUISceneController(leftPanel);
   }
 }
 /// #endif

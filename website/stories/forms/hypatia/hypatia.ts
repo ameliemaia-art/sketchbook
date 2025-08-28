@@ -10,7 +10,7 @@ import {
   Shape,
 } from "three";
 
-import { GUIType } from "@utils/gui/gui-types";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import { TWO_PI } from "@utils/three/math";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 

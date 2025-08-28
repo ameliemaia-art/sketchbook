@@ -2,7 +2,7 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import { saveImage } from "@utils/common/file";
-import GUIController from "@utils/gui/gui";
+import GUIController from "@utils/editor/gui/gui";
 import soundAnalyzer, { GUISoundAnalyzer } from "@utils/sound/sound-analyzer";
 import Graph from "./graph/graph";
 import Visualizer from "./visualizer/brightness-visualizer";

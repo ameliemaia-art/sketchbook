@@ -10,7 +10,7 @@ import {
   Vector3,
 } from "three";
 
-import { GUIType } from "@utils/gui/gui-types";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 
 export default class PlatonicSketch extends WebGLApp {

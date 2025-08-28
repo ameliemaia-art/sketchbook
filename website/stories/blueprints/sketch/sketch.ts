@@ -3,8 +3,8 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import { composite, saveImage, saveSVG } from "@utils/common/file";
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import mathSeeded from "@utils/math-seeded";
 
 export type SketchSettings = {

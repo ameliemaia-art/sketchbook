@@ -1,9 +1,9 @@
 import paper from "paper";
 import { MathUtils } from "three";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
-import { generateBindingOptions } from "@utils/gui/gui-utils";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
+import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
 import { GUIScotia, Scotia, scotia } from "./scotia-geometry";

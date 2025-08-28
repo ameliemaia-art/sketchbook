@@ -2,7 +2,7 @@ import paper from "paper";
 import { FolderApi, Pane } from "tweakpane";
 
 import { composite, saveImage, saveSVG } from "@utils/common/file";
-import GUIController from "@utils/gui/gui";
+import GUIController from "@utils/editor/gui/gui";
 import { creation, moon, realm, stars, structure } from "./form";
 import { Settings } from "./types";
 

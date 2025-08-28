@@ -6,8 +6,8 @@ import {
   Audio as ThreeAudio,
 } from "three";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import FrequencyModel, { GUIFrequencyModel } from "./frequency-model";
 
 export type SoundData = {

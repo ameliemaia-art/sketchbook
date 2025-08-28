@@ -1,20 +1,14 @@
 import {
-  AmbientLight,
   DirectionalLight,
   DoubleSide,
-  HemisphereLight,
   MeshBasicMaterial,
   MeshStandardMaterial,
   PCFSoftShadowMap,
   PMREMGenerator,
-  Vector3,
 } from "three";
-import {
-  DebugEnvironment,
-  RoomEnvironment,
-} from "three/examples/jsm/Addons.js";
+import { DebugEnvironment } from "three/examples/jsm/Addons.js";
 
-import { GUIType } from "@utils/gui/gui-types";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import { resetCamera } from "@utils/three/camera";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 
@@ -81,10 +75,10 @@ export default class ColumnForm extends WebGLApp {
 /// #if DEBUG
 export class GUIColumnForm extends GUIWebGLApp {
   constructor(
-    gui: GUIType,
+    title: string,
     public target: ColumnForm,
   ) {
-    super(gui, target);
+    super(title, target);
   }
 }
 /// #endif

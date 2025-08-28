@@ -13,8 +13,8 @@ import {
 } from "three";
 import { Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import { TWO_PI } from "@utils/three/math";
 import { wireframeMaterial } from "../../materials/materials";
 import { getGeometryDimensions } from "./column-echinus-geometry";

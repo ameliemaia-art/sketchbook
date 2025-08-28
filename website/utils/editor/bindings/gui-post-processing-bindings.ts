@@ -44,3 +44,11 @@ export function n8AOPassBinding(gui: GUIType, object: typeof N8AOPass) {
   });
   gui.addBinding(object.configuration, "color", { color: { type: "float" } });
 }
+
+export function tintPassBinding(gui: GUIType, object: ShaderPass) {
+  gui.addBinding(object.material.uniforms.transition, "value", {
+    min: 0,
+    max: 1,
+    label: "transition",
+  });
+}

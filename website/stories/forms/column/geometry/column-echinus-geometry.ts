@@ -9,8 +9,8 @@ import {
   Vector3,
 } from "three";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import { wireframeMaterial } from "../../materials/materials";
 import { ColumnScotia, generateProfilePoints } from "./column-scotia-geometry";
 

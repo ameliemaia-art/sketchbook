@@ -1,7 +1,7 @@
 import { FolderApi, Pane } from "tweakpane";
 
 import { composite, saveImage } from "@utils/common/file";
-import GUIController from "@utils/gui/gui";
+import GUIController from "@utils/editor/gui/gui";
 import Text from "../text/text";
 
 export default class Frame {
