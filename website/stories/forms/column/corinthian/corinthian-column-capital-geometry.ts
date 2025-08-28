@@ -1,8 +1,8 @@
-import { AxesHelper, Box3, Box3Helper, Group, Material } from "three";
+import { AxesHelper, Box3, Box3Helper, Group, Material, Vector3 } from "three";
 
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
-import { boundingBox, stack } from "@utils/three/object3d";
+import { addAndStack, boundingBox } from "@utils/three/object3d";
 import {
   ColumnAbacus,
   columnAbacus,
@@ -35,32 +35,31 @@ export function corinthianColumnCapital(
   // group.add(new AxesHelper());
   group.name = "column-corinthian-captital";
   const necking = columnEchinus(settings.necking, material);
+  necking.name = "necking";
   const torus = columnTorus(settings.torus, material);
+  torus.name = "torus";
   const echinus = columnEchinus(settings.echinus, material);
-  // const abacus = columnAbacus(settings.abacus, material);
+  echinus.name = "echinus";
+  const abacus = columnAbacus(settings.abacus, material);
+  abacus.name = "abacus";
 
-  group.add(necking);
-  group.add(torus);
-  stack(group, torus);
-  group.add(echinus);
-  group.updateMatrixWorld(true);
-  stack(group, echinus);
+  addAndStack(group, necking, torus, echinus, abacus);
 
-  // if (settings.necking.helper) {
-  //   group.add(boundingBox(necking));
-  // }
+  if (settings.necking.helper) {
+    group.add(boundingBox(necking));
+  }
 
-  // if (settings.torus.helper) {
-  //   group.add(boundingBox(torus));
-  // }
+  if (settings.torus.helper) {
+    group.add(boundingBox(torus));
+  }
 
-  // if (settings.echinus.helper) {
-  //   group.add(boundingBox(echinus));
-  // }
+  if (settings.echinus.helper) {
+    group.add(boundingBox(echinus));
+  }
 
-  // if (settings.abacus.helper) {
-  //   group.add(boundingBox(abacus));
-  // }
+  if (settings.abacus.helper) {
+    group.add(boundingBox(abacus));
+  }
 
   return group;
 }

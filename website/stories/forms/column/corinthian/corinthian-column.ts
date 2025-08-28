@@ -1,7 +1,7 @@
 import { Box3, Group, Mesh, Object3D, Vector3 } from "three";
 
 import { GUIType } from "@utils/editor/gui/gui-types";
-import { stack } from "@utils/three/object3d";
+import { addAndStack, stack } from "@utils/three/object3d";
 import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
 import { GUIWebGLApp } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
@@ -195,7 +195,6 @@ export default class ColumnCorinthianForm extends ColumnForm {
         this.columnMaterial,
       );
       this.enableShadows(this.columnBase);
-      this.column.add(this.columnBase);
     }
 
     if (CREATE_SHAFT) {
@@ -205,8 +204,6 @@ export default class ColumnCorinthianForm extends ColumnForm {
         this.scene,
       );
       this.enableShadows(this.columnShaft);
-      stack(this.column, this.columnShaft);
-      this.column.add(this.columnShaft);
     }
 
     if (CREATE_CAPITAL) {
@@ -215,9 +212,13 @@ export default class ColumnCorinthianForm extends ColumnForm {
         this.columnMaterial,
       );
       this.enableShadows(this.columnCapital);
-      stack(this.column, this.columnCapital);
-      this.column.add(this.columnCapital);
     }
+    addAndStack(
+      this.column,
+      this.columnBase,
+      this.columnShaft,
+      this.columnCapital,
+    );
 
     // this.scene.add(this.floor);
   };

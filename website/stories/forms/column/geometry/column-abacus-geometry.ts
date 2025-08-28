@@ -27,7 +27,9 @@ export function columnAbacus(settings: ColumnAbacus, material: Material) {
 
   const dimensions = getGeometryDimensions(geometry);
 
-  geometry.applyMatrix4(new Matrix4().makeTranslation(0, dimensions.height, 0));
+  geometry.applyMatrix4(
+    new Matrix4().makeTranslation(0, dimensions.height / 2, 0),
+  );
   return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 

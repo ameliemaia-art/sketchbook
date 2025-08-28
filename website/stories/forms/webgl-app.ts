@@ -337,7 +337,7 @@ export class GUIWebGLApp extends GUIController {
 
     const leftPanel = new Pane({
       title: "Editor",
-      expanded: true,
+      expanded: false,
     });
 
     this.gui = rightPanel;
@@ -406,8 +406,6 @@ export class GUIWebGLApp extends GUIController {
     GUIController.state.scene = target.scene;
     GUIController.state.controls = target.controls;
     GUIController.state.activeObject = target.scene;
-
-    console.log("setting here", GUIController.state);
 
     this.controllers.sceneController = new GUISceneController(leftPanel);
   }
