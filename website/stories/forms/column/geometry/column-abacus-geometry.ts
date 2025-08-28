@@ -5,7 +5,7 @@ import { GUIType } from "@utils/gui/gui-types";
 import { wireframeMaterial } from "../../materials/materials";
 import { getGeometryDimensions } from "./column-echinus-geometry";
 
-export type ColumnPlinth = {
+export type ColumnAbacus = {
   height: number;
   width: number;
   widthSegments: number;
@@ -15,7 +15,7 @@ export type ColumnPlinth = {
   wireframe: boolean;
 };
 
-export function columnPlinth(settings: ColumnPlinth, material: Material) {
+export function columnAbacus(settings: ColumnAbacus, material: Material) {
   const geometry = new BoxGeometry(
     settings.width,
     settings.height,
@@ -27,20 +27,18 @@ export function columnPlinth(settings: ColumnPlinth, material: Material) {
 
   const dimensions = getGeometryDimensions(geometry);
 
-  geometry.applyMatrix4(
-    new Matrix4().makeTranslation(0, dimensions.height / 2, 0),
-  );
+  geometry.applyMatrix4(new Matrix4().makeTranslation(0, dimensions.height, 0));
   return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 
 /// #if DEBUG
-export class GUIPlinth extends GUIController {
+export class GUIAbacus extends GUIController {
   constructor(
     gui: GUIType,
-    public target: ColumnPlinth,
+    public target: ColumnAbacus,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Plinth" });
+    this.gui = this.addFolder(gui, { title: "Abacus" });
 
     this.gui
       .addBinding(target, "width", { min: 0 })

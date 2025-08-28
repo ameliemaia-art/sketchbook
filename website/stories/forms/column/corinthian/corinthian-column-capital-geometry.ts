@@ -1,14 +1,18 @@
-import { Group, Material } from "three";
+import { AxesHelper, Box3, Box3Helper, Group, Material } from "three";
 
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
-import { stack } from "@utils/three/object3d";
+import { boundingBox, stack } from "@utils/three/object3d";
+import {
+  ColumnAbacus,
+  columnAbacus,
+  GUIAbacus,
+} from "../geometry/column-abacus-geometry";
 import {
   columnEchinus,
   ColumnEchinus,
   GUIEchinus,
 } from "../geometry/column-echinus-geometry";
-import { ColumnScotia, columnScotia } from "../geometry/column-scotia-geometry";
 import {
   ColumnTorus,
   columnTorus,
@@ -19,6 +23,7 @@ export type CorinthianColumnCaptitalSettings = {
   necking: ColumnEchinus;
   torus: ColumnTorus;
   echinus: ColumnEchinus;
+  abacus: ColumnAbacus;
 };
 
 export function corinthianColumnCapital(
@@ -26,24 +31,36 @@ export function corinthianColumnCapital(
   material: Material,
 ) {
   const group = new Group();
+
+  // group.add(new AxesHelper());
   group.name = "column-corinthian-captital";
-  const scotia = columnEchinus(settings.necking, material);
+  const necking = columnEchinus(settings.necking, material);
   const torus = columnTorus(settings.torus, material);
   const echinus = columnEchinus(settings.echinus, material);
-  // const torus2 = columnTorus(settings.torus2, material);
-  // torus.position.y = settings.plinth.height;
-  // scotia.position.y = settings.plinth.height + settings.torus.height;
-  // torus2.position.y =
-  //   settings.plinth.height + settings.torus2.height + settings.scotia.height;
+  // const abacus = columnAbacus(settings.abacus, material);
 
-  stack(scotia, torus);
-  stack(torus, echinus);
-
-  group.add(scotia);
+  group.add(necking);
   group.add(torus);
+  stack(group, torus);
   group.add(echinus);
-  // group.add(scotia);
-  // group.add(torus2);
+  group.updateMatrixWorld(true);
+  stack(group, echinus);
+
+  // if (settings.necking.helper) {
+  //   group.add(boundingBox(necking));
+  // }
+
+  // if (settings.torus.helper) {
+  //   group.add(boundingBox(torus));
+  // }
+
+  // if (settings.echinus.helper) {
+  //   group.add(boundingBox(echinus));
+  // }
+
+  // if (settings.abacus.helper) {
+  //   group.add(boundingBox(abacus));
+  // }
 
   return group;
 }
@@ -69,6 +86,9 @@ export class GUICorinthianCapital extends GUIController {
 
     this.controllers.echinus = new GUIEchinus(this.gui, target.echinus);
     this.controllers.echinus.addEventListener("change", this.onChange);
+
+    this.controllers.abacus = new GUIAbacus(this.gui, target.abacus);
+    this.controllers.abacus.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

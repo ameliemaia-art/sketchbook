@@ -2,6 +2,7 @@ import { Group, Material } from "three";
 
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
+import { boundingBox } from "@utils/three/object3d";
 import {
   columnPlinth,
   ColumnPlinth,
@@ -32,6 +33,7 @@ export function corinthianColumnBase(
   const group = new Group();
   group.name = "column-corinthian";
   const plinth = columnPlinth(settings.plinth, material);
+
   const torus = columnTorus(settings.torus, material);
   const scotia = columnScotia(settings.scotia, material);
   const torus2 = columnTorus(settings.torus2, material);
@@ -44,6 +46,20 @@ export function corinthianColumnBase(
   group.add(torus);
   group.add(scotia);
   group.add(torus2);
+
+  // Add helpers for debugging stacking placement
+  if (settings.plinth.helper) {
+    group.add(boundingBox(plinth));
+  }
+  if (settings.torus.helper) {
+    group.add(boundingBox(torus));
+  }
+  if (settings.scotia.helper) {
+    group.add(boundingBox(scotia));
+  }
+  if (settings.torus2.helper) {
+    group.add(boundingBox(torus2));
+  }
 
   return group;
 }

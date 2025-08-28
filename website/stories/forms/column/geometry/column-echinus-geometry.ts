@@ -1,14 +1,17 @@
 import {
-  BoxGeometry,
+  BufferGeometry,
   LatheGeometry,
   Material,
   Matrix4,
   Mesh,
-  Vector2,
+  MeshBasicMaterial,
+  SphereGeometry,
+  Vector3,
 } from "three";
 
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
+import { wireframeMaterial } from "../../materials/materials";
 import { ColumnScotia, generateProfilePoints } from "./column-scotia-geometry";
 
 export type ColumnEchinus = ColumnScotia;
@@ -27,10 +30,40 @@ export function columnEchinus(settings: ColumnEchinus, material: Material) {
   const geometry = new LatheGeometry(profile, settings.radialSegments);
   geometry.computeVertexNormals();
 
-  geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI));
-  geometry.applyMatrix4(new Matrix4().makeTranslation(0, settings.height, 0));
+  const dimensions = getGeometryDimensions(geometry);
 
-  return new Mesh(geometry, material);
+  geometry.applyMatrix4(
+    new Matrix4().makeTranslation(0, -dimensions.height, 0),
+  );
+
+  geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI));
+
+  const m = new Mesh(
+    geometry,
+    settings.wireframe ? wireframeMaterial : material,
+  );
+
+  // m.add(
+  //   new Mesh(
+  //     new SphereGeometry(1, 32, 32),
+  //     new MeshBasicMaterial({ color: 0xff0000 }),
+  //   ),
+  // );
+  return m;
+}
+
+export function getGeometryDimensions(geometry: BufferGeometry) {
+  geometry.computeBoundingBox();
+  const boundingBox = geometry.boundingBox!;
+
+  return {
+    height: boundingBox.max.y - boundingBox.min.y,
+    width: boundingBox.max.x - boundingBox.min.x,
+    depth: boundingBox.max.z - boundingBox.min.z,
+    center: boundingBox.getCenter(new Vector3()),
+    size: boundingBox.getSize(new Vector3()),
+    boundingBox: boundingBox.clone(),
+  };
 }
 
 /// #if DEBUG
@@ -64,6 +97,8 @@ export class GUIEchinus extends GUIController {
     this.gui
       .addBinding(target, "radialSegments", { min: 0 })
       .on("change", this.onChange);
+    this.gui.addBinding(target, "helper").on("change", this.onChange);
+    this.gui.addBinding(target, "wireframe").on("change", this.onChange);
   }
 
   onChange = () => {

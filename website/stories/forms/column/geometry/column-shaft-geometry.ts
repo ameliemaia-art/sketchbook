@@ -16,6 +16,8 @@ import { Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
 import { TWO_PI } from "@utils/three/math";
+import { wireframeMaterial } from "../../materials/materials";
+import { getGeometryDimensions } from "./column-echinus-geometry";
 
 export type Flutes = {
   total: number;
@@ -31,6 +33,8 @@ export type ColumnShaft = {
   radius: number;
   radialSegments: number;
   flutes: Flutes;
+  helper: boolean;
+  wireframe: boolean;
 };
 
 const evaluator = new Evaluator();
@@ -107,11 +111,13 @@ export function columnShaft(
 
   geometry = performCSG(settings, geometry);
 
+  const dimensions = getGeometryDimensions(geometry);
+
   geometry.applyMatrix4(
-    new Matrix4().makeTranslation(0, settings.height / 2, 0),
+    new Matrix4().makeTranslation(0, dimensions.height / 2, 0),
   );
 
-  return new Mesh(geometry, material);
+  return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 
 /// #if DEBUG
@@ -140,6 +146,8 @@ export class GUIColumnShaft extends GUIController {
     this.folders.flutes
       .addButton({ title: "Rebuild" })
       .on("click", this.onChange);
+    this.gui.addBinding(target, "helper").on("change", this.onChange);
+    this.gui.addBinding(target, "wireframe").on("change", this.onChange);
   }
 
   onChange = () => {

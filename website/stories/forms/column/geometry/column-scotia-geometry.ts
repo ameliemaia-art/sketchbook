@@ -9,6 +9,7 @@ import {
 
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
+import { wireframeMaterial } from "../../materials/materials";
 
 export type ColumnScotia = {
   topRadius: number;
@@ -18,6 +19,8 @@ export type ColumnScotia = {
   height: number;
   divisions: number;
   radialSegments: number;
+  helper: boolean;
+  wireframe: boolean;
 };
 
 export function generateProfilePoints(settings: ColumnScotia): Vector2[] {
@@ -27,17 +30,12 @@ export function generateProfilePoints(settings: ColumnScotia): Vector2[] {
   // Bottom left end
   points.push(new Vector2(settings.bottomRadius, 0));
   // Move up
-  points.push(
-    new Vector2(settings.bottomRadius, settings.height * settings.bottomHeight),
-  );
+  points.push(new Vector2(settings.bottomRadius, settings.bottomHeight));
   // Arc (scotia curve)
-  const arcStart = new Vector2(
-    settings.bottomRadius,
-    settings.height * settings.bottomHeight,
-  );
+  const arcStart = new Vector2(settings.bottomRadius, settings.bottomHeight);
   const arcEnd = new Vector2(
     settings.topRadius,
-    settings.height * (1 - settings.topHeight),
+    settings.height - settings.topHeight,
   );
   const arcCenter = new Vector2(arcStart.x, arcEnd.y);
   const radiusX = arcStart.x - arcEnd.x;
@@ -51,7 +49,7 @@ export function generateProfilePoints(settings: ColumnScotia): Vector2[] {
   }
   // Top left end
   points.push(
-    new Vector2(settings.topRadius, settings.height * (1 - settings.topHeight)),
+    new Vector2(settings.topRadius, settings.height - settings.topHeight),
   );
   // Top left end top
   points.push(new Vector2(settings.topRadius, settings.height));
@@ -66,7 +64,8 @@ export function columnScotia(settings: ColumnScotia, material: Material) {
 
   const geometry = new LatheGeometry(profile, settings.radialSegments);
   geometry.computeVertexNormals();
-  return new Mesh(geometry, material);
+
+  return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 
 /// #if DEBUG
@@ -99,6 +98,8 @@ export class GUIScotia extends GUIController {
     this.gui
       .addBinding(target, "radialSegments", { min: 0 })
       .on("change", this.onChange);
+    this.gui.addBinding(target, "helper").on("change", this.onChange);
+    this.gui.addBinding(target, "wireframe").on("change", this.onChange);
   }
 
   onChange = () => {

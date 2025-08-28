@@ -34,8 +34,7 @@ const CREATE_CAPITAL = true;
 
 export default class ColumnCorinthianForm extends ColumnForm {
   // Settings
-  form: SketchSettings & ColumnSettings = {
-    wireframe: false,
+  form: ColumnSettings = {
     floor: {
       width: 150,
       height: 1,
@@ -48,6 +47,8 @@ export default class ColumnCorinthianForm extends ColumnForm {
         widthSegments: 1,
         heightSegments: 1,
         depthSegments: 1,
+        helper: true,
+        wireframe: false,
       },
       torus: {
         height: 2.5,
@@ -55,6 +56,8 @@ export default class ColumnCorinthianForm extends ColumnForm {
         buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
+        helper: true,
+        wireframe: false,
       },
       scotia: {
         topHeight: 0,
@@ -64,6 +67,8 @@ export default class ColumnCorinthianForm extends ColumnForm {
         height: 3,
         divisions: 25,
         radialSegments: 32,
+        helper: true,
+        wireframe: false,
       },
       torus2: {
         height: 2.5,
@@ -71,6 +76,8 @@ export default class ColumnCorinthianForm extends ColumnForm {
         buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
+        helper: true,
+        wireframe: false,
       },
     },
     shaft: {
@@ -85,32 +92,49 @@ export default class ColumnCorinthianForm extends ColumnForm {
         capSegments: 16,
         scale: 0.5,
       },
+      helper: true,
+      wireframe: false,
     },
     captital: {
       necking: {
-        topHeight: 0.1,
+        topHeight: 0.5,
         bottomRadius: 8.5,
         topRadius: 11.5,
         bottomHeight: 0,
         height: 5,
         divisions: 25,
         radialSegments: 32,
+        helper: true,
+        wireframe: false,
       },
       torus: {
         height: 2.5,
         radius: 11.5,
-        buldge: 1,
+        buldge: 1.25,
         heightSegments: 32,
         radialSegments: 64,
+        helper: true,
+        wireframe: false,
       },
       echinus: {
-        topHeight: 0.1,
+        topHeight: 0.5,
         bottomRadius: 8.5,
         topRadius: 15,
-        bottomHeight: 0.1,
+        bottomHeight: 0,
         height: 15,
         divisions: 25,
         radialSegments: 32,
+        helper: true,
+        wireframe: false,
+      },
+      abacus: {
+        height: 5,
+        width: 25,
+        widthSegments: 1,
+        heightSegments: 1,
+        depthSegments: 1,
+        helper: true,
+        wireframe: false,
       },
     },
   };
@@ -163,15 +187,12 @@ export default class ColumnCorinthianForm extends ColumnForm {
       this.column.remove(this.columnCapital);
     }
 
-    this.floor = floor(
-      this.form.floor,
-      this.form.wireframe ? this.wireframeMaterial : this.floorMaterial,
-    );
+    this.floor = floor(this.form.floor, this.floorMaterial);
 
     if (CREATE_BASE) {
       this.columnBase = corinthianColumnBase(
         this.form.base,
-        this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+        this.columnMaterial,
       );
       this.enableShadows(this.columnBase);
       this.column.add(this.columnBase);
@@ -180,7 +201,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
     if (CREATE_SHAFT) {
       this.columnShaft = corinthianColumnShaft(
         this.form.shaft,
-        this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+        this.columnMaterial,
         this.scene,
       );
       this.enableShadows(this.columnShaft);
@@ -191,7 +212,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
     if (CREATE_CAPITAL) {
       this.columnCapital = corinthianColumnCapital(
         this.form.captital,
-        this.form.wireframe ? this.wireframeMaterial : this.columnMaterial,
+        this.columnMaterial,
       );
       this.enableShadows(this.columnCapital);
       stack(this.column, this.columnCapital);
@@ -223,8 +244,6 @@ export class GUICorinthianForm extends GUIColumnForm {
     this.gui = gui.addFolder({ title: "Corinthian Column" });
 
     target.addEventListener("create", this.onCreate);
-
-    this.gui.addBinding(target.form, "wireframe").on("change", target.generate);
 
     // this.controllers.floor = new GUIFloor(this.gui, target.form.floor);
     // this.controllers.floor.addEventListener("change", target.generate);

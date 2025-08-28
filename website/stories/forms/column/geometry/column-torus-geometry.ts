@@ -1,15 +1,17 @@
 import {
-  CylinderGeometry,
   LatheGeometry,
   Material,
   Matrix4,
   Mesh,
+  MeshBasicMaterial,
+  SphereGeometry,
   Vector2,
-  Vector3,
 } from "three";
 
 import GUIController from "@utils/gui/gui";
 import { GUIType } from "@utils/gui/gui-types";
+import { wireframeMaterial } from "../../materials/materials";
+import { getGeometryDimensions } from "./column-echinus-geometry";
 
 export type ColumnTorus = {
   height: number;
@@ -17,6 +19,8 @@ export type ColumnTorus = {
   heightSegments: number;
   radialSegments: number;
   buldge: number;
+  helper: boolean;
+  wireframe: boolean;
 };
 
 export function generateTorusProfilePoints(
@@ -62,15 +66,17 @@ export function columnTorus(settings: ColumnTorus, material: Material) {
   );
   const geometry = new LatheGeometry(profile, settings.radialSegments);
 
+  const dimensions = getGeometryDimensions(geometry);
+
   // Move the geometry so its bottom sits at y = 0
   geometry.applyMatrix4(
-    new Matrix4().makeTranslation(0, settings.height / 2, 0),
+    new Matrix4().makeTranslation(0, dimensions.height / 2, 0),
   );
 
   // Update vertex normals
   geometry.computeVertexNormals();
 
-  return new Mesh(geometry, material);
+  return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 
 /// #if DEBUG
@@ -108,6 +114,8 @@ export class GUITorus extends GUIController {
         step: 1,
       })
       .on("change", this.onChange);
+    this.gui.addBinding(target, "helper").on("change", this.onChange);
+    this.gui.addBinding(target, "wireframe").on("change", this.onChange);
   }
 
   onChange = () => {
