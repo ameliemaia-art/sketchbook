@@ -6,15 +6,17 @@ import { GUIType } from "@utils/editor/gui/gui-types";
 import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
+import { acanthus, Acanthus, GUIAcanthus } from "./acanthus-geometry";
 import { GUIScotia, Scotia, scotia } from "./scotia-geometry";
 import { GUITorus, torus, Torus } from "./torus-geometry";
 
-export enum LatheProfile {
+export enum PathProfileProfile {
   Torus = "Torus",
   Scotia = "Scotia",
+  Acanthus = "Acanthus",
 }
 
-export type LatheSettings = {
+export type PathProfileSettings = {
   blueprint: {};
   grid: {
     visible: boolean;
@@ -26,20 +28,21 @@ export type LatheSettings = {
     opacity: number;
     outline: boolean;
   };
-  lathe: {
+  pathProfile: {
     profile: string;
   };
   torus: Torus;
   scotia: Scotia;
+  acanthus: Acanthus;
 };
 
-export function lathe(
+export function pathProfile(
   blueprint: paper.Group,
   form: paper.Group,
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: SketchSettings & LatheSettings,
+  settings: SketchSettings & PathProfileSettings,
 ) {
   if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);
@@ -64,12 +67,15 @@ export function lathe(
 
   let points: paper.Point[] = [];
 
-  switch (settings.lathe.profile) {
-    case LatheProfile.Torus:
+  switch (settings.pathProfile.profile) {
+    case PathProfileProfile.Torus:
       points = torus(center, size, radius, settings.torus);
       break;
-    case LatheProfile.Scotia:
+    case PathProfileProfile.Scotia:
       points = scotia(center, size, radius, settings.scotia);
+      break;
+    case PathProfileProfile.Acanthus:
+      points = acanthus(center, size, radius, settings.acanthus);
       break;
     default:
       break;
@@ -89,17 +95,17 @@ export function lathe(
 }
 
 /// #if DEBUG
-export class GUILatheGeometry extends GUIController {
+export class GUIPathProfileGeometry extends GUIController {
   constructor(
     gui: GUIType,
-    public target: LatheSettings,
+    public target: PathProfileSettings,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "lathe" });
+    this.gui = this.addFolder(gui, { title: "Path Profile Geometry" });
 
     this.gui
-      .addBinding(target.lathe, "profile", {
-        options: generateBindingOptions(Object.values(LatheProfile)),
+      .addBinding(target.pathProfile, "profile", {
+        options: generateBindingOptions(Object.values(PathProfileProfile)),
       })
       .on("change", this.onChange);
 
@@ -108,6 +114,9 @@ export class GUILatheGeometry extends GUIController {
 
     this.controllers.scotia = new GUIScotia(this.gui, target.scotia);
     this.controllers.scotia.addEventListener("change", this.onChange);
+
+    this.controllers.acanthus = new GUIAcanthus(this.gui, target.acanthus);
+    this.controllers.acanthus.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

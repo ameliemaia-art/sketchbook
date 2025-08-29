@@ -1,29 +1,30 @@
 import { useEffect, useRef } from "react";
 
-import LatheSketch, { GUILathe } from "./lathe";
+import PathProfileSketch, { GUIPathProfile } from "./path-profile";
 
 import "../../global.css";
 
 import { Pane } from "tweakpane";
 
 export default {
-  title: "Sketchbook/Blueprints/Geometry/Lathe",
+  title: "Sketchbook/Blueprints/Geometry/PathProfile",
 };
 
-export const Lathe = () => {
+export const PathProfile = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const pane = new Pane({ title: "Lathe" });
     if (rootRef.current && canvasRef.current) {
-      const lathe = new LatheSketch(rootRef.current, canvasRef.current);
-      new GUILathe(pane, lathe);
+      const pane = new Pane({ title: "PathProfile" });
+      const pathProfile = new PathProfileSketch(
+        rootRef.current,
+        canvasRef.current,
+      );
+      new GUIPathProfile(pane, pathProfile);
     }
 
-    return () => {
-      pane.dispose();
-    };
+    return () => {};
   }, []);
 
   return (

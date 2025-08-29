@@ -7,13 +7,13 @@ import Sketch, {
   sketchSettings,
 } from "../sketch/sketch";
 import {
-  GUILatheGeometry,
-  lathe,
-  LatheProfile,
-  LatheSettings,
-} from "./lathe-geometry";
+  GUIPathProfileGeometry,
+  pathProfile,
+  PathProfileProfile,
+  PathProfileSettings,
+} from "./path-profile-geometry";
 
-export const latheSettings: SketchSettings & LatheSettings = {
+export const pathProfileSettings: SketchSettings & PathProfileSettings = {
   ...sketchSettings,
   scale: 1,
   darkness: true,
@@ -32,8 +32,8 @@ export const latheSettings: SketchSettings & LatheSettings = {
     opacity: 1,
     outline: true,
   },
-  lathe: {
-    profile: LatheProfile.Scotia,
+  pathProfile: {
+    profile: PathProfileProfile.Acanthus,
   },
   torus: {
     divisions: 25,
@@ -46,16 +46,22 @@ export const latheSettings: SketchSettings & LatheSettings = {
     bottomHeight: 0.1,
     topHeight: 0.1,
   },
+  acanthus: {
+    width: 0.7,
+    height: 1,
+    arcStart: 0.25,
+    divisions: 25,
+  },
 };
 
-export default class Lathe extends Sketch {
-  settings: SketchSettings & LatheSettings = latheSettings;
+export default class PathProfile extends Sketch {
+  settings: SketchSettings & PathProfileSettings = pathProfileSettings;
 
   constructor(
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
   ) {
-    super(root, canvas, "Lathe");
+    super(root, canvas, "PathProfile");
   }
 
   draw() {
@@ -63,7 +69,7 @@ export default class Lathe extends Sketch {
     if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
-    lathe(
+    pathProfile(
       this.layers.blueprint,
       this.layers.form,
       center,
@@ -74,10 +80,10 @@ export default class Lathe extends Sketch {
   }
 }
 
-export class GUILathe extends GUISketch {
+export class GUIPathProfile extends GUISketch {
   constructor(
     gui: FolderApi,
-    public target: Lathe,
+    public target: PathProfile,
   ) {
     super(gui, target, target.name());
 
@@ -96,7 +102,10 @@ export class GUILathe extends GUISketch {
       })
       .on("change", this.draw);
 
-    this.controllers.lathe = new GUILatheGeometry(this.gui, target.settings);
-    this.controllers.lathe.addEventListener("change", this.draw);
+    this.controllers.pathProfile = new GUIPathProfileGeometry(
+      this.gui,
+      target.settings,
+    );
+    this.controllers.pathProfile.addEventListener("change", this.draw);
   }
 }

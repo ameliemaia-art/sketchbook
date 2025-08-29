@@ -28,8 +28,8 @@ type ColumnSettings = {
   captital: CorinthianColumnCaptitalSettings;
 };
 
-const CREATE_BASE = true;
-const CREATE_SHAFT = true;
+const CREATE_BASE = false;
+const CREATE_SHAFT = false;
 const CREATE_CAPITAL = true;
 
 export default class ColumnCorinthianForm extends ColumnForm {
@@ -128,6 +128,15 @@ export default class ColumnCorinthianForm extends ColumnForm {
         wireframe: false,
       },
       abacus: {
+        height: 5,
+        width: 25,
+        widthSegments: 1,
+        heightSegments: 1,
+        depthSegments: 1,
+        helper: true,
+        wireframe: false,
+      },
+      acanthus: {
         height: 5,
         width: 25,
         widthSegments: 1,
