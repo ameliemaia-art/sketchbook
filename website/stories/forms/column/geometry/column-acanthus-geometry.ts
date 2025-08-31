@@ -1,12 +1,11 @@
 import {
   Acanthus,
   acanthus,
-} from "@/stories/blueprints/path-profile/acanthus-geometry";
+} from "@/stories/blueprints/path-profile/acanthus-side-geometry";
 import paper from "paper";
 import {
   BoxGeometry,
   CatmullRomCurve3,
-  ExtrudeGeometry,
   Group,
   Material,
   Matrix4,
@@ -19,6 +18,7 @@ import {
 
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
+import { ExtrudeGeometry } from "@utils/three/extrude-geometry";
 import {
   createCanvas,
   extrude,
@@ -81,9 +81,13 @@ export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
     steps: 50,
     bevelEnabled: false,
     extrudePath: extrudePath,
+    taperStart: 1,
+    taperEnd: 0.25,
   };
 
   const geometry = new ExtrudeGeometry(shape, extrudeSettings);
+  geometry.rotateX(Math.PI);
+  geometry.translate(0, canvasSize, 0);
 
   const mesh = new Mesh(
     geometry,

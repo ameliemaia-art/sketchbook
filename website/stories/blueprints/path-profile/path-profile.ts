@@ -34,7 +34,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     outline: true,
   },
   pathProfile: {
-    profile: PathProfileProfile.Acanthus,
+    profile: PathProfileProfile.AcanthusFront,
   },
   torus: {
     divisions: 25,
@@ -47,7 +47,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     bottomHeight: 0.1,
     topHeight: 0.1,
   },
-  acanthus: {
+  acanthusSide: {
     spiralTurns: 1,
     spiralDivisions: 20,
     smoothness: 100,
@@ -56,6 +56,12 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     cp2: { x: 0.17, y: 0.53 },
     cp3: { x: 0.32, y: 0.31 },
     cp4: { x: 0.58, y: 0.4 },
+  },
+  acanthusFront: {
+    width: 0.7,
+    height: 1,
+    arcStart: 0.25,
+    divisions: 25,
   },
 };
 
@@ -68,7 +74,7 @@ export default class PathProfile extends Sketch {
   ) {
     super(root, canvas, "PathProfile");
 
-    Object.assign(this.settings.acanthus, acanthusSettings);
+    Object.assign(this.settings.acanthusSide, acanthusSettings);
   }
 
   draw() {

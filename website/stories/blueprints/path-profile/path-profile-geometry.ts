@@ -6,14 +6,24 @@ import { GUIType } from "@utils/editor/gui/gui-types";
 import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
-import { acanthus, Acanthus, GUIAcanthus } from "./acanthus-geometry";
+import {
+  acanthusFront,
+  AcanthusFront,
+  GUIAcanthusFront,
+} from "./acanthus-front-geometry";
+import {
+  acanthusSide,
+  AcanthusSide,
+  GUIAcanthusSide,
+} from "./acanthus-side-geometry";
 import { GUIScotia, Scotia, scotia } from "./scotia-geometry";
 import { GUITorus, torus, Torus } from "./torus-geometry";
 
 export enum PathProfileProfile {
   Torus = "Torus",
   Scotia = "Scotia",
-  Acanthus = "Acanthus",
+  AcanthusSide = "AcanthusSide",
+  AcanthusFront = "AcanthusFront",
 }
 
 export type PathProfileSettings = {
@@ -33,7 +43,8 @@ export type PathProfileSettings = {
   };
   torus: Torus;
   scotia: Scotia;
-  acanthus: Acanthus;
+  acanthusSide: AcanthusSide;
+  acanthusFront: AcanthusFront;
 };
 
 export function pathProfile(
@@ -74,8 +85,11 @@ export function pathProfile(
     case PathProfileProfile.Scotia:
       points = scotia(center, size, radius, settings.scotia);
       break;
-    case PathProfileProfile.Acanthus:
-      points = acanthus(center, size, radius, settings.acanthus);
+    case PathProfileProfile.AcanthusSide:
+      points = acanthusSide(center, size, radius, settings.acanthusSide);
+      break;
+    case PathProfileProfile.AcanthusFront:
+      points = acanthusFront(center, size, radius, settings.acanthusFront);
       break;
     default:
       break;
@@ -115,8 +129,16 @@ export class GUIPathProfileGeometry extends GUIController {
     this.controllers.scotia = new GUIScotia(this.gui, target.scotia);
     this.controllers.scotia.addEventListener("change", this.onChange);
 
-    this.controllers.acanthus = new GUIAcanthus(this.gui, target.acanthus);
-    this.controllers.acanthus.addEventListener("change", this.onChange);
+    this.controllers.acanthusSide = new GUIAcanthusSide(
+      this.gui,
+      target.acanthusSide,
+    );
+    this.controllers.acanthusSide.addEventListener("change", this.onChange);
+    this.controllers.acanthusFront = new GUIAcanthusFront(
+      this.gui,
+      target.acanthusFront,
+    );
+    this.controllers.acanthusFront.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

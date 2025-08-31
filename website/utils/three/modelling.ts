@@ -190,7 +190,7 @@ export function createCanvas(
 
   // Orientate so the coordinates match paperjs canvas (top left)
   mesh.rotateX(-Math.PI);
-  mesh.translateY(-10);
+  mesh.translateY(-height);
   return mesh;
 }
 

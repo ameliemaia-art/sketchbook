@@ -1,18 +1,11 @@
 import paper from "paper";
-import { CatmullRomCurve3, MathUtils, Vector3 } from "three";
+import { CatmullRomCurve3, Vector3 } from "three";
 
 import { saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
-import {
-  dot,
-  lerp,
-  pointsToVector3,
-  vector3ToPoints,
-} from "@utils/paper/utils";
-import { createSmoothSpline } from "@utils/three/modelling";
 
-export type Acanthus = {
+export type AcanthusSide = {
   spiralDivisions: number;
   spiralTurns: number;
   smoothness: number;
@@ -23,11 +16,11 @@ export type Acanthus = {
   cp4: { x: number; y: number };
 };
 
-export function acanthus(
+export function acanthusSide(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: Acanthus,
+  settings: AcanthusSide,
 ) {
   let points: paper.Point[] = [];
 
@@ -102,25 +95,22 @@ export function acanthus(
   const spline = new CatmullRomCurve3(points2, false);
   const points3 = spline.getPoints(settings.smoothness);
 
-  return points3;
+  return points3.map((p) => {
+    const { x, y } = p;
+    return new paper.Point(x, y);
+  });
 }
 
 /// #if DEBUG
-export class GUIAcanthus extends GUIController {
+export class GUIAcanthusSide extends GUIController {
   constructor(
     gui: GUIType,
-    public target: Acanthus,
+    public target: AcanthusSide,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Acanthus" });
+    this.gui = this.addFolder(gui, { title: "Acanthus Side" });
 
     // Basic dimensions
-    this.gui
-      .addBinding(target, "width", { min: 0, max: 1 })
-      .on("change", this.onChange);
-    this.gui
-      .addBinding(target, "height", { min: 0, max: 1 })
-      .on("change", this.onChange);
     this.gui
       .addBinding(target, "spiralDivisions", { min: 0, step: 1 })
       .on("change", this.onChange);
@@ -166,10 +156,6 @@ export class GUIAcanthus extends GUIController {
     this.gui.addButton({ title: "Save" }).on("click", () => {
       saveJsonFile(JSON.stringify(target), "acanthus");
     });
-
-    // this.gui
-    //   .addBinding(target, "divisions", { min: 0 })
-    //   .on("change", this.onChange);
   }
 
   onChange = () => {
