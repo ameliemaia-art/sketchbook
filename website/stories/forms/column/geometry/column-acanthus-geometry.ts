@@ -83,15 +83,34 @@ export function acanthusLeaf(settings: ColumnAcanthus, material: Material) {
   extrudePath.closed = false; // Acanthus spiral shouldn't be closed
 
   // Create a simple cross-section shape to extrude along the path
-  // This creates a rectangular cross-section for the acanthus leaf
+  // This creates a rectangular cross-section for the acanthus leaf with subdivisions
   const crossSectionWidth = 5;
   const crossSectionHeight = 0.5;
+  const subdivisions = 8; // Number of subdivisions along the width
 
   const shape = new Shape();
+
+  // Create subdivided shape along x-axis for better geometry detail
+  const stepWidth = crossSectionWidth / subdivisions;
+
+  // Start from left bottom
   shape.moveTo(-crossSectionWidth / 2, -crossSectionHeight / 2);
-  shape.lineTo(crossSectionWidth / 2, -crossSectionHeight / 2);
+
+  // Bottom edge with subdivisions
+  for (let i = 1; i <= subdivisions; i++) {
+    const x = -crossSectionWidth / 2 + i * stepWidth;
+    shape.lineTo(x, -crossSectionHeight / 2);
+  }
+
+  // Right edge
   shape.lineTo(crossSectionWidth / 2, crossSectionHeight / 2);
-  shape.lineTo(-crossSectionWidth / 2, crossSectionHeight / 2);
+
+  // Top edge with subdivisions (reverse order)
+  for (let i = subdivisions - 1; i >= 0; i--) {
+    const x = -crossSectionWidth / 2 + i * stepWidth;
+    shape.lineTo(x, crossSectionHeight / 2);
+  }
+
   shape.closePath();
 
   const extrudeSettings = {
