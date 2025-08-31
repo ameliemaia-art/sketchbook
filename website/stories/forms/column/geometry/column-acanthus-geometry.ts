@@ -1,7 +1,7 @@
 import {
-  Acanthus,
   acanthus,
-} from "@/stories/blueprints/path-profile/acanthus-side-geometry";
+  Acanthus,
+} from "@/stories/blueprints/path-profile/acanthus-geometry";
 import paper from "paper";
 import {
   BoxGeometry,
@@ -61,7 +61,9 @@ export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
   // canvas.rotateY(Math.PI / 2);
 
   // Create the extrude path from acanthus points
-  const extrudePath = new CatmullRomCurve3(points);
+  const extrudePath = new CatmullRomCurve3(
+    points.map((p) => new Vector3(p.x, p.y, 0)),
+  );
   extrudePath.curveType = "catmullrom";
   extrudePath.closed = false; // Acanthus spiral shouldn't be closed
 

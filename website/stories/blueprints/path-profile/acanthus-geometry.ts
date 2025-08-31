@@ -5,7 +5,7 @@ import { saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
 
-export type AcanthusSide = {
+export type Acanthus = {
   spiralDivisions: number;
   spiralTurns: number;
   smoothness: number;
@@ -16,11 +16,11 @@ export type AcanthusSide = {
   cp4: { x: number; y: number };
 };
 
-export function acanthusSide(
+export function acanthus(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: AcanthusSide,
+  settings: Acanthus,
 ) {
   let points: paper.Point[] = [];
 

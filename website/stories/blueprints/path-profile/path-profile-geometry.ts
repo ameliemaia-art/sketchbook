@@ -6,16 +6,7 @@ import { GUIType } from "@utils/editor/gui/gui-types";
 import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
-import {
-  acanthusFront,
-  AcanthusFront,
-  GUIAcanthusFront,
-} from "./acanthus-front-geometry";
-import {
-  acanthusSide,
-  AcanthusSide,
-  GUIAcanthusSide,
-} from "./acanthus-side-geometry";
+import { Acanthus } from "./acanthus-geometry";
 import { GUIScotia, Scotia, scotia } from "./scotia-geometry";
 import { GUITorus, torus, Torus } from "./torus-geometry";
 
@@ -43,8 +34,7 @@ export type PathProfileSettings = {
   };
   torus: Torus;
   scotia: Scotia;
-  acanthusSide: AcanthusSide;
-  acanthusFront: AcanthusFront;
+  acanthus: Acanthus;
 };
 
 export function pathProfile(
