@@ -1,15 +1,26 @@
 import paper from "paper";
-import { MathUtils } from "three";
+import { CatmullRomCurve3, MathUtils, Vector3 } from "three";
 
+import { saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
-import { dot, lerp } from "@utils/paper/utils";
+import {
+  dot,
+  lerp,
+  pointsToVector3,
+  vector3ToPoints,
+} from "@utils/paper/utils";
+import { createSmoothSpline } from "@utils/three/modelling";
 
 export type Acanthus = {
-  width: number;
-  height: number;
-  arcStart: number;
-  divisions: number;
+  spiralDivisions: number;
+  spiralTurns: number;
+  smoothness: number;
+  cp0: { x: number; y: number };
+  cp1: { x: number; y: number };
+  cp2: { x: number; y: number };
+  cp3: { x: number; y: number };
+  cp4: { x: number; y: number };
 };
 
 export function acanthus(
@@ -18,41 +29,80 @@ export function acanthus(
   radius: number,
   settings: Acanthus,
 ) {
-  const width = settings.width * size.width;
-  const startX = size.width / 2 - width / 2;
-  const endX = size.width / 2 + width / 2;
+  let points: paper.Point[] = [];
 
-  const points: paper.Point[] = [];
+  const p0 = new paper.Point(
+    settings.cp0.x * size.width,
+    settings.cp0.y * size.height,
+  );
+  const p1 = new paper.Point(
+    settings.cp1.x * size.width,
+    settings.cp1.y * size.height,
+  );
+  const p2 = new paper.Point(
+    settings.cp2.x * size.width,
+    settings.cp2.y * size.height,
+  );
+  const p3 = new paper.Point(
+    settings.cp3.x * size.width,
+    settings.cp3.y * size.height,
+  );
+  const p4 = new paper.Point(
+    settings.cp4.x * size.width,
+    settings.cp4.y * size.height,
+  );
 
-  const p0 = new paper.Point(startX, size.height);
+  // dot(p0, 5);
+  // dot(p1, 5);
+  // dot(p2, 5);
+  // dot(p3, 5);
+  // dot(p4, 5);
 
-  const lineHeight = settings.height * size.height;
-  const p1 = new paper.Point(startX, size.height - lineHeight);
-  const p2 = new paper.Point(endX, size.height - lineHeight);
-  const p3 = new paper.Point(endX, size.height);
+  // Create spiral starting from p1 with p2 as center
+  const spiralPoints: paper.Point[] = [];
+  const spiralCenter = p4;
+  const startRadius = p3.getDistance(spiralCenter);
 
-  const arcStart = lerp(p0, p1, settings.arcStart);
-  const arcEnd = lerp(p1, p2, 0.5);
-  const arcCenter = new paper.Point(arcEnd.x, arcStart.y);
+  // Calculate the starting angle based on the vector from spiral center to p1
+  const startAngle = Math.atan2(p3.y - spiralCenter.y, p3.x - spiralCenter.x);
 
-  const radiusX = arcEnd.x - arcStart.x;
-  const radiusY = arcEnd.y - arcStart.y;
+  // Generate spiral points
+  for (let i = 0; i < settings.spiralDivisions; i++) {
+    const t = i / (settings.spiralDivisions - 1);
 
-  points.push(p0);
+    // Calculate spiral parameters
+    const angle = startAngle + t * settings.spiralTurns * Math.PI * 2; // Start from p1's angle and spiral
+    const radius = startRadius * (1 - t * 0.8); // Spiral inward (decrease radius over time)
 
-  for (let i = 0; i < settings.divisions; i++) {
-    const t = i / (settings.divisions - 1);
-    const theta = MathUtils.lerp(180, 0, t);
-    const x = arcCenter.x + radiusX * Math.cos(MathUtils.degToRad(theta));
-    const y = arcCenter.y + radiusY * Math.sin(MathUtils.degToRad(theta));
-    const point = new paper.Point(x, y);
-    points.push(point);
+    // Calculate spiral position
+    const x = spiralCenter.x + radius * Math.cos(angle);
+    const y = spiralCenter.y + radius * Math.sin(angle);
+
+    spiralPoints.push(new paper.Point(x, y));
   }
 
-  points.push(p3);
+  // Combine base points with spiral
   points.push(p0);
+  points.push(p1);
+  points.push(p2);
+  points.push(p3);
 
-  return points;
+  // Add spiral points
+  spiralPoints.forEach((point, i) => {
+    if (i > 0) {
+      points.push(point);
+    }
+  });
+
+  const points2 = points.map((p) => {
+    const { x, y } = p;
+    return new Vector3(x, y, 0);
+  });
+
+  const spline = new CatmullRomCurve3(points2, false);
+  const points3 = spline.getPoints(settings.smoothness);
+
+  return points3;
 }
 
 /// #if DEBUG
@@ -72,14 +122,50 @@ export class GUIAcanthus extends GUIController {
       .addBinding(target, "height", { min: 0, max: 1 })
       .on("change", this.onChange);
     this.gui
-      .addBinding(target, "arcStart", { min: 0, max: 1 })
+      .addBinding(target, "spiralDivisions", { min: 0, step: 1 })
       .on("change", this.onChange);
     this.gui
-      .addBinding(target, "divisions", { min: 10, step: 1 })
+      .addBinding(target, "smoothness", { min: 10, step: 1 })
       .on("change", this.onChange);
-    // this.gui
-    //   .addBinding(target, "bottomHeight", { min: 0 })
-    //   .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "spiralTurns", { min: 0 })
+      .on("change", this.onChange);
+
+    // Control points
+    this.gui
+      .addBinding(target, "cp0", {
+        x: { min: 0, max: 1 },
+        y: { min: 0, max: 1 },
+      })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "cp1", {
+        x: { min: 0, max: 1 },
+        y: { min: 0, max: 1 },
+      })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "cp2", {
+        x: { min: 0, max: 1 },
+        y: { min: 0, max: 1 },
+      })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "cp3", {
+        x: { min: 0, max: 1 },
+        y: { min: 0, max: 1 },
+      })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "cp4", {
+        x: { min: 0, max: 1 },
+        y: { min: 0, max: 1 },
+      })
+      .on("change", this.onChange);
+
+    this.gui.addButton({ title: "Save" }).on("click", () => {
+      saveJsonFile(JSON.stringify(target), "acanthus");
+    });
 
     // this.gui
     //   .addBinding(target, "divisions", { min: 0 })

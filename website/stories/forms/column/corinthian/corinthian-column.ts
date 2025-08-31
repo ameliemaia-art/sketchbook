@@ -2,6 +2,7 @@ import { Box3, Group, Mesh, Object3D, Vector3 } from "three";
 
 import { GUIType } from "@utils/editor/gui/gui-types";
 import { addAndStack, stack } from "@utils/three/object3d";
+import acanthusPath from "../../../blueprints/path-profile/data/acanthus-settings.json";
 import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
 import { GUIWebGLApp } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
@@ -137,13 +138,9 @@ export default class ColumnCorinthianForm extends ColumnForm {
         wireframe: false,
       },
       acanthus: {
-        height: 5,
-        width: 25,
-        widthSegments: 1,
-        heightSegments: 1,
-        depthSegments: 1,
+        path: acanthusPath,
         helper: true,
-        wireframe: false,
+        wireframe: true,
       },
     },
   };

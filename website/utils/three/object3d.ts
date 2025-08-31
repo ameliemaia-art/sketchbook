@@ -1,4 +1,12 @@
-import { Box3, Box3Helper, Object3D, Vector3 } from "three";
+import {
+  Box3,
+  Box3Helper,
+  Mesh,
+  MeshBasicMaterial,
+  Object3D,
+  SphereGeometry,
+  Vector3,
+} from "three";
 
 export function stack(object0: Object3D, object1: Object3D) {
   object0.updateMatrixWorld(true);
@@ -60,4 +68,24 @@ export function addAndStack(
 
 export function boundingBox(object: Object3D) {
   return new Box3Helper(new Box3().setFromObject(object), 0x00ff00);
+}
+
+const pointGeometry = new SphereGeometry(0.1, 16, 16);
+const pointMaterial = new MeshBasicMaterial({ color: 0xffffff });
+
+export function createPoint(
+  radius = 1,
+  position = new Vector3(),
+  debug = false,
+) {
+  let object: Mesh | Object3D;
+  if (debug) {
+    object = new Mesh(pointGeometry, pointMaterial);
+    object.scale.setScalar(radius);
+    object.position.copy(position);
+  } else {
+    object = new Object3D();
+    object.position.copy(position);
+  }
+  return object;
 }

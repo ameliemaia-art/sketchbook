@@ -1,5 +1,5 @@
 import paper from "paper";
-import { MathUtils } from "three";
+import { MathUtils, Vector3 } from "three";
 
 export function dot(
   position: paper.Point,
@@ -175,4 +175,12 @@ export function createPointOnCircle(
     center.x + radius * Math.cos(angle),
     center.y + radius * Math.sin(angle),
   );
+}
+
+export function pointsToVector3(points: paper.Point[]): Vector3[] {
+  return points.map((p) => new Vector3(p.x, p.y, 0));
+}
+
+export function vector3ToPoints(vectors: Vector3[]): paper.Point[] {
+  return vectors.map((v) => new paper.Point(v.x, v.y));
 }

@@ -124,11 +124,11 @@ export default class WebGLApp extends EventDispatcher {
     this.copyPassToRenderTarget = new ShaderPass(CopyShader);
 
     this.postProcessing.addPass(this.renderPass);
-    this.postProcessing.addPass(this.aoPass);
-    this.postProcessing.addPass(this.bloomPass);
+    // this.postProcessing.addPass(this.aoPass);
+    // this.postProcessing.addPass(this.bloomPass);
     this.postProcessing.addPass(this.fxaaPass);
     this.postProcessing.addPass(this.outputPass);
-    this.postProcessing.addPass(this.vignettePass);
+    // this.postProcessing.addPass(this.vignettePass);
 
     this.screenshot = new Screenshot(
       this.renderer,
@@ -147,7 +147,7 @@ export default class WebGLApp extends EventDispatcher {
       this.renderer.domElement,
     );
 
-    this.helpers.gridHelperX = new GridHelper(500, 50);
+    this.helpers.gridHelperX = new GridHelper(500, 500);
 
     // this.helpers.gridHelperY = new GridHelper(500, 50);
     // this.helpers.gridHelperY.rotateX(Math.PI / 2);
