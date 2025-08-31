@@ -147,7 +147,7 @@ export default class WebGLApp extends EventDispatcher {
       this.renderer.domElement,
     );
 
-    this.helpers.gridHelperX = new GridHelper(500, 500);
+    this.helpers.gridHelperX = new GridHelper(500, 50);
 
     // this.helpers.gridHelperY = new GridHelper(500, 50);
     // this.helpers.gridHelperY.rotateX(Math.PI / 2);

@@ -21,6 +21,7 @@ interface ExtrudeGeometryOptions {
   extrudePath?: Curve<Vector3>;
   taperStart?: number;
   taperEnd?: number;
+  taperFunction?: (t: number) => number;
   UVGenerator?: {
     generateTopUV: (
       geometry: any,
@@ -141,6 +142,7 @@ class ExtrudeGeometry extends BufferGeometry {
       const taperStart =
         options.taperStart !== undefined ? options.taperStart : 1;
       const taperEnd = options.taperEnd !== undefined ? options.taperEnd : 1;
+      const taperFunction = options.taperFunction;
 
       const uvgen =
         options.UVGenerator !== undefined
@@ -492,14 +494,18 @@ class ExtrudeGeometry extends BufferGeometry {
           if (!extrudeByPath) {
             // Calculate taper scale factor based on step position
             const t = s / steps; // 0 to 1 progression along extrusion
-            const scaleFactor = taperStart + (taperEnd - taperStart) * t;
+            const scaleFactor = taperFunction
+              ? taperFunction(t)
+              : taperStart + (taperEnd - taperStart) * t;
             v(vert.x * scaleFactor, vert.y * scaleFactor, (depth / steps) * s);
           } else {
             // v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
 
             // Calculate taper scale factor based on step position
             const t = s / steps; // 0 to 1 progression along extrusion
-            const scaleFactor = taperStart + (taperEnd - taperStart) * t;
+            const scaleFactor = taperFunction
+              ? taperFunction(t)
+              : taperStart + (taperEnd - taperStart) * t;
 
             normal!
               .copy(splineTube!.normals[s])
@@ -858,6 +864,7 @@ function toJSON(shapes, options, data) {
  * @property {?Curve} [extrudePath=null] - A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.
  * @property {number} [taperStart=1] - Scale factor at the start of the extrusion (default: 1 = no scaling).
  * @property {number} [taperEnd=1] - Scale factor at the end of the extrusion (default: 1 = no scaling).
+ * @property {Function} [taperFunction] - Custom taper function that takes t (0-1) and returns scale factor. If provided, overrides taperStart/taperEnd.
  * @property {Object} [UVGenerator] - An object that provides UV generator functions for custom UV generation.
  **/
 

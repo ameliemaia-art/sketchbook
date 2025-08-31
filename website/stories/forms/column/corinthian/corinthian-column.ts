@@ -141,6 +141,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         path: acanthusPath,
         helper: true,
         wireframe: true,
+        taperMode: "sine",
       },
     },
   };
