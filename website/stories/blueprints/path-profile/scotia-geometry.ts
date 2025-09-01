@@ -4,7 +4,7 @@ import { MathUtils } from "three";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
 
-export type Scotia = {
+export type ScotiaPath = {
   divisions: number;
   bottomLength: number;
   topLength: number;
@@ -12,11 +12,11 @@ export type Scotia = {
   topHeight: number;
 };
 
-export function scotia(
+export function scotiaPath(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: Scotia,
+  settings: ScotiaPath,
 ) {
   // Bottom left
   const p0 = new paper.Point(0, size.height);
@@ -63,13 +63,13 @@ export function scotia(
 }
 
 /// #if DEBUG
-export class GUIScotia extends GUIController {
+export class GUIScotiaPath extends GUIController {
   constructor(
     gui: GUIType,
-    public target: Scotia,
+    public target: ScotiaPath,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Scotia" });
+    this.gui = this.addFolder(gui, { title: "Scotia Path" });
 
     // Basic dimensions
     this.gui

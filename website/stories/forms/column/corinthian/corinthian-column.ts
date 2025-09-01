@@ -2,7 +2,7 @@ import { Box3, Group, Mesh, Object3D, Vector3 } from "three";
 
 import { GUIType } from "@utils/editor/gui/gui-types";
 import { addAndStack, stack } from "@utils/three/object3d";
-import acanthusPath from "../../../blueprints/path-profile/data/acanthus-settings.json";
+import acanthusBasePath from "../../../blueprints/path-profile/data/acanthus-base-settings.json";
 import { floor, FloorSettings, GUIFloor } from "../../geometry/floor-geometry";
 import { GUIWebGLApp } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
@@ -138,10 +138,17 @@ export default class ColumnCorinthianForm extends ColumnForm {
         wireframe: false,
       },
       acanthus: {
-        path: acanthusPath,
         helper: true,
         wireframe: false,
-        taperMode: "sine",
+        base: {
+          path: acanthusBasePath,
+          radius: 10,
+          leafTaperMode: "sine",
+          leafCount: 12,
+          leafWidth: 7,
+          leafHeight: 0.5,
+          leafSubdivisions: 12,
+        },
       },
     },
   };

@@ -4,8 +4,9 @@ import { CatmullRomCurve3, Vector3 } from "three";
 import { saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
+import { pointsToVector3, vector3ToPoints } from "@utils/paper/utils";
 
-export type Acanthus = {
+export type AcanthusPath = {
   spiralDivisions: number;
   spiralTurns: number;
   smoothness: number;
@@ -16,11 +17,11 @@ export type Acanthus = {
   cp4: { x: number; y: number };
 };
 
-export function acanthus(
+export function acanthusPath(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: Acanthus,
+  settings: AcanthusPath,
 ) {
   let points: paper.Point[] = [];
 
@@ -87,28 +88,19 @@ export function acanthus(
     }
   });
 
-  const points2 = points.map((p) => {
-    const { x, y } = p;
-    return new Vector3(x, y, 0);
-  });
-
-  const spline = new CatmullRomCurve3(points2, false);
-  const points3 = spline.getPoints(settings.smoothness);
-
-  return points3.map((p) => {
-    const { x, y } = p;
-    return new paper.Point(x, y);
-  });
+  const spline = new CatmullRomCurve3(pointsToVector3(points), false);
+  return vector3ToPoints(spline.getPoints(settings.smoothness));
 }
 
 /// #if DEBUG
-export class GUIAcanthusSide extends GUIController {
+export class GUIAcanthusPath extends GUIController {
   constructor(
     gui: GUIType,
-    public target: Acanthus,
+    public target: AcanthusPath,
+    title: string = "",
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Acanthus Side" });
+    this.gui = this.addFolder(gui, { title: `Acanthus Path: ${title}` });
 
     // Basic dimensions
     this.gui

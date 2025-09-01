@@ -4,16 +4,16 @@ import { MathUtils } from "three";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
 
-export type Torus = {
+export type TorusPath = {
   divisions: number;
   scaleX: number;
 };
 
-export function torus(
+export function torusPath(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: Torus,
+  settings: TorusPath,
 ) {
   const points: paper.Point[] = [];
   for (let i = 0; i < settings.divisions; i++) {
@@ -28,13 +28,13 @@ export function torus(
 }
 
 /// #if DEBUG
-export class GUITorus extends GUIController {
+export class GUITorusPath extends GUIController {
   constructor(
     gui: GUIType,
-    public target: Torus,
+    public target: TorusPath,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Torus" });
+    this.gui = this.addFolder(gui, { title: "Torus Path" });
 
     // Basic dimensions
     this.gui

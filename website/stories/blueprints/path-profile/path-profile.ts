@@ -6,7 +6,9 @@ import Sketch, {
   SketchSettings,
   sketchSettings,
 } from "../sketch/sketch";
-import acanthusSettings from "./data/acanthus-settings.json";
+import acanthusBaseSettings from "./data/acanthus-base-settings.json";
+import acanthusMiddleSettings from "./data/acanthus-middle-settings.json";
+import acanthusTopSettings from "./data/acanthus-top-settings.json";
 import {
   GUIPathProfileGeometry,
   pathProfile,
@@ -33,9 +35,9 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     opacity: 1,
     outline: true,
   },
-  pathProfile: {
-    profile: PathProfileProfile.AcanthusFront,
-  },
+  // Path Profile to render
+  pathProfile: PathProfileProfile.AcanthusBase,
+  // Paths
   torus: {
     divisions: 25,
     scaleX: 1,
@@ -47,7 +49,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     bottomHeight: 0.1,
     topHeight: 0.1,
   },
-  acanthusSide: {
+  acanthusBase: {
     spiralTurns: 1,
     spiralDivisions: 20,
     smoothness: 100,
@@ -57,11 +59,25 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     cp3: { x: 0.32, y: 0.31 },
     cp4: { x: 0.58, y: 0.4 },
   },
-  acanthusFront: {
-    width: 0.7,
-    height: 1,
-    arcStart: 0.25,
-    divisions: 25,
+  acanthusMiddle: {
+    spiralTurns: 1,
+    spiralDivisions: 20,
+    smoothness: 100,
+    cp0: { x: 0.2, y: 1 },
+    cp1: { x: 0.15, y: 0.8 },
+    cp2: { x: 0.17, y: 0.53 },
+    cp3: { x: 0.32, y: 0.31 },
+    cp4: { x: 0.58, y: 0.4 },
+  },
+  acanthusTop: {
+    spiralTurns: 1,
+    spiralDivisions: 20,
+    smoothness: 100,
+    cp0: { x: 0.2, y: 1 },
+    cp1: { x: 0.15, y: 0.8 },
+    cp2: { x: 0.17, y: 0.53 },
+    cp3: { x: 0.32, y: 0.31 },
+    cp4: { x: 0.58, y: 0.4 },
   },
 };
 
@@ -74,7 +90,9 @@ export default class PathProfile extends Sketch {
   ) {
     super(root, canvas, "PathProfile");
 
-    Object.assign(this.settings.acanthusSide, acanthusSettings);
+    Object.assign(this.settings.acanthusBase, acanthusBaseSettings);
+    Object.assign(this.settings.acanthusMiddle, acanthusMiddleSettings);
+    Object.assign(this.settings.acanthusTop, acanthusTopSettings);
   }
 
   draw() {

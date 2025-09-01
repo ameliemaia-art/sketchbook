@@ -39,43 +39,50 @@ export function corinthianColumnCapital(
   const group = new Group();
 
   // group.add(new AxesHelper());
-  // group.name = "column-corinthian-captital";
-  // const necking = columnEchinus(settings.necking, material);
-  // necking.name = "necking";
-  // const torus = columnTorus(settings.torus, material);
-  // torus.name = "torus";
-  // const echinus = columnEchinus(settings.echinus, material);
-  // echinus.name = "echinus";
-  // const abacus = columnAbacus(settings.abacus, material);
-  // abacus.name = "abacus";
-  const acanthus = columnAcanthus(settings.acanthus, material);
+  group.name = "column-corinthian-captital";
+  const necking = columnEchinus(settings.necking, material);
+  necking.name = "necking";
+  const torus = columnTorus(settings.torus, material);
+  torus.name = "torus";
+  const echinus = columnEchinus(settings.echinus, material);
+  echinus.name = "echinus";
+  const abacus = columnAbacus(settings.abacus, material);
+  abacus.name = "abacus";
+  const acanthus = columnAcanthus(
+    settings.acanthus,
+    settings.acanthus.base,
+    material,
+  );
   acanthus.name = "acanthus";
 
-  // if (settings.necking.helper) {
-  //   group.add(boundingBox(necking));
-  // }
+  if (settings.necking.helper) {
+    group.add(boundingBox(necking));
+  }
 
-  // if (settings.torus.helper) {
-  //   group.add(boundingBox(torus));
-  // }
+  if (settings.torus.helper) {
+    group.add(boundingBox(torus));
+  }
 
-  // if (settings.echinus.helper) {
-  //   group.add(boundingBox(echinus));
-  // }
+  if (settings.echinus.helper) {
+    group.add(boundingBox(echinus));
+  }
+
+  if (settings.abacus.helper) {
+    group.add(boundingBox(abacus));
+  }
+
   if (settings.acanthus.helper) {
     group.add(boundingBox(acanthus));
   }
 
-  // if (settings.abacus.helper) {
-  //   group.add(boundingBox(abacus));
-  // }
-
-  // addAndStack(group, necking, torus, echinus, abacus);
+  addAndStack(group, necking, torus, echinus, abacus);
+  group.add(acanthus);
+  acanthus.position.y = echinus.position.y;
   // addAndStack(group, necking, torus, acanthus);
 
   // acanthus.position.y = echinus.position.y;
 
-  group.add(acanthus);
+  // group.add(acanthus);
 
   return group;
 }
@@ -105,7 +112,11 @@ export class GUICorinthianCapital extends GUIController {
     this.controllers.abacus = new GUIAbacus(this.gui, target.abacus);
     this.controllers.abacus.addEventListener("change", this.onChange);
 
-    this.controllers.acanthus = new GUIAcanthus(this.gui, target.acanthus);
+    this.controllers.acanthus = new GUIAcanthus(
+      this.gui,
+      target.acanthus,
+      target.acanthus.base,
+    );
     this.controllers.acanthus.addEventListener("change", this.onChange);
   }
 
