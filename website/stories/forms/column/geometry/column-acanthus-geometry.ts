@@ -24,7 +24,7 @@ import {
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
 import { pointsToVector3 } from "@utils/paper/utils";
-import { Flow } from "@utils/three/curve-modifier";
+import { CPUFlow } from "@utils/three/cpu-flow";
 import { ExtrudeGeometry } from "@utils/three/extrude-geometry";
 import { TWO_PI } from "@utils/three/math";
 import { createCanvas } from "@utils/three/modelling";
@@ -135,12 +135,9 @@ export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
   const radius = settings.radius || 10;
   const leafCount = settings.leafCount || 12;
 
-  // Create a single acanthus leaf to use as the base
-  const baseLeaf = acanthusLeaf(settings, material);
-
-  // Create a circular path for the Flow modifier
+  // Create helper circle
   const circlePoints: Vector3[] = [];
-  const numPoints = 64; // More points for smoother curve
+  const numPoints = 64;
 
   for (let i = 0; i < numPoints; i++) {
     const angle = (i / numPoints) * Math.PI * 2;
@@ -149,31 +146,50 @@ export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
     circlePoints.push(new Vector3(x, 0, z));
   }
 
-  const circleCurve = new CatmullRomCurve3(circlePoints);
-  circleCurve.closed = true;
-  circleCurve.curveType = "catmullrom";
+  if (settings.helper) {
+    const circleGeometry = new BufferGeometry().setFromPoints(circlePoints);
+    const circleLine = new LineLoop(
+      circleGeometry,
+      new LineBasicMaterial({ color: 0x00ff00 }),
+    );
+    group.add(circleLine);
+  }
 
-  // Create multiple flow instances for each leaf position
+  // Create multiple leaves positioned around the circle
   for (let i = 0; i < leafCount; i++) {
-    const flow = new Flow(baseLeaf);
-    flow.updateCurve(0, circleCurve);
+    // Create a fresh leaf for each instance
+    const leaf = acanthusLeaf(settings, material);
 
-    // Set the path offset to position this leaf at the correct point on the circle
-    const t = i / leafCount;
-    flow.uniforms.pathOffset.value = t;
+    // Calculate position and rotation for this leaf
+    const angle = (i / leafCount) * Math.PI * 2;
+
+    // Create a small arc curve for this specific leaf
+    // The arc should be roughly the size of the leaf geometry
+    const arcPoints: Vector3[] = [];
+    const arcLength = 8; // Approximate length of acanthus leaf
+    const arcRadius = radius + arcLength / 2; // Slightly larger radius for the curve
+    const arcSpan = arcLength / arcRadius; // Arc angle in radians
+
+    // Create arc points centered around this leaf's angle
+    const numArcPoints = 16;
+    for (let j = 0; j < numArcPoints; j++) {
+      const t = j / (numArcPoints - 1); // 0 to 1
+      const arcAngle = angle + (t - 0.5) * arcSpan; // Center arc around leaf angle
+      const x = Math.cos(arcAngle) * arcRadius;
+      const z = Math.sin(arcAngle) * arcRadius;
+      arcPoints.push(new Vector3(x, 0, z));
+    }
+
+    const arcCurve = new CatmullRomCurve3(arcPoints);
+    arcCurve.closed = false;
+    arcCurve.curveType = "catmullrom";
+
+    // Apply CPU Flow to bend the leaf along this arc
+    const flow = new CPUFlow(leaf);
+    flow.updateCurve(arcCurve);
 
     group.add(flow.object3D);
   }
-
-  // Add helper to show the circular path
-  // if (settings.helper) {
-  //   const circleGeometry = new BufferGeometry().setFromPoints(circlePoints);
-  //   const circleLine = new LineLoop(
-  //     circleGeometry,
-  //     new LineBasicMaterial({ color: 0x00ff00 }),
-  //   );
-  //   group.add(circleLine);
-  // }
 
   return group;
 }
