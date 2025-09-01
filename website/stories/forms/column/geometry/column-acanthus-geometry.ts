@@ -5,6 +5,7 @@ import {
 import paper from "paper";
 import {
   ArrowHelper,
+  Box3,
   BoxGeometry,
   BufferGeometry,
   CatmullRomCurve3,
@@ -122,8 +123,8 @@ export function acanthusLeaf(settings: ColumnAcanthus, material: Material) {
   };
 
   const geometry = new ExtrudeGeometry(shape, extrudeSettings);
-  // geometry.rotateX(Math.PI);
-  geometry.rotateY(-Math.PI / 2);
+  geometry.rotateX(Math.PI);
+  geometry.rotateY(Math.PI / 2);
   centerGeometry(geometry);
   return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
@@ -166,7 +167,7 @@ export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
     // Create a small arc curve for this specific leaf
     // The arc should be roughly the size of the leaf geometry
     const arcPoints: Vector3[] = [];
-    const arcLength = 8; // Approximate length of acanthus leaf
+    const arcLength = 6; // Approximate length of acanthus leaf
     const arcRadius = radius + arcLength / 2; // Slightly larger radius for the curve
     const arcSpan = arcLength / arcRadius; // Arc angle in radians
 
@@ -190,6 +191,13 @@ export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
 
     group.add(flow.object3D);
   }
+
+  // Get dimensions of the entire group and center it vertically
+  const box = new Box3().setFromObject(group);
+  const groupHeight = box.max.y - box.min.y;
+
+  // Translate the entire group so it sits properly on the base
+  group.position.y = groupHeight / 2;
 
   return group;
 }

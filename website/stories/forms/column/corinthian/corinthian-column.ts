@@ -140,7 +140,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
       acanthus: {
         path: acanthusPath,
         helper: true,
-        wireframe: true,
+        wireframe: false,
         taperMode: "sine",
       },
     },

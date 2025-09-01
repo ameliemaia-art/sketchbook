@@ -48,8 +48,8 @@ export function corinthianColumnCapital(
   // echinus.name = "echinus";
   // const abacus = columnAbacus(settings.abacus, material);
   // abacus.name = "abacus";
-
-  // addAndStack(group, necking, torus, echinus, abacus);
+  const acanthus = columnAcanthus(settings.acanthus, material);
+  acanthus.name = "acanthus";
 
   // if (settings.necking.helper) {
   //   group.add(boundingBox(necking));
@@ -62,18 +62,20 @@ export function corinthianColumnCapital(
   // if (settings.echinus.helper) {
   //   group.add(boundingBox(echinus));
   // }
+  if (settings.acanthus.helper) {
+    group.add(boundingBox(acanthus));
+  }
 
   // if (settings.abacus.helper) {
   //   group.add(boundingBox(abacus));
   // }
 
-  const acanthus = columnAcanthus(settings.acanthus, material);
-  acanthus.name = "acanthus";
-  addAndStack(group, acanthus);
+  // addAndStack(group, necking, torus, echinus, abacus);
+  // addAndStack(group, necking, torus, acanthus);
 
-  if (settings.acanthus.helper) {
-    group.add(boundingBox(acanthus));
-  }
+  // acanthus.position.y = echinus.position.y;
+
+  group.add(acanthus);
 
   return group;
 }

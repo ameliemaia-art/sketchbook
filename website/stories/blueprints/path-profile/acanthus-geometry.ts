@@ -105,7 +105,7 @@ export function acanthus(
 export class GUIAcanthusSide extends GUIController {
   constructor(
     gui: GUIType,
-    public target: AcanthusSide,
+    public target: Acanthus,
   ) {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Acanthus Side" });
