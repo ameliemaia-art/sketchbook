@@ -84,25 +84,45 @@ export function acanthusLeaf(settings: ColumnAcanthus, material: Material) {
   extrudePath.closed = false; // Acanthus spiral shouldn't be closed
 
   // Create a simple rectangular cross-section shape to extrude along the path
+  // Adding subdivisions for better Flow deformation
   const crossSectionWidth = 5;
   const crossSectionHeight = 0.5;
+  const subdivisions = 12; // More subdivisions for better curve deformation
 
   const shape = new Shape();
+
+  // Create subdivided shape along x-axis for better Flow modifier results
+  const stepWidth = crossSectionWidth / subdivisions;
+
+  // Start from left bottom
   shape.moveTo(-crossSectionWidth / 2, -crossSectionHeight / 2);
-  shape.lineTo(crossSectionWidth / 2, -crossSectionHeight / 2);
+
+  // Bottom edge with subdivisions
+  for (let i = 1; i <= subdivisions; i++) {
+    const x = -crossSectionWidth / 2 + i * stepWidth;
+    shape.lineTo(x, -crossSectionHeight / 2);
+  }
+
+  // Right edge
   shape.lineTo(crossSectionWidth / 2, crossSectionHeight / 2);
-  shape.lineTo(-crossSectionWidth / 2, crossSectionHeight / 2);
+
+  // Top edge with subdivisions (reverse order)
+  for (let i = subdivisions - 1; i >= 0; i--) {
+    const x = -crossSectionWidth / 2 + i * stepWidth;
+    shape.lineTo(x, crossSectionHeight / 2);
+  }
+
   shape.closePath();
 
   const extrudeSettings = {
     steps: 50,
     bevelEnabled: false,
     extrudePath: extrudePath,
-    taperFunction: createTaperFunction(settings.taperMode, 1, 0.25),
+    taperFunction: createTaperFunction(settings.taperMode, 1, 0.1),
   };
 
   const geometry = new ExtrudeGeometry(shape, extrudeSettings);
-  geometry.rotateX(Math.PI);
+  // geometry.rotateX(Math.PI);
   geometry.rotateY(-Math.PI / 2);
   centerGeometry(geometry);
   return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
@@ -146,14 +166,14 @@ export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
   }
 
   // Add helper to show the circular path
-  if (settings.helper) {
-    const circleGeometry = new BufferGeometry().setFromPoints(circlePoints);
-    const circleLine = new LineLoop(
-      circleGeometry,
-      new LineBasicMaterial({ color: 0x00ff00 }),
-    );
-    group.add(circleLine);
-  }
+  // if (settings.helper) {
+  //   const circleGeometry = new BufferGeometry().setFromPoints(circlePoints);
+  //   const circleLine = new LineLoop(
+  //     circleGeometry,
+  //     new LineBasicMaterial({ color: 0x00ff00 }),
+  //   );
+  //   group.add(circleLine);
+  // }
 
   return group;
 }

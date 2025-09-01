@@ -2,6 +2,7 @@
 // Based on: https://github.com/mrdoob/three.js/blob/dev/examples/jsm/modifiers/CurveModifier.js
 
 import {
+  CatmullRomCurve3,
   DataTexture,
   DataUtils,
   HalfFloatType,
@@ -10,7 +11,6 @@ import {
   RepeatWrapping,
   RGBAFormat,
   Vector3,
-  CatmullRomCurve3,
 } from "three";
 
 const CHANNELS = 4;
@@ -19,14 +19,14 @@ const TEXTURE_HEIGHT = 4;
 
 function initSplineTexture(numberOfCurves = 1) {
   const dataArray = new Uint16Array(
-    TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS
+    TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS,
   );
   const dataTexture = new DataTexture(
     dataArray,
     TEXTURE_WIDTH,
     TEXTURE_HEIGHT * numberOfCurves,
     RGBAFormat,
-    HalfFloatType
+    HalfFloatType,
   );
 
   dataTexture.wrapS = RepeatWrapping;
@@ -38,13 +38,17 @@ function initSplineTexture(numberOfCurves = 1) {
   return dataTexture;
 }
 
-function updateSplineTexture(texture: DataTexture, splineCurve: CatmullRomCurve3, offset = 0) {
+function updateSplineTexture(
+  texture: DataTexture,
+  splineCurve: CatmullRomCurve3,
+  offset = 0,
+) {
   const numberOfPoints = Math.floor(TEXTURE_WIDTH * (TEXTURE_HEIGHT / 4));
-  
+
   // Ensure the curve has proper arc length divisions
   splineCurve.arcLengthDivisions = numberOfPoints / 2;
   splineCurve.updateArcLengths();
-  
+
   const points = splineCurve.getSpacedPoints(numberOfPoints);
   const frenetFrames = splineCurve.computeFrenetFrames(numberOfPoints, true);
 
@@ -59,9 +63,9 @@ function updateSplineTexture(texture: DataTexture, splineCurve: CatmullRomCurve3
       pt.x,
       pt.y,
       pt.z,
-      0 + rowOffset + TEXTURE_HEIGHT * offset
+      0 + rowOffset + TEXTURE_HEIGHT * offset,
     );
-    
+
     pt = frenetFrames.tangents[i];
     setTextureValue(
       texture,
@@ -69,9 +73,9 @@ function updateSplineTexture(texture: DataTexture, splineCurve: CatmullRomCurve3
       pt.x,
       pt.y,
       pt.z,
-      1 + rowOffset + TEXTURE_HEIGHT * offset
+      1 + rowOffset + TEXTURE_HEIGHT * offset,
     );
-    
+
     pt = frenetFrames.normals[i];
     setTextureValue(
       texture,
@@ -79,9 +83,9 @@ function updateSplineTexture(texture: DataTexture, splineCurve: CatmullRomCurve3
       pt.x,
       pt.y,
       pt.z,
-      2 + rowOffset + TEXTURE_HEIGHT * offset
+      2 + rowOffset + TEXTURE_HEIGHT * offset,
     );
-    
+
     pt = frenetFrames.binormals[i];
     setTextureValue(
       texture,
@@ -89,14 +93,21 @@ function updateSplineTexture(texture: DataTexture, splineCurve: CatmullRomCurve3
       pt.x,
       pt.y,
       pt.z,
-      3 + rowOffset + TEXTURE_HEIGHT * offset
+      3 + rowOffset + TEXTURE_HEIGHT * offset,
     );
   }
 
   texture.needsUpdate = true;
 }
 
-function setTextureValue(texture: DataTexture, index: number, x: number, y: number, z: number, o: number) {
+function setTextureValue(
+  texture: DataTexture,
+  index: number,
+  x: number,
+  y: number,
+  z: number,
+  o: number,
+) {
   const image = texture.image;
   const data = image.data as Uint16Array;
   const i = CHANNELS * TEXTURE_WIDTH * o;
@@ -166,12 +177,12 @@ mat3 basis = mat3(a, b, c);
 
 vec3 transformed = basis * vec3(worldPos.x * xWeight, worldPos.y, worldPos.z) + spinePos;
 vec3 transformedNormal = normalMatrix * (basis * objectNormal);
-`
+`,
       )
       .replace(
         "#include <project_vertex>",
         `vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
-gl_Position = projectionMatrix * mvPosition;`
+gl_Position = projectionMatrix * mvPosition;`,
       );
 
     shader.vertexShader = vertexShader;
@@ -215,7 +226,7 @@ export class Flow {
     if (index >= this.curveArray.length) {
       throw new Error("Flow: Index out of range.");
     }
-    
+
     const curveLength = curve.getLength();
     this.uniforms.spineLength.value = curveLength;
     this.curveLengthArray[index] = curveLength;
