@@ -6,8 +6,11 @@ import paper from "paper";
 import {
   ArrowHelper,
   BoxGeometry,
+  BufferGeometry,
   CatmullRomCurve3,
   Group,
+  LineBasicMaterial,
+  LineLoop,
   Material,
   MathUtils,
   Matrix4,
@@ -20,10 +23,12 @@ import {
 
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
+import { pointsToVector3 } from "@utils/paper/utils";
 import { ExtrudeGeometry } from "@utils/three/extrude-geometry";
+import { Flow } from "@utils/three/flow";
 import { TWO_PI } from "@utils/three/math";
 import { createCanvas } from "@utils/three/modelling";
-import { createPoint } from "@utils/three/object3d";
+import { centerGeometry, createPoint } from "@utils/three/object3d";
 import { wireframeMaterial } from "../../materials/materials";
 import { getGeometryDimensions } from "./column-echinus-geometry";
 
@@ -52,6 +57,8 @@ export type ColumnAcanthus = {
   wireframe: boolean;
   path: Acanthus;
   taperMode: "linear" | "sine";
+  radius: number; // Radius of the circular path
+  leafCount: number; // Number of leaves around the circle
 };
 
 export function acanthusLeaf(settings: ColumnAcanthus, material: Material) {
@@ -59,7 +66,6 @@ export function acanthusLeaf(settings: ColumnAcanthus, material: Material) {
 
   // Physical canvas where points get added to
   const canvas = createCanvas(canvasSize, canvasSize, new Vector3(1, 1, 0));
-  // group.add(canvas);
 
   const points = acanthus(
     new paper.Point(0, 0),
@@ -72,45 +78,20 @@ export function acanthusLeaf(settings: ColumnAcanthus, material: Material) {
     canvas.add(createPoint(1, new Vector3(point.x, point.y, 0), true));
   });
 
-  // canvas.translateX(-canvasSize / 2);
-  // canvas.rotateY(Math.PI / 2);
-
-  // Create the extrude path from acanthus points with circular ending
-  const extrudePath = new CatmullRomCurve3(
-    points.map((p) => new Vector3(p.x, p.y, 0)),
-  );
+  // Create the extrude path from acanthus points
+  const extrudePath = new CatmullRomCurve3(pointsToVector3(points));
   extrudePath.curveType = "catmullrom";
   extrudePath.closed = false; // Acanthus spiral shouldn't be closed
 
-  // Create a simple cross-section shape to extrude along the path
-  // This creates a rectangular cross-section for the acanthus leaf with subdivisions
+  // Create a simple rectangular cross-section shape to extrude along the path
   const crossSectionWidth = 5;
   const crossSectionHeight = 0.5;
-  const subdivisions = 8; // Number of subdivisions along the width
 
   const shape = new Shape();
-
-  // Create subdivided shape along x-axis for better geometry detail
-  const stepWidth = crossSectionWidth / subdivisions;
-
-  // Start from left bottom
   shape.moveTo(-crossSectionWidth / 2, -crossSectionHeight / 2);
-
-  // Bottom edge with subdivisions
-  for (let i = 1; i <= subdivisions; i++) {
-    const x = -crossSectionWidth / 2 + i * stepWidth;
-    shape.lineTo(x, -crossSectionHeight / 2);
-  }
-
-  // Right edge
+  shape.lineTo(crossSectionWidth / 2, -crossSectionHeight / 2);
   shape.lineTo(crossSectionWidth / 2, crossSectionHeight / 2);
-
-  // Top edge with subdivisions (reverse order)
-  for (let i = subdivisions - 1; i >= 0; i--) {
-    const x = -crossSectionWidth / 2 + i * stepWidth;
-    shape.lineTo(x, crossSectionHeight / 2);
-  }
-
+  shape.lineTo(-crossSectionWidth / 2, crossSectionHeight / 2);
   shape.closePath();
 
   const extrudeSettings = {
@@ -123,20 +104,39 @@ export function acanthusLeaf(settings: ColumnAcanthus, material: Material) {
   const geometry = new ExtrudeGeometry(shape, extrudeSettings);
   geometry.rotateX(Math.PI);
   geometry.rotateY(-Math.PI / 2);
-  const dimensions = getGeometryDimensions(geometry);
-  geometry.translate(0, canvasSize, 0);
-
+  centerGeometry(geometry);
   return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 
 export function columnAcanthus(settings: ColumnAcanthus, material: Material) {
   const group = new Object3D();
 
-  const leaf = acanthusLeaf(settings, material);
-  leaf.add(
-    new ArrowHelper(new Vector3(0, 0, 1), new Vector3(0, 0, 0), 5, 0xffff00),
-  );
-  group.add(leaf);
+  // Ensure we have valid settings with defaults
+  const radius = settings.radius || 10;
+  const leafCount = settings.leafCount || 12;
+
+  // const leaf = acanthusLeaf(settings, material);
+  // leaf.add(new ArrowHelper(new Vector3(0, 0, 1), new Vector3(0, 0, 0), 5));
+  // group.add(leaf);
+
+  // Create multiple acanthus leaves positioned around the circle
+  for (let i = 0; i < leafCount; i++) {
+    const leaf = acanthusLeaf(settings, material);
+
+    // Calculate angle for this leaf
+    const angle = (i / leafCount) * Math.PI * 2;
+
+    // Position the leaf around the circle
+    const x = Math.cos(angle) * radius;
+    const z = Math.sin(angle) * radius;
+
+    leaf.position.set(x, 0, z);
+
+    // Rotate the leaf to face outward from the center
+    leaf.rotation.y = (i * (Math.PI * 2)) / leafCount;
+
+    group.add(leaf);
+  }
 
   return group;
 }
@@ -152,15 +152,25 @@ export class GUIAcanthus extends GUIController {
 
     this.gui.addBinding(target, "helper").on("change", this.onChange);
     this.gui.addBinding(target, "wireframe").on("change", this.onChange);
+    // this.gui
+    //   .addBinding(target, "radius", {
+    //     min: 5,
+    //     max: 20,
+    //     step: 0.5,
+    //   })
+    //   .on("change", this.onChange);
+    // this.gui
+    //   .addBinding(target, "leafCount", {
+    //     min: 3,
+    //     max: 24,
+    //     step: 1,
+    //   })
+    //   .on("change", this.onChange);
     this.gui
       .addBinding(target, "taperMode", {
         options: {
           Linear: "linear",
           Sine: "sine",
-          Quadratic: "quadratic",
-          Exponential: "exponential",
-          Custom: "custom",
-          Circular: "circular",
         },
       })
       .on("change", this.onChange);

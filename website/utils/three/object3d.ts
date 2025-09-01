@@ -1,6 +1,8 @@
+import { getGeometryDimensions } from "@/stories/forms/column/geometry/column-echinus-geometry";
 import {
   Box3,
   Box3Helper,
+  BufferGeometry,
   Mesh,
   MeshBasicMaterial,
   Object3D,
@@ -88,4 +90,13 @@ export function createPoint(
     object.position.copy(position);
   }
   return object;
+}
+
+export function centerGeometry(geometry: BufferGeometry) {
+  const dimensions = getGeometryDimensions(geometry);
+  geometry.translate(
+    -dimensions.center.x,
+    -dimensions.center.y,
+    -dimensions.center.z,
+  );
 }
