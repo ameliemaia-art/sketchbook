@@ -48,12 +48,25 @@ export function corinthianColumnCapital(
   echinus.name = "echinus";
   const abacus = columnAbacus(settings.abacus, material);
   abacus.name = "abacus";
-  const acanthus = columnAcanthus(
+  const acanthusBase = columnAcanthus(
     settings.acanthus,
     settings.acanthus.base,
     material,
   );
-  acanthus.name = "acanthus";
+  acanthusBase.name = "acanthus-base";
+  const acanthusMiddle = columnAcanthus(
+    settings.acanthus,
+    settings.acanthus.middle,
+    material,
+  );
+  acanthusMiddle.name = "acanthus-middle";
+
+  const acanthusTop = columnAcanthus(
+    settings.acanthus,
+    settings.acanthus.top,
+    material,
+  );
+  acanthusTop.name = "acanthus-top";
 
   if (settings.necking.helper) {
     group.add(boundingBox(necking));
@@ -72,17 +85,18 @@ export function corinthianColumnCapital(
   }
 
   if (settings.acanthus.helper) {
-    group.add(boundingBox(acanthus));
+    group.add(boundingBox(acanthusBase));
+    group.add(boundingBox(acanthusMiddle));
+    group.add(boundingBox(acanthusTop));
   }
 
   addAndStack(group, necking, torus, echinus, abacus);
-  group.add(acanthus);
-  acanthus.position.y = echinus.position.y;
-  // addAndStack(group, necking, torus, acanthus);
-
-  // acanthus.position.y = echinus.position.y;
-
-  // group.add(acanthus);
+  group.add(acanthusBase);
+  group.add(acanthusMiddle);
+  group.add(acanthusTop);
+  acanthusBase.position.y = echinus.position.y;
+  acanthusMiddle.position.y = echinus.position.y;
+  acanthusTop.position.y = echinus.position.y;
 
   return group;
 }
@@ -112,12 +126,26 @@ export class GUICorinthianCapital extends GUIController {
     this.controllers.abacus = new GUIAbacus(this.gui, target.abacus);
     this.controllers.abacus.addEventListener("change", this.onChange);
 
-    this.controllers.acanthus = new GUIAcanthus(
+    this.controllers.acanthusBase = new GUIAcanthus(
       this.gui,
       target.acanthus,
       target.acanthus.base,
     );
-    this.controllers.acanthus.addEventListener("change", this.onChange);
+    this.controllers.acanthusBase.addEventListener("change", this.onChange);
+
+    this.controllers.acanthusMiddle = new GUIAcanthus(
+      this.gui,
+      target.acanthus,
+      target.acanthus.middle,
+    );
+    this.controllers.acanthusMiddle.addEventListener("change", this.onChange);
+
+    this.controllers.acanthusTop = new GUIAcanthus(
+      this.gui,
+      target.acanthus,
+      target.acanthus.top,
+    );
+    this.controllers.acanthusTop.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

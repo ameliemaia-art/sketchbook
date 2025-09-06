@@ -36,7 +36,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     outline: true,
   },
   // Path Profile to render
-  pathProfile: PathProfileProfile.AcanthusBase,
+  pathProfile: PathProfileProfile.AcanthusTop,
   // Paths
   torus: {
     divisions: 25,

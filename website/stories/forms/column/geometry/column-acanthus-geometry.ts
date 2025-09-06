@@ -4,6 +4,7 @@ import {
 } from "@/stories/blueprints/path-profile/acanthus-geometry";
 import paper from "paper";
 import {
+  Box3,
   BufferGeometry,
   CatmullRomCurve3,
   LineBasicMaterial,
@@ -53,16 +54,17 @@ export type AcanthusTier = {
   leafWidth: number;
   leafHeight: number;
   leafSubdivisions: number;
-  useBevels: boolean; // Enable/disable bevels (affects extrusion method)
-  bevelThickness: number;
   chamferSize: number; // Size of the chamfer
-  extrudeDepth: number; // Depth for simple extrusion when not using path
+  positionY: number;
+  rotationY: number;
 };
 
 export type ColumnAcanthus = {
   helper: boolean;
   wireframe: boolean;
   base: AcanthusTier;
+  middle: AcanthusTier;
+  top: AcanthusTier;
 };
 
 export function acanthusLeaf(
@@ -267,6 +269,20 @@ export function columnAcanthus(
     group.add(flow.object3D);
   }
 
+  // Get size of group and shift the inner meshes up by half their height
+  const box = new Box3().setFromObject(group);
+  const height = box.max.y - box.min.y;
+  const offsetY = height / 2;
+
+  // Move all leaves up so their bottom edge is at y=0
+  group.children.forEach((child) => {
+    if (child instanceof Mesh || (child as any).object3D instanceof Mesh) {
+      child.position.y += offsetY + tierSettings.positionY;
+    }
+  });
+
+  group.rotation.y = MathUtils.degToRad(tierSettings.rotationY);
+
   return group;
 }
 
@@ -321,6 +337,19 @@ export class GUIAcanthus extends GUIController {
         min: 0,
         max: 0.5,
         step: 0.01,
+      })
+      .on("change", this.onChange);
+
+    this.gui
+      .addBinding(tierSettings, "positionY", {
+        min: 0,
+      })
+      .on("change", this.onChange);
+
+    this.gui
+      .addBinding(tierSettings, "rotationY", {
+        min: 0,
+        max: 360,
       })
       .on("change", this.onChange);
   }
