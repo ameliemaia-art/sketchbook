@@ -53,6 +53,10 @@ export type AcanthusTier = {
   leafWidth: number;
   leafHeight: number;
   leafSubdivisions: number;
+  useBevels: boolean; // Enable/disable bevels (affects extrusion method)
+  bevelThickness: number;
+  chamferSize: number; // Size of the chamfer
+  extrudeDepth: number; // Depth for simple extrusion when not using path
 };
 
 export type ColumnAcanthus = {
@@ -89,44 +93,110 @@ export function acanthusLeaf(
 
   const shape = new Shape();
 
-  // Create subdivided shape along x-axis for better Flow modifier results
-  const stepWidth = tierSettings.leafWidth / tierSettings.leafSubdivisions;
+  const chamferSize = tierSettings.chamferSize;
 
-  // Start from left bottom
-  shape.moveTo(-tierSettings.leafWidth / 2, -tierSettings.leafHeight / 2);
+  // Create chamfered rectangle shape
+  const halfWidth = tierSettings.leafWidth / 2;
+  const halfHeight = tierSettings.leafHeight / 2;
 
-  // Bottom edge with subdivisions
-  for (let i = 1; i <= tierSettings.leafSubdivisions; i++) {
-    const x = -tierSettings.leafWidth / 2 + i * stepWidth;
-    shape.lineTo(x, -tierSettings.leafHeight / 2);
-  }
+  if (chamferSize > 0) {
+    // Create smooth rounded box-style chamfers using quadratic curves
+    shape.moveTo(-halfWidth + chamferSize, -halfHeight);
 
-  // Right edge
-  shape.lineTo(tierSettings.leafWidth / 2, tierSettings.leafHeight / 2);
+    // Bottom edge with subdivisions
+    const stepWidth =
+      (tierSettings.leafWidth - 2 * chamferSize) /
+      tierSettings.leafSubdivisions;
+    for (let i = 1; i <= tierSettings.leafSubdivisions; i++) {
+      const x = -halfWidth + chamferSize + i * stepWidth;
+      shape.lineTo(x, -halfHeight);
+    }
 
-  // Top edge with subdivisions (reverse order)
-  for (let i = tierSettings.leafSubdivisions - 1; i >= 0; i--) {
-    const x = -tierSettings.leafWidth / 2 + i * stepWidth;
-    shape.lineTo(x, tierSettings.leafHeight / 2);
+    // Bottom-right rounded corner
+    shape.lineTo(halfWidth - chamferSize, -halfHeight);
+    shape.quadraticCurveTo(
+      halfWidth,
+      -halfHeight,
+      halfWidth,
+      -halfHeight + chamferSize,
+    );
+
+    // Right edge
+    shape.lineTo(halfWidth, halfHeight - chamferSize);
+
+    // Top-right rounded corner
+    shape.quadraticCurveTo(
+      halfWidth,
+      halfHeight,
+      halfWidth - chamferSize,
+      halfHeight,
+    );
+
+    // Top edge with subdivisions (reverse order)
+    for (let i = tierSettings.leafSubdivisions - 1; i >= 0; i--) {
+      const x = -halfWidth + chamferSize + i * stepWidth;
+      shape.lineTo(x, halfHeight);
+    }
+
+    // Top-left rounded corner
+    shape.lineTo(-halfWidth + chamferSize, halfHeight);
+    shape.quadraticCurveTo(
+      -halfWidth,
+      halfHeight,
+      -halfWidth,
+      halfHeight - chamferSize,
+    );
+
+    // Left edge
+    shape.lineTo(-halfWidth, -halfHeight + chamferSize);
+
+    // Bottom-left rounded corner
+    shape.quadraticCurveTo(
+      -halfWidth,
+      -halfHeight,
+      -halfWidth + chamferSize,
+      -halfHeight,
+    );
+  } else {
+    // Create subdivided shape along x-axis for better Flow modifier results
+    const stepWidth = tierSettings.leafWidth / tierSettings.leafSubdivisions;
+
+    // Start from left bottom
+    shape.moveTo(-halfWidth, -halfHeight);
+
+    // Bottom edge with subdivisions
+    for (let i = 1; i <= tierSettings.leafSubdivisions; i++) {
+      const x = -halfWidth + i * stepWidth;
+      shape.lineTo(x, -halfHeight);
+    }
+
+    // Right edge
+    shape.lineTo(halfWidth, halfHeight);
+
+    // Top edge with subdivisions (reverse order)
+    for (let i = tierSettings.leafSubdivisions - 1; i >= 0; i--) {
+      const x = -halfWidth + i * stepWidth;
+      shape.lineTo(x, halfHeight);
+    }
   }
 
   shape.closePath();
 
+  // Create extrude settings with path extrusion (chamfer is built into the shape)
   const extrudeSettings = {
     steps: 50,
-    bevelEnabled: false,
+    bevelEnabled: false, // Chamfer is handled by the shape itself
     extrudePath: extrudePath,
-    taperFunction: createTaperFunction(tierSettings.leafTaperMode, 1, 0.25),
+    taperFunction: createTaperFunction(tierSettings.leafTaperMode, 1, 0),
   };
 
   const geometry = new ExtrudeGeometry(shape, extrudeSettings);
+
+  // Apply transformations carefully
   geometry.rotateX(Math.PI);
   geometry.rotateY(Math.PI / 2);
   centerGeometry(geometry);
 
-  const dimensions = getGeometryDimensions(geometry);
-
-  geometry.translate(0, dimensions.height / 2, 0);
   return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 
@@ -243,6 +313,14 @@ export class GUIAcanthus extends GUIController {
           Linear: "linear",
           Sine: "sine",
         },
+      })
+      .on("change", this.onChange);
+
+    this.gui
+      .addBinding(tierSettings, "chamferSize", {
+        min: 0,
+        max: 0.5,
+        step: 0.01,
       })
       .on("change", this.onChange);
   }
