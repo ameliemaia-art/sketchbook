@@ -70,7 +70,17 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     cp3: { x: 0.32, y: 0.31 },
     cp4: { x: 0.58, y: 0.4 },
   },
-  acanthusTop: {
+  acanthusVoluteCorner: {
+    spiralTurns: 1,
+    spiralDivisions: 20,
+    smoothness: 100,
+    cp0: { x: 0.2, y: 1 },
+    cp1: { x: 0.15, y: 0.8 },
+    cp2: { x: 0.17, y: 0.53 },
+    cp3: { x: 0.32, y: 0.31 },
+    cp4: { x: 0.58, y: 0.4 },
+  },
+  acanthusVoluteCenter: {
     spiralTurns: 1,
     spiralDivisions: 20,
     smoothness: 100,
@@ -93,7 +103,14 @@ export default class PathProfile extends Sketch {
 
     Object.assign(this.settings.acanthusBase, acanthusBaseSettings);
     Object.assign(this.settings.acanthusMiddle, acanthusMiddleSettings);
-    Object.assign(this.settings.acanthusTop, acanthusTopSettings);
+    Object.assign(
+      this.settings.acanthusVoluteCenter,
+      acanthusVoluteCenterSettings,
+    );
+    Object.assign(
+      this.settings.acanthusVoluteCorner,
+      acanthusVoluteCornerSettings,
+    );
   }
 
   draw() {

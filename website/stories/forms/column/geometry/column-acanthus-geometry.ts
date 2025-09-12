@@ -3,6 +3,7 @@ import {
   acanthusPath,
 } from "@/stories/blueprints/path-profile/acanthus-geometry";
 import paper from "paper";
+import { Group } from "paper/dist/paper-core";
 import {
   Box3,
   BufferGeometry,
@@ -299,31 +300,52 @@ export function columnAcanthusVolute(
   const group = new Object3D();
 
   const corners = columnAcanthusTier(settings, voluteCorners, material);
+  corners.name = "acanthus-volute-corners";
 
-  const leaf0 = acanthusLeaf(settings, voluteCenter, material);
-  leaf0.position.y = voluteCenter.positionY;
-  leaf0.position.x = -voluteCorners.leafWidth / 5;
-  leaf0.rotation.y = MathUtils.degToRad(-35);
-  leaf0.position.z = -voluteCenter.radius;
-  const leaf1 = acanthusLeaf(settings, voluteCenter, material);
-  leaf1.position.y = voluteCenter.positionY;
-  leaf1.position.x = voluteCorners.leafWidth / 5;
-  leaf1.rotation.y = MathUtils.degToRad(35);
-  leaf1.position.z = -voluteCenter.radius;
+  const centers = new Object3D();
+  centers.name = "acanthus-volute-centers";
 
-  group.add(corners);
-  group.add(leaf0);
-  group.add(leaf1);
+  // Create 2 leaves at each 90-degree position, both facing inward at 35 degrees
+  for (let i = 0; i < 4; i++) {
+    const angle = i * 90; // 0°, 90°, 180°, 270°
+    const angleRad = MathUtils.degToRad(angle);
 
-  const box = new Box3().setFromObject(group);
-  const height = box.max.y - box.min.y;
-  const offsetY = height / 2;
+    // Create a group for this pair of leaves
+    const leafPairGroup = new Object3D();
 
-  group.children.forEach((child) => {
-    if (child instanceof Mesh || (child as any).object3D instanceof Mesh) {
-      child.position.y += offsetY; // + voluteCorners.positionY;
+    // Create two leaves with the original simple rotations
+    for (let j = 0; j < 2; j++) {
+      const leaf = acanthusLeaf(settings, voluteCenter, material);
+      leaf.position.y = voluteCenter.positionY;
+
+      // Use the original simple positioning and rotation logic
+      const offsetDirection = j === 0 ? -1 : 1;
+      const offsetAmount = voluteCorners.leafWidth / 5;
+      leaf.position.x = offsetDirection * offsetAmount;
+      leaf.position.z = -voluteCenter.radius;
+      leaf.rotation.y = MathUtils.degToRad(offsetDirection * 20);
+
+      leafPairGroup.add(leaf);
     }
-  });
+
+    // Position and rotate the entire group
+    leafPairGroup.position.set(0, 0, 0);
+    leafPairGroup.rotation.y = angleRad;
+
+    centers.add(leafPairGroup);
+
+    const box = new Box3().setFromObject(leafPairGroup);
+    const height = box.max.y - box.min.y;
+    const offsetY = height / 2;
+
+    leafPairGroup.children.forEach((child) => {
+      if (child instanceof Mesh || (child as any).object3D instanceof Mesh) {
+        child.position.y += offsetY;
+      }
+    });
+  }
+
+  group.add(corners, centers);
 
   return group;
 }

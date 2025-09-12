@@ -121,14 +121,14 @@ export default class ColumnCorinthianForm extends ColumnForm {
       },
       echinus: {
         topHeight: 0.5,
-        bottomRadius: 8.5,
+        bottomRadius: 5,
         topRadius: 15,
         bottomHeight: 0,
         height: 15,
         divisions: 25,
         radialSegments: 32,
         helper: true,
-        wireframe: false,
+        wireframe: true,
       },
       abacus: {
         height: 5,
@@ -152,7 +152,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
           leafSubdivisions: 12,
           chamferSize: 0.25,
           positionY: 0,
-          rotationY: 0,
+          rotationY: 15,
           voluteLeaves: false,
         },
         middle: {
@@ -184,7 +184,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
           },
           center: {
             path: acanthusVoluteCenterPath,
-            radius: 7.5,
+            radius: 10,
             leafTaperMode: "sine",
             leafCount: 4,
             leafWidth: 5,

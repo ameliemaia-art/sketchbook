@@ -47,27 +47,20 @@ export function corinthianColumnCapital(
   torus.name = "torus";
   const echinus = columnEchinus(settings.echinus, material);
   echinus.name = "echinus";
-  const abacus = columnAbacus(settings.abacus, material);
-  abacus.name = "abacus";
-  // const acanthusBase = columnAcanthusTier(
-  //   settings.acanthus,
-  //   settings.acanthus.base,
-  //   material,
-  // );
-  // acanthusBase.name = "acanthus-base";
-  // const acanthusMiddle = columnAcanthusTier(
-  //   settings.acanthus,
-  //   settings.acanthus.middle,
-  //   material,
-  // );
-  // acanthusMiddle.name = "acanthus-middle";
-
-  // const acanthusTop = columnAcanthusTier(
-  //   settings.acanthus,
-  //   settings.acanthus.top,
-  //   material,
-  // );
-  // acanthusTop.name = "acanthus-top";
+  // const abacus = columnAbacus(settings.abacus, material);
+  // abacus.name = "abacus";
+  const acanthusBase = columnAcanthusTier(
+    settings.acanthus,
+    settings.acanthus.base,
+    material,
+  );
+  acanthusBase.name = "acanthus-base";
+  const acanthusMiddle = columnAcanthusTier(
+    settings.acanthus,
+    settings.acanthus.middle,
+    material,
+  );
+  acanthusMiddle.name = "acanthus-middle";
 
   const acanthusVolute = columnAcanthusVolute(
     settings.acanthus,
@@ -99,13 +92,13 @@ export function corinthianColumnCapital(
   //   group.add(boundingBox(acanthusTop));
   // }
 
-  // addAndStack(group, necking, torus, echinus, abacus);
-  // group.add(acanthusBase);
-  // group.add(acanthusMiddle);
+  addAndStack(group, necking, torus, echinus);
+  group.add(acanthusBase);
+  group.add(acanthusMiddle);
   group.add(acanthusVolute);
-  // acanthusBase.position.y = echinus.position.y;
-  // acanthusMiddle.position.y = echinus.position.y;
-  // acanthusTop.position.y = echinus.position.y;
+  acanthusBase.position.y = echinus.position.y;
+  acanthusMiddle.position.y = echinus.position.y;
+  acanthusVolute.position.y = echinus.position.y;
 
   return group;
 }
