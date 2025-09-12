@@ -28,6 +28,7 @@ import {
 } from "three/examples/jsm/Addons.js";
 import { Pane } from "tweakpane";
 
+import { n8AOPassBinding } from "@utils/editor/bindings/gui-post-processing-bindings";
 import GUIController from "@utils/editor/gui/gui";
 import GUISceneController from "@utils/editor/gui/scene/gui-scene";
 import BookmarkManager, {
@@ -124,7 +125,7 @@ export default class WebGLApp extends EventDispatcher {
     this.copyPassToRenderTarget = new ShaderPass(CopyShader);
 
     this.postProcessing.addPass(this.renderPass);
-    // this.postProcessing.addPass(this.aoPass);
+    this.postProcessing.addPass(this.aoPass);
     // this.postProcessing.addPass(this.bloomPass);
     this.postProcessing.addPass(this.fxaaPass);
     this.postProcessing.addPass(this.outputPass);
@@ -372,7 +373,7 @@ export class GUIWebGLApp extends GUIController {
     this.gui.addBinding(target.settings, "orthCamera");
     this.gui.addBinding(target.settings, "helpers");
 
-    // this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
+    this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
 
     // this.folders.fxaa = this.addFolder(this.folders.passes, { title: "FXAA" });
     // fxaaPassBinding(this.folders.fxaa, target.fxaaPass);
@@ -387,10 +388,10 @@ export class GUIWebGLApp extends GUIController {
     // });
     // vignettePassBinding(this.folders.vignette, target.vignettePass);
 
-    // this.folders.ao = this.addFolder(this.folders.passes, {
-    //   title: "Ambient Occlusion",
-    // });
-    // n8AOPassBinding(this.folders.ao, target.aoPass);
+    this.folders.ao = this.addFolder(this.folders.passes, {
+      title: "Ambient Occlusion",
+    });
+    n8AOPassBinding(this.folders.ao, target.aoPass);
 
     this.controllers.screenshot = new GUIScreenshot(
       this.gui,

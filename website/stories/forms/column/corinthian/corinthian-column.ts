@@ -31,8 +31,8 @@ type ColumnSettings = {
   captital: CorinthianColumnCaptitalSettings;
 };
 
-const CREATE_BASE = false;
-const CREATE_SHAFT = false;
+const CREATE_BASE = true;
+const CREATE_SHAFT = true;
 const CREATE_CAPITAL = true;
 
 export default class ColumnCorinthianForm extends ColumnForm {
@@ -50,7 +50,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         widthSegments: 1,
         heightSegments: 1,
         depthSegments: 1,
-        helper: true,
+        helper: false,
         wireframe: false,
       },
       torus: {
@@ -59,7 +59,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
-        helper: true,
+        helper: false,
         wireframe: false,
       },
       scotia: {
@@ -70,7 +70,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         height: 3,
         divisions: 25,
         radialSegments: 32,
-        helper: true,
+        helper: false,
         wireframe: false,
       },
       torus2: {
@@ -79,7 +79,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         buldge: 1,
         heightSegments: 32,
         radialSegments: 64,
-        helper: true,
+        helper: false,
         wireframe: false,
       },
     },
@@ -93,9 +93,9 @@ export default class ColumnCorinthianForm extends ColumnForm {
         height: 45,
         radialSegments: 32,
         capSegments: 16,
-        scale: 0.5,
+        scale: 0.75,
       },
-      helper: true,
+      helper: false,
       wireframe: false,
     },
     captital: {
@@ -107,7 +107,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         height: 5,
         divisions: 25,
         radialSegments: 32,
-        helper: true,
+        helper: false,
         wireframe: false,
       },
       torus: {
@@ -116,7 +116,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         buldge: 1.25,
         heightSegments: 32,
         radialSegments: 64,
-        helper: true,
+        helper: false,
         wireframe: false,
       },
       echinus: {
@@ -127,8 +127,8 @@ export default class ColumnCorinthianForm extends ColumnForm {
         height: 15,
         divisions: 25,
         radialSegments: 32,
-        helper: true,
-        wireframe: true,
+        helper: false,
+        wireframe: false,
       },
       abacus: {
         height: 5,
@@ -136,11 +136,11 @@ export default class ColumnCorinthianForm extends ColumnForm {
         widthSegments: 1,
         heightSegments: 1,
         depthSegments: 1,
-        helper: true,
+        helper: false,
         wireframe: false,
       },
       acanthus: {
-        helper: true,
+        helper: false,
         wireframe: false,
         base: {
           path: acanthusBasePath,
@@ -214,24 +214,6 @@ export default class ColumnCorinthianForm extends ColumnForm {
     super();
     this.column.name = "Corinthium Column";
     this.scene.add(this.column);
-  }
-
-  /**
-   * Deep compare two objects to detect changes
-   */
-  private hasChanged<T>(current: T, previous: T | undefined): boolean {
-    if (!previous) return true;
-    return JSON.stringify(current) !== JSON.stringify(previous);
-  }
-
-  /**
-   * Update stored settings for a component
-   */
-  private updateStoredSettings<K extends keyof ColumnSettings>(
-    key: K,
-    settings: ColumnSettings[K],
-  ) {
-    this.previousSettings[key] = JSON.parse(JSON.stringify(settings));
   }
 
   generate = () => {
