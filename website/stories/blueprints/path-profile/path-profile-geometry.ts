@@ -19,7 +19,8 @@ export enum PathProfileProfile {
   Scotia = "Scotia",
   AcanthusBase = "AcanthusBase",
   AcanthusMiddle = "AcanthusMiddle",
-  AcanthusTop = "AcanthusTop",
+  AcanthusVoluteCorner = "AcanthusVoluteCorner",
+  AcanthusVoluteCenter = "AcanthusVoluteCenter",
 }
 
 export type PathProfileSettings = {

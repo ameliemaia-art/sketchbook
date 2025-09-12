@@ -3,7 +3,8 @@ import { Group, Mesh, Object3D } from "three";
 import { addAndStack, stack } from "@utils/three/object3d";
 import acanthusBasePath from "../../../blueprints/path-profile/data/acanthus-base-settings.json";
 import acanthusMiddlePath from "../../../blueprints/path-profile/data/acanthus-middle-settings.json";
-import acanthusTopPath from "../../../blueprints/path-profile/data/acanthus-top-settings.json";
+import acanthusVoluteCenterPath from "../../../blueprints/path-profile/data/acanthus-volute-center-settings.json";
+import acanthusVoluteCornersPath from "../../../blueprints/path-profile/data/acanthus-volute-corner-settings.json";
 import { floor, FloorSettings } from "../../geometry/floor-geometry";
 import { GUIWebGLApp } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
@@ -30,8 +31,8 @@ type ColumnSettings = {
   captital: CorinthianColumnCaptitalSettings;
 };
 
-const CREATE_BASE = true;
-const CREATE_SHAFT = true;
+const CREATE_BASE = false;
+const CREATE_SHAFT = false;
 const CREATE_CAPITAL = true;
 
 export default class ColumnCorinthianForm extends ColumnForm {
@@ -152,6 +153,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
           chamferSize: 0.25,
           positionY: 0,
           rotationY: 0,
+          voluteLeaves: false,
         },
         middle: {
           path: acanthusMiddlePath,
@@ -164,18 +166,35 @@ export default class ColumnCorinthianForm extends ColumnForm {
           chamferSize: 0.25,
           positionY: 2,
           rotationY: 0,
+          voluteLeaves: false,
         },
-        top: {
-          path: acanthusTopPath,
-          radius: 7.5,
-          leafTaperMode: "sine",
-          leafCount: 4,
-          leafWidth: 9,
-          leafHeight: 0.5,
-          leafSubdivisions: 12,
-          chamferSize: 0.25,
-          positionY: 4,
-          rotationY: 45,
+        volute: {
+          corner: {
+            path: acanthusVoluteCornersPath,
+            radius: 7.5,
+            leafTaperMode: "sine",
+            leafCount: 4,
+            leafWidth: 9,
+            leafHeight: 0.5,
+            leafSubdivisions: 12,
+            chamferSize: 0.25,
+            positionY: 4,
+            rotationY: 45,
+            voluteLeaves: true,
+          },
+          center: {
+            path: acanthusVoluteCenterPath,
+            radius: 7.5,
+            leafTaperMode: "sine",
+            leafCount: 4,
+            leafWidth: 5,
+            leafHeight: 0.5,
+            leafSubdivisions: 12,
+            chamferSize: 0.25,
+            positionY: 4,
+            rotationY: 45,
+            voluteLeaves: true,
+          },
         },
       },
     },

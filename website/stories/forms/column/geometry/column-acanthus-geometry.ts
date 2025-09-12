@@ -57,6 +57,7 @@ export type AcanthusTier = {
   chamferSize: number; // Size of the chamfer
   positionY: number;
   rotationY: number;
+  voluteLeaves: boolean;
 };
 
 export type ColumnAcanthus = {
@@ -64,7 +65,10 @@ export type ColumnAcanthus = {
   wireframe: boolean;
   base: AcanthusTier;
   middle: AcanthusTier;
-  top: AcanthusTier;
+  volute: {
+    corner: AcanthusTier;
+    center: AcanthusTier;
+  };
 };
 
 export function acanthusLeaf(
@@ -202,7 +206,7 @@ export function acanthusLeaf(
   return new Mesh(geometry, settings.wireframe ? wireframeMaterial : material);
 }
 
-export function columnAcanthus(
+export function columnAcanthusTier(
   settings: ColumnAcanthus,
   tierSettings: AcanthusTier,
   material: Material,
@@ -282,6 +286,44 @@ export function columnAcanthus(
   });
 
   group.rotation.y = MathUtils.degToRad(tierSettings.rotationY);
+
+  return group;
+}
+
+export function columnAcanthusVolute(
+  settings: ColumnAcanthus,
+  voluteCorners: AcanthusTier,
+  voluteCenter: AcanthusTier,
+  material: Material,
+) {
+  const group = new Object3D();
+
+  const corners = columnAcanthusTier(settings, voluteCorners, material);
+
+  const leaf0 = acanthusLeaf(settings, voluteCenter, material);
+  leaf0.position.y = voluteCenter.positionY;
+  leaf0.position.x = -voluteCorners.leafWidth / 5;
+  leaf0.rotation.y = MathUtils.degToRad(-35);
+  leaf0.position.z = -voluteCenter.radius;
+  const leaf1 = acanthusLeaf(settings, voluteCenter, material);
+  leaf1.position.y = voluteCenter.positionY;
+  leaf1.position.x = voluteCorners.leafWidth / 5;
+  leaf1.rotation.y = MathUtils.degToRad(35);
+  leaf1.position.z = -voluteCenter.radius;
+
+  group.add(corners);
+  group.add(leaf0);
+  group.add(leaf1);
+
+  const box = new Box3().setFromObject(group);
+  const height = box.max.y - box.min.y;
+  const offsetY = height / 2;
+
+  group.children.forEach((child) => {
+    if (child instanceof Mesh || (child as any).object3D instanceof Mesh) {
+      child.position.y += offsetY; // + voluteCorners.positionY;
+    }
+  });
 
   return group;
 }

@@ -10,7 +10,8 @@ import {
 } from "../geometry/column-abacus-geometry";
 import {
   ColumnAcanthus,
-  columnAcanthus,
+  columnAcanthusTier,
+  columnAcanthusVolute,
   GUIAcanthus,
 } from "../geometry/column-acanthus-geometry";
 import {
@@ -48,55 +49,63 @@ export function corinthianColumnCapital(
   echinus.name = "echinus";
   const abacus = columnAbacus(settings.abacus, material);
   abacus.name = "abacus";
-  const acanthusBase = columnAcanthus(
+  // const acanthusBase = columnAcanthusTier(
+  //   settings.acanthus,
+  //   settings.acanthus.base,
+  //   material,
+  // );
+  // acanthusBase.name = "acanthus-base";
+  // const acanthusMiddle = columnAcanthusTier(
+  //   settings.acanthus,
+  //   settings.acanthus.middle,
+  //   material,
+  // );
+  // acanthusMiddle.name = "acanthus-middle";
+
+  // const acanthusTop = columnAcanthusTier(
+  //   settings.acanthus,
+  //   settings.acanthus.top,
+  //   material,
+  // );
+  // acanthusTop.name = "acanthus-top";
+
+  const acanthusVolute = columnAcanthusVolute(
     settings.acanthus,
-    settings.acanthus.base,
+    settings.acanthus.volute.corner,
+    settings.acanthus.volute.center,
     material,
   );
-  acanthusBase.name = "acanthus-base";
-  const acanthusMiddle = columnAcanthus(
-    settings.acanthus,
-    settings.acanthus.middle,
-    material,
-  );
-  acanthusMiddle.name = "acanthus-middle";
+  acanthusVolute.name = "acanthus-volute";
 
-  const acanthusTop = columnAcanthus(
-    settings.acanthus,
-    settings.acanthus.top,
-    material,
-  );
-  acanthusTop.name = "acanthus-top";
+  // if (settings.necking.helper) {
+  //   group.add(boundingBox(necking));
+  // }
 
-  if (settings.necking.helper) {
-    group.add(boundingBox(necking));
-  }
+  // if (settings.torus.helper) {
+  //   group.add(boundingBox(torus));
+  // }
 
-  if (settings.torus.helper) {
-    group.add(boundingBox(torus));
-  }
+  // if (settings.echinus.helper) {
+  //   group.add(boundingBox(echinus));
+  // }
 
-  if (settings.echinus.helper) {
-    group.add(boundingBox(echinus));
-  }
+  // if (settings.abacus.helper) {
+  //   group.add(boundingBox(abacus));
+  // }
 
-  if (settings.abacus.helper) {
-    group.add(boundingBox(abacus));
-  }
+  // if (settings.acanthus.helper) {
+  //   group.add(boundingBox(acanthusBase));
+  //   group.add(boundingBox(acanthusMiddle));
+  //   group.add(boundingBox(acanthusTop));
+  // }
 
-  if (settings.acanthus.helper) {
-    group.add(boundingBox(acanthusBase));
-    group.add(boundingBox(acanthusMiddle));
-    group.add(boundingBox(acanthusTop));
-  }
-
-  addAndStack(group, necking, torus, echinus, abacus);
-  group.add(acanthusBase);
-  group.add(acanthusMiddle);
-  group.add(acanthusTop);
-  acanthusBase.position.y = echinus.position.y;
-  acanthusMiddle.position.y = echinus.position.y;
-  acanthusTop.position.y = echinus.position.y;
+  // addAndStack(group, necking, torus, echinus, abacus);
+  // group.add(acanthusBase);
+  // group.add(acanthusMiddle);
+  group.add(acanthusVolute);
+  // acanthusBase.position.y = echinus.position.y;
+  // acanthusMiddle.position.y = echinus.position.y;
+  // acanthusTop.position.y = echinus.position.y;
 
   return group;
 }
@@ -140,12 +149,12 @@ export class GUICorinthianCapital extends GUIController {
     );
     this.controllers.acanthusMiddle.addEventListener("change", this.onChange);
 
-    this.controllers.acanthusTop = new GUIAcanthus(
-      this.gui,
-      target.acanthus,
-      target.acanthus.top,
-    );
-    this.controllers.acanthusTop.addEventListener("change", this.onChange);
+    // this.controllers.acanthusTop = new GUIAcanthus(
+    //   this.gui,
+    //   target.acanthus,
+    //   target.acanthus.top,
+    // );
+    // this.controllers.acanthusTop.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

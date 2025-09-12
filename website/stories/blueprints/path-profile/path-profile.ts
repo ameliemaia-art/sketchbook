@@ -8,7 +8,8 @@ import Sketch, {
 } from "../sketch/sketch";
 import acanthusBaseSettings from "./data/acanthus-base-settings.json";
 import acanthusMiddleSettings from "./data/acanthus-middle-settings.json";
-import acanthusTopSettings from "./data/acanthus-top-settings.json";
+import acanthusVoluteCenterSettings from "./data/acanthus-volute-center-settings.json";
+import acanthusVoluteCornerSettings from "./data/acanthus-volute-corner-settings.json";
 import {
   GUIPathProfileGeometry,
   pathProfile,
@@ -36,7 +37,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     outline: true,
   },
   // Path Profile to render
-  pathProfile: PathProfileProfile.AcanthusTop,
+  pathProfile: PathProfileProfile.AcanthusVoluteCenter,
   // Paths
   torus: {
     divisions: 25,
