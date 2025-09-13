@@ -6,6 +6,7 @@ import { GUIType } from "@utils/editor/gui/gui-types";
 import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
+import { abacusPath, AbacusPath } from "./abacus-geometry";
 import {
   acanthusPath,
   AcanthusPath,
@@ -22,6 +23,7 @@ export enum PathProfileProfile {
   AcanthusVoluteCorner = "AcanthusVoluteCorner",
   AcanthusVoluteCenter = "AcanthusVoluteCenter",
   Volute = "Volute",
+  Abacus = "Abacus",
 }
 
 export type PathProfileSettings = {
@@ -44,6 +46,7 @@ export type PathProfileSettings = {
   acanthusVoluteCorner: AcanthusPath;
   acanthusVoluteCenter: AcanthusPath;
   volute: AcanthusPath;
+  abacus: AbacusPath;
 };
 
 export function pathProfile(
@@ -108,6 +111,9 @@ export function pathProfile(
       break;
     case PathProfileProfile.Volute:
       points = acanthusPath(center, size, radius, settings.volute);
+      break;
+    case PathProfileProfile.Abacus:
+      points = abacusPath(center, size, radius, settings.abacus);
       break;
     default:
       break;

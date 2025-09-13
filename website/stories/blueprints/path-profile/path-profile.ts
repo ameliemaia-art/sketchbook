@@ -38,7 +38,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     outline: true,
   },
   // Path Profile to render
-  pathProfile: PathProfileProfile.Volute,
+  pathProfile: PathProfileProfile.Abacus,
   // Paths
   torus: {
     divisions: 25,
@@ -100,6 +100,10 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     cp2: { x: 0.17, y: 0.53 },
     cp3: { x: 0.32, y: 0.31 },
     cp4: { x: 0.58, y: 0.4 },
+  },
+  abacus: {
+    radius: 0.45,
+    cornerAngleOffset: 2.5,
   },
 };
 
