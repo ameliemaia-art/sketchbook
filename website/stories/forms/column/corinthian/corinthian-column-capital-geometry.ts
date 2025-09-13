@@ -24,6 +24,11 @@ import {
   columnTorus,
   GUITorus,
 } from "../geometry/column-torus-geometry";
+import {
+  columnVolute,
+  ColumnVolute,
+  GUIVolute,
+} from "../geometry/column-volute-geometry";
 
 export type CorinthianColumnCaptitalSettings = {
   necking: ColumnEchinus;
@@ -31,6 +36,7 @@ export type CorinthianColumnCaptitalSettings = {
   echinus: ColumnEchinus;
   abacus: ColumnAbacus;
   acanthus: ColumnAcanthus;
+  volute: ColumnVolute;
 };
 
 export function corinthianColumnCapital(
@@ -70,6 +76,9 @@ export function corinthianColumnCapital(
   );
   acanthusVolute.name = "acanthus-volute";
 
+  const volute = columnVolute(settings.volute, material);
+  volute.name = "volute";
+
   // if (settings.necking.helper) {
   //   group.add(boundingBox(necking));
   // }
@@ -96,6 +105,7 @@ export function corinthianColumnCapital(
   group.add(acanthusBase);
   group.add(acanthusMiddle);
   group.add(acanthusVolute);
+  group.add(volute);
   acanthusBase.position.y = echinus.position.y;
   acanthusMiddle.position.y = echinus.position.y;
   acanthusVolute.position.y = echinus.position.y;
@@ -142,12 +152,8 @@ export class GUICorinthianCapital extends GUIController {
     );
     this.controllers.acanthusMiddle.addEventListener("change", this.onChange);
 
-    // this.controllers.acanthusTop = new GUIAcanthus(
-    //   this.gui,
-    //   target.acanthus,
-    //   target.acanthus.top,
-    // );
-    // this.controllers.acanthusTop.addEventListener("change", this.onChange);
+    this.controllers.volute = new GUIVolute(this.gui, target.volute);
+    this.controllers.volute.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

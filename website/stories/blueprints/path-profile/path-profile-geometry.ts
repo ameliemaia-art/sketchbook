@@ -21,6 +21,7 @@ export enum PathProfileProfile {
   AcanthusMiddle = "AcanthusMiddle",
   AcanthusVoluteCorner = "AcanthusVoluteCorner",
   AcanthusVoluteCenter = "AcanthusVoluteCenter",
+  Volute = "Volute",
 }
 
 export type PathProfileSettings = {
@@ -42,6 +43,7 @@ export type PathProfileSettings = {
   acanthusMiddle: AcanthusPath;
   acanthusVoluteCorner: AcanthusPath;
   acanthusVoluteCenter: AcanthusPath;
+  volute: AcanthusPath;
 };
 
 export function pathProfile(
@@ -103,6 +105,9 @@ export function pathProfile(
         radius,
         settings.acanthusVoluteCorner,
       );
+      break;
+    case PathProfileProfile.Volute:
+      points = acanthusPath(center, size, radius, settings.volute);
       break;
     default:
       break;
@@ -175,6 +180,13 @@ export class GUIPathProfileGeometry extends GUIController {
       "change",
       this.onChange,
     );
+
+    this.controllers.volute = new GUIAcanthusPath(
+      this.gui,
+      target.volute,
+      "Volute",
+    );
+    this.controllers.volute.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

@@ -5,6 +5,7 @@ import acanthusBasePath from "../../../blueprints/path-profile/data/acanthus-bas
 import acanthusMiddlePath from "../../../blueprints/path-profile/data/acanthus-middle-settings.json";
 import acanthusVoluteCenterPath from "../../../blueprints/path-profile/data/acanthus-volute-center-settings.json";
 import acanthusVoluteCornersPath from "../../../blueprints/path-profile/data/acanthus-volute-corner-settings.json";
+import volutePath from "../../../blueprints/path-profile/data/volute-settings.json";
 import { floor, FloorSettings } from "../../geometry/floor-geometry";
 import { GUIWebGLApp } from "../../webgl-app";
 import ColumnForm, { GUIColumnForm } from "../column";
@@ -124,7 +125,7 @@ export default class ColumnCorinthianForm extends ColumnForm {
         bottomRadius: 5,
         topRadius: 15,
         bottomHeight: 0,
-        height: 15,
+        height: 18.0,
         divisions: 25,
         radialSegments: 32,
         helper: false,
@@ -138,6 +139,18 @@ export default class ColumnCorinthianForm extends ColumnForm {
         depthSegments: 1,
         helper: false,
         wireframe: false,
+      },
+      volute: {
+        path: volutePath,
+        height: 1,
+        width: 7.5,
+        helper: false,
+        wireframe: false,
+        subdivisions: 100,
+        chamferSize: 0.25,
+        radius: 11,
+        rotationY: 45,
+        positionY: 16.5,
       },
       acanthus: {
         helper: false,

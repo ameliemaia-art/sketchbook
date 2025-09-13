@@ -10,6 +10,7 @@ import acanthusBaseSettings from "./data/acanthus-base-settings.json";
 import acanthusMiddleSettings from "./data/acanthus-middle-settings.json";
 import acanthusVoluteCenterSettings from "./data/acanthus-volute-center-settings.json";
 import acanthusVoluteCornerSettings from "./data/acanthus-volute-corner-settings.json";
+import voluteSettings from "./data/volute-settings.json";
 import {
   GUIPathProfileGeometry,
   pathProfile,
@@ -37,7 +38,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     outline: true,
   },
   // Path Profile to render
-  pathProfile: PathProfileProfile.AcanthusVoluteCenter,
+  pathProfile: PathProfileProfile.Volute,
   // Paths
   torus: {
     divisions: 25,
@@ -90,6 +91,16 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     cp3: { x: 0.32, y: 0.31 },
     cp4: { x: 0.58, y: 0.4 },
   },
+  volute: {
+    spiralTurns: 3,
+    spiralDivisions: 20,
+    smoothness: 200,
+    cp0: { x: 0.2, y: 1 },
+    cp1: { x: 0.15, y: 0.8 },
+    cp2: { x: 0.17, y: 0.53 },
+    cp3: { x: 0.32, y: 0.31 },
+    cp4: { x: 0.58, y: 0.4 },
+  },
 };
 
 export default class PathProfile extends Sketch {
@@ -111,6 +122,7 @@ export default class PathProfile extends Sketch {
       this.settings.acanthusVoluteCorner,
       acanthusVoluteCornerSettings,
     );
+    Object.assign(this.settings.volute, voluteSettings);
   }
 
   draw() {
