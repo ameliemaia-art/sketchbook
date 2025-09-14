@@ -26,6 +26,8 @@ export type ColumnAbacus = {
   radius: number;
   height: number;
   cornerAngleOffset: number;
+  taperEnabled: boolean;
+  taperAmount: number;
   bevelEnabled: boolean;
   bevelThickness: number;
   bevelSize: number;
@@ -38,15 +40,16 @@ function createTaperFunction(
   mode: "linear" | "sine",
   start: number = 1,
   end: number = 0.25,
+  angle: number = 90,
 ): (t: number) => number {
   switch (mode) {
     case "linear":
       return (t: number) => start + (end - start) * t;
     case "sine":
-      // Smooth sine-based easing for organic, leaf-like tapering
+      // Smooth sine-based easing for organic, leaf-like tapering that curves inward
       return (t: number) => {
-        const eased = Math.sin((1 - t) * Math.PI * 0.5); // Ease out sine curve
-        return MathUtils.lerp(end, start, eased);
+        const eased = Math.sin(t * MathUtils.degToRad(angle)); // Ease in sine curve (curves inward)
+        return MathUtils.lerp(start, end, eased);
       };
     default:
       return (t: number) => start + (end - start) * t;
@@ -77,9 +80,14 @@ export function columnAbacus(settings: ColumnAbacus, material: Material) {
   });
 
   const shape = new Shape();
-  shape.moveTo(points[0].x, points[0].y);
+
+  // Center the shape by calculating the centroid and offsetting points
+  const centerX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+  const centerY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+
+  shape.moveTo(points[0].x - centerX, points[0].y - centerY);
   for (let i = 1; i < points.length; i++) {
-    shape.lineTo(points[i].x, points[i].y);
+    shape.lineTo(points[i].x - centerX, points[i].y - centerY);
   }
   shape.closePath();
 
@@ -89,12 +97,12 @@ export function columnAbacus(settings: ColumnAbacus, material: Material) {
   ]);
 
   // Create extrude settings with proper bevel configuration
-  // Note: When bevelEnabled is true, avoid using extrudePath as they can conflict
+  // Note: When bevelEnabled is true, use depth instead of extrudePath
   const extrudeSettings = settings.bevelEnabled
     ? {
         steps: 10,
         depth: settings.height,
-        bevelEnabled: settings.bevelEnabled,
+        bevelEnabled: true,
         bevelThickness: settings.bevelThickness,
         bevelSize: settings.bevelSize,
         bevelOffset: 0,
@@ -104,16 +112,18 @@ export function columnAbacus(settings: ColumnAbacus, material: Material) {
         steps: 10,
         bevelEnabled: false,
         extrudePath: extrudePath,
-        taperFunction: createTaperFunction("linear", 1, 0.1),
+        taperFunction: createTaperFunction("sine", 1, 1 - settings.taperAmount),
       };
 
   const geometry = new ExtrudeGeometry(shape, extrudeSettings);
-  // Apply transformations carefully
-  centerGeometry(geometry);
+
+  // Apply transformations in the correct order
+  // First rotate to orient properly (X-axis becomes vertical)
   geometry.rotateX(Math.PI / 2);
 
+  // Then position the bottom at y=0
   const dimensions = getGeometryDimensions(geometry);
-  geometry.translate(0, dimensions.height / 2, 0);
+  geometry.translate(0, -dimensions.boundingBox.min.y, 0);
 
   const mesh = new Mesh(
     geometry,
@@ -143,6 +153,11 @@ export class GUIAbacus extends GUIController {
       .on("change", this.onChange);
     this.gui
       .addBinding(target, "cornerAngleOffset", { min: 0.1 })
+      .on("change", this.onChange);
+
+    this.gui.addBinding(target, "taperEnabled").on("change", this.onChange);
+    this.gui
+      .addBinding(target, "taperAmount", { min: 0, max: 0.5 })
       .on("change", this.onChange);
 
     this.gui.addBinding(target, "bevelEnabled").on("change", this.onChange);

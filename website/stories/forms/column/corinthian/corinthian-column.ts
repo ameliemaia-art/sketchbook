@@ -135,6 +135,8 @@ export default class ColumnCorinthianForm extends ColumnForm {
         height: 5,
         radius: 35,
         cornerAngleOffset: 2,
+        taperEnabled: false,
+        taperAmount: 0.1,
         bevelEnabled: false,
         bevelThickness: 0.5,
         bevelSize: 0.1,
