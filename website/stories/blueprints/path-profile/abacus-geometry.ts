@@ -60,9 +60,23 @@ export function abacusPath(
     dot(p0, 5, undefined, colors[i]);
     dot(p1, 5, undefined, colors[i]);
 
-    const mid = lerp(p0.add(p1).divide(2), center, 0.7);
+    if (i === 0) {
+      const arcCenter = new paper.Point(p0.x, p1.y);
+      dot(arcCenter, 5, undefined, colors[i]);
 
-    dot(mid, 5, undefined, colors[i]);
+      const startAngle = Math.atan2(p0.y - arcCenter.y, p0.x - arcCenter.x);
+      const endAngle = Math.atan2(p1.y - arcCenter.y, p1.x - arcCenter.x);
+
+      const subdivisions = 10;
+      for (let j = 0; j < subdivisions; j++) {
+        const angle2 = MathUtils.lerp(startAngle, -endAngle, j / subdivisions);
+        const rad = p0.getDistance(arcCenter);
+        const x = Math.cos(angle2) * rad + arcCenter.x;
+        const y = Math.sin(angle2) * rad + arcCenter.y;
+        const p = new paper.Point(x, y);
+        dot(p, 3, undefined, colors[i]);
+      }
+    }
 
     // Circle arc center
     // p.push(p0, p1);
