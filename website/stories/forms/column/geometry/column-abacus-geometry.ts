@@ -72,6 +72,7 @@ export function columnAbacus(settings: ColumnAbacus, material: Material) {
       radius: 0.5,
       cornerAngleOffset: settings.cornerAngleOffset,
       subdivisions: 20,
+      curveOffset: 0.75,
     },
   );
 
@@ -129,6 +130,8 @@ export function columnAbacus(settings: ColumnAbacus, material: Material) {
     geometry,
     settings.wireframe ? wireframeMaterial : material,
   );
+
+  mesh.rotateY(MathUtils.degToRad(45));
 
   // group.add(canvas);
   // group.add(mesh);

@@ -105,6 +105,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
     radius: 0.45,
     cornerAngleOffset: 2.5,
     subdivisions: 25,
+    curveOffset: 0.1,
   },
 };
 

@@ -5,11 +5,13 @@ import { MathUtils } from "three";
 import { saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
+import { dot } from "@utils/paper/utils";
 
 export type AbacusPath = {
   radius: number;
   cornerAngleOffset: number;
   subdivisions: number;
+  curveOffset: number;
 };
 
 function getCirclePoint(angle: number, radius: number, center: paper.Point) {
@@ -50,7 +52,18 @@ export function abacusPath(
     // Pattern: even indices use (p0.x, p1.y), odd use (p1.x, p0.y)
     const arcCenter =
       i % 2 === 0 ? new paper.Point(p0.x, p1.y) : new paper.Point(p1.x, p0.y);
+
+    const nx = arcCenter.x - center.x;
+    const ny = arcCenter.y - center.y;
+    const normal = new paper.Point(nx, ny).normalize();
+
+    const offset = settings.curveOffset * size.width;
+    arcCenter.x += offset * normal.x;
+    arcCenter.y += offset * normal.y;
+
     // dot(arcCenter, 5, undefined, colors[i]);
+
+    // console.log(`Corner Angle [${i}]:`, MathUtils.radToDeg(cornerAngle));
 
     const startAngle = Math.atan2(p0.y - arcCenter.y, p0.x - arcCenter.x);
     const endAngle = Math.atan2(p1.y - arcCenter.y, p1.x - arcCenter.x);
@@ -95,6 +108,9 @@ export class GUIAbacusPath extends GUIController {
 
     this.gui
       .addBinding(target, "subdivisions", { min: 5, max: 50, step: 1 })
+      .on("change", this.onChange);
+    this.gui
+      .addBinding(target, "curveOffset", { min: 0 })
       .on("change", this.onChange);
 
     this.gui.addButton({ title: "Save" }).on("click", () => {
