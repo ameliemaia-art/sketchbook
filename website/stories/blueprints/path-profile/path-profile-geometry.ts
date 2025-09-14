@@ -6,7 +6,7 @@ import { GUIType } from "@utils/editor/gui/gui-types";
 import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../sketch/sketch";
-import { abacusPath, AbacusPath } from "./abacus-geometry";
+import { abacusPath, AbacusPath, GUIAbacusPath } from "./abacus-geometry";
 import {
   acanthusPath,
   AcanthusPath,
@@ -193,6 +193,13 @@ export class GUIPathProfileGeometry extends GUIController {
       "Volute",
     );
     this.controllers.volute.addEventListener("change", this.onChange);
+
+    this.controllers.abacus = new GUIAbacusPath(
+      this.gui,
+      target.abacus,
+      "Abacus",
+    );
+    this.controllers.abacus.addEventListener("change", this.onChange);
   }
 
   onChange = () => {

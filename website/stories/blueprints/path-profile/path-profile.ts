@@ -104,6 +104,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
   abacus: {
     radius: 0.45,
     cornerAngleOffset: 2.5,
+    subdivisions: 25,
   },
 };
 

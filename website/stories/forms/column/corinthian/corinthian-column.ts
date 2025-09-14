@@ -32,8 +32,8 @@ type ColumnSettings = {
   captital: CorinthianColumnCaptitalSettings;
 };
 
-const CREATE_BASE = true;
-const CREATE_SHAFT = true;
+const CREATE_BASE = false;
+const CREATE_SHAFT = false;
 const CREATE_CAPITAL = true;
 
 export default class ColumnCorinthianForm extends ColumnForm {
@@ -133,12 +133,14 @@ export default class ColumnCorinthianForm extends ColumnForm {
       },
       abacus: {
         height: 5,
-        width: 25,
-        widthSegments: 1,
-        heightSegments: 1,
-        depthSegments: 1,
+        radius: 35,
+        cornerAngleOffset: 2,
+        bevelEnabled: false,
+        bevelThickness: 0.5,
+        bevelSize: 0.1,
+        bevelSegments: 5,
         helper: false,
-        wireframe: false,
+        wireframe: true,
       },
       volute: {
         path: volutePath,
@@ -212,9 +214,6 @@ export default class ColumnCorinthianForm extends ColumnForm {
       },
     },
   };
-
-  // Previous settings for change tracking
-  private previousSettings: Partial<ColumnSettings> = {};
 
   // Forms
   column = new Group();
