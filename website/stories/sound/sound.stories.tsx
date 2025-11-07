@@ -24,7 +24,7 @@ export const Analysis = () => {
   return (
     <>
       <div ref={rootRef}>
-        <button id="startButton">Play</button>
+        {/* <button id="startButton">Play</button> */}
         <canvas ref={canvasRef} />;
       </div>
     </>

@@ -31,6 +31,8 @@ class SoundAnalyzer extends EventDispatcher {
   binSize = 0;
   seek = 0;
   started = false;
+  isLoaded = false;
+  isLoading = false;
 
   data: SoundData = {
     amplitude: 0,
@@ -87,6 +89,7 @@ class SoundAnalyzer extends EventDispatcher {
 
   async loadAndPlayAudio(fileUrl: string) {
     try {
+      this.isLoading = true;
       // Ensure audio context is resumed (required for autoplay policies)
       if (this.listener.context.state === "suspended") {
         console.log("Audio context suspended, attempting to resume...");
@@ -111,11 +114,16 @@ class SoundAnalyzer extends EventDispatcher {
             (buffer) => {
               this.audio!.setBuffer(buffer);
               this.setSound(this.audio!);
+              this.isLoaded = true;
+              this.isLoading = false;
               console.log("Audio loaded successfully (iOS)");
+              console.log("Analyser set up:", !!this.analyser);
+              console.log("Audio context state:", this.listener.context.state);
               resolve();
             },
             undefined,
             (error) => {
+              this.isLoading = false;
               console.error("Failed to load audio (iOS):", error);
               reject(error);
             },
@@ -124,9 +132,12 @@ class SoundAnalyzer extends EventDispatcher {
       } else {
         this.htmlAudio = new Audio(fileUrl);
         this.htmlAudio.addEventListener("loadeddata", () => {
+          this.isLoaded = true;
+          this.isLoading = false;
           console.log("Audio loaded successfully");
         });
         this.htmlAudio.addEventListener("error", (e) => {
+          this.isLoading = false;
           console.error("Audio load error:", e);
         });
 
@@ -135,7 +146,30 @@ class SoundAnalyzer extends EventDispatcher {
         this.setSound(this.audio);
       }
     } catch (error) {
+      this.isLoading = false;
       console.error("Error in loadAndPlayAudio:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Smart method that loads audio if not loaded, then plays it
+   */
+  async loadAndPlay(
+    fileUrl: string = "/assets/sounds/klangkuenstler-untergang.mp3",
+  ) {
+    try {
+      await this.initialize();
+
+      if (!this.isLoaded && !this.isLoading) {
+        await this.loadAndPlayAudio(fileUrl);
+      }
+
+      if (this.isLoaded) {
+        await this.play();
+      }
+    } catch (error) {
+      console.error("Error in loadAndPlay:", error);
       throw error;
     }
   }
@@ -192,7 +226,12 @@ class SoundAnalyzer extends EventDispatcher {
       this.data.fft = this.analyser.getFrequencyData();
       this.data.amplitude = this.analyser.getAverageFrequency() / 255;
 
-      if (this.htmlAudio) {
+      if (this.audioType === AudioType.IOS && this.audio) {
+        // For iOS/Three.js Audio, we don't have direct access to currentTime/duration
+        // But the FFT data should still be flowing through the analyser
+        this.time = "Playing (iOS)";
+        this.progress = 0; // Could calculate based on buffer offset if needed
+      } else if (this.htmlAudio) {
         this.time = `${this.formatTime(this.htmlAudio.currentTime)} / ${this.formatTime(this.htmlAudio.duration)}`;
         this.progress = this.htmlAudio.currentTime / this.htmlAudio.duration;
       } else {
@@ -220,7 +259,40 @@ class SoundAnalyzer extends EventDispatcher {
   }
 
   get isPlaying() {
-    return this.htmlAudio ? !this.htmlAudio.paused : false;
+    if (this.audioType === AudioType.IOS) {
+      return this.audio ? this.audio.isPlaying : false;
+    } else {
+      return this.htmlAudio ? !this.htmlAudio.paused : false;
+    }
+  }
+
+  get playButtonLabel() {
+    if (this.isLoading) return "Loading...";
+    if (!this.isLoaded) return "Load & Play";
+    if (this.isPlaying) return "Playing";
+    return "Play";
+  }
+
+  /**
+   * Reset audio state to allow loading new files
+   */
+  reset() {
+    if (this.htmlAudio) {
+      this.htmlAudio.pause();
+      this.htmlAudio = undefined;
+    }
+    if (this.audio) {
+      if (this.audio.isPlaying) {
+        this.audio.stop();
+      }
+      this.audio = undefined;
+    }
+    this.analyser = undefined;
+    this.isLoaded = false;
+    this.isLoading = false;
+    this.progress = 0;
+    this.time = "00:00";
+    console.log("Audio reset");
   }
 
   onSeek = () => {
@@ -234,12 +306,24 @@ export default soundAnalyzer;
 
 /// #if DEBUG
 export class GUISoundAnalyzer extends GUIController {
+  private playButton: any;
+  private target: SoundAnalyzer;
+
   constructor(gui: GUIType, target: SoundAnalyzer) {
     super(gui);
+    this.target = target;
     this.gui = this.addFolder(gui, { title: "SoundAnalyzer" });
 
-    this.gui.addButton({ title: "Play", label: "" }).on("click", target.play);
+    // Smart play/load button that changes based on state
+    this.playButton = this.gui
+      .addButton({
+        title: "Load & Play",
+        label: "",
+      })
+      .on("click", () => target.loadAndPlay());
+
     this.gui.addButton({ title: "Pause", label: "" }).on("click", target.pause);
+    this.gui.addButton({ title: "Reset", label: "" }).on("click", target.reset);
 
     this.gui.addBinding(target, "time", { readonly: true });
     this.gui.addBinding(target, "progress", { min: 0, max: 1, readonly: true });
@@ -250,6 +334,22 @@ export class GUISoundAnalyzer extends GUIController {
     this.controllers.kick = new GUIFrequencyModel(this.gui, target.kickModel);
     this.controllers.snare = new GUIFrequencyModel(this.gui, target.snareModel);
     this.controllers.beat = new GUIFrequencyModel(this.gui, target.beatModel);
+
+    // Start updating button label
+    this.startButtonLabelUpdate();
+  }
+
+  private startButtonLabelUpdate() {
+    const updateLabel = () => {
+      if (this.playButton && this.playButton.element) {
+        const button = this.playButton.element.querySelector("button");
+        if (button) {
+          button.textContent = this.target.playButtonLabel;
+        }
+      }
+      requestAnimationFrame(updateLabel);
+    };
+    updateLabel();
   }
 }
 /// #endif
