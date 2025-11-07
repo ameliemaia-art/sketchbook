@@ -15,6 +15,11 @@ export type SoundData = {
   fft: Uint8Array | null;
 };
 
+enum AudioType {
+  IOS = "iOS",
+  DEFAULT = "default",
+}
+
 class SoundAnalyzer extends EventDispatcher {
   audio?: ThreeAudio;
   htmlAudio?: HTMLAudioElement;
@@ -39,6 +44,29 @@ class SoundAnalyzer extends EventDispatcher {
   snareModel: FrequencyModel;
   beatModel: FrequencyModel;
 
+  audioType: AudioType = AudioType.DEFAULT;
+
+  get audioContextState() {
+    return this.listener.context.state;
+  }
+
+  get requiresUserInteraction() {
+    return this.listener.context.state === "suspended";
+  }
+
+  /**
+   * Initialize audio context after user interaction.
+   * Call this method in response to user interaction (click, touch, etc.)
+   * to ensure audio can play without issues.
+   */
+  async initialize() {
+    if (this.listener.context.state === "suspended") {
+      console.log("Initializing audio context...");
+      await this.listener.context.resume();
+      console.log("Audio context initialized");
+    }
+  }
+
   constructor() {
     super();
     this.kickModel = new FrequencyModel("kick");
@@ -58,46 +86,92 @@ class SoundAnalyzer extends EventDispatcher {
   }
 
   async loadAndPlayAudio(fileUrl: string) {
-    // Create an HTML5 audio element and load the file
-    this.htmlAudio = new Audio(fileUrl);
-    this.htmlAudio.crossOrigin = "anonymous"; // Enable CORS if needed
-    this.htmlAudio.controls = true;
-    document.body.appendChild(this.htmlAudio);
+    try {
+      // Ensure audio context is resumed (required for autoplay policies)
+      if (this.listener.context.state === "suspended") {
+        console.log("Audio context suspended, attempting to resume...");
+        await this.listener.context.resume();
+        console.log("Audio context resumed");
+      }
 
-    const onLoaded = () => {
-      if (!this.htmlAudio) return;
-
-      // Create a Three.js Audio instance and link it with the HTML5 audio
-      const context = this.listener.context;
-
-      const source = context.createMediaElementSource(this.htmlAudio);
-
-      // Create the Three.js Audio object using the context and source
       this.audio = new ThreeAudio(this.listener);
-      // @ts-ignore
-      this.audio.setNodeSource(source);
 
-      this.setSound(this.audio);
-    };
+      this.audioType = /(iPad|iPhone|iPod)/g.test(navigator.userAgent)
+        ? AudioType.IOS
+        : AudioType.DEFAULT;
 
-    this.htmlAudio.addEventListener("canplaythrough", onLoaded);
+      console.log("Audio type:", this.audioType);
+      console.log("Audio context state:", this.listener.context.state);
 
-    this.htmlAudio.load(); // Wait for audio to load if needed
-    // Object.assign(this.htmlAudio.style, {
-    //   position: "absolute",
-    //   top: "0",
-    //   left: "0",
-    //   zIndex: "100",
-    // });
-    // document.body.appendChild(this.htmlAudio);
+      if (this.audioType === AudioType.IOS) {
+        const loader = new AudioLoader();
+        return new Promise<void>((resolve, reject) => {
+          loader.load(
+            fileUrl,
+            (buffer) => {
+              this.audio!.setBuffer(buffer);
+              this.setSound(this.audio!);
+              console.log("Audio loaded successfully (iOS)");
+              resolve();
+            },
+            undefined,
+            (error) => {
+              console.error("Failed to load audio (iOS):", error);
+              reject(error);
+            },
+          );
+        });
+      } else {
+        this.htmlAudio = new Audio(fileUrl);
+        this.htmlAudio.addEventListener("loadeddata", () => {
+          console.log("Audio loaded successfully");
+        });
+        this.htmlAudio.addEventListener("error", (e) => {
+          console.error("Audio load error:", e);
+        });
+
+        // Don't auto-play immediately, wait for explicit play() call
+        this.audio.setMediaElementSource(this.htmlAudio);
+        this.setSound(this.audio);
+      }
+    } catch (error) {
+      console.error("Error in loadAndPlayAudio:", error);
+      throw error;
+    }
   }
 
-  play = () => {
-    if (this.htmlAudio) this.htmlAudio.play();
+  play = async () => {
+    try {
+      // Ensure audio context is resumed before playing
+      if (this.listener.context.state === "suspended") {
+        console.log("Audio context suspended, attempting to resume...");
+        await this.listener.context.resume();
+        console.log("Audio context resumed");
+      }
+
+      if (this.audioType === AudioType.IOS) {
+        if (this.audio) {
+          this.audio.play();
+          console.log("Playing audio (iOS)");
+        }
+      } else {
+        if (this.htmlAudio) {
+          await this.htmlAudio.play();
+          console.log("Playing audio");
+        }
+      }
+    } catch (error) {
+      console.error("Error playing audio:", error);
+      throw error;
+    }
   };
 
   pause = () => {
-    if (this.htmlAudio) this.htmlAudio.pause();
+    if (this.audioType === AudioType.IOS) {
+      if (this.audio) this.audio.pause();
+    } else {
+      if (this.htmlAudio) this.htmlAudio.pause();
+    }
   };
 
   setSound(audio: ThreeAudio) {
@@ -114,15 +188,15 @@ class SoundAnalyzer extends EventDispatcher {
   update() {
     if (!this.isPlaying) return;
 
-    if (this.analyser && this.htmlAudio && this.audio) {
+    if (this.analyser) {
       this.data.fft = this.analyser.getFrequencyData();
       this.data.amplitude = this.analyser.getAverageFrequency() / 255;
 
-      this.time = `${this.formatTime(this.htmlAudio.currentTime)} / ${this.formatTime(this.htmlAudio.duration)}`;
-
       if (this.htmlAudio) {
+        this.time = `${this.formatTime(this.htmlAudio.currentTime)} / ${this.formatTime(this.htmlAudio.duration)}`;
         this.progress = this.htmlAudio.currentTime / this.htmlAudio.duration;
       } else {
+        this.time = "00:00 / 00:00";
         this.progress = 0;
       }
 

@@ -43,10 +43,6 @@ export default class Wordmark {
     canvas.height = 600;
     paper.setup(canvas);
 
-    soundAnalyzer
-      .loadAndPlayAudio("/assets/sounds/klangkuenstler-untergang.mp3")
-      .then(() => {});
-
     const size = 200;
 
     this.kickGraph = new Graph(100, 300, size);
@@ -61,8 +57,29 @@ export default class Wordmark {
     this.snareEnergyVisualizer = new EnergyVisualizer(500, 100, 100);
     this.beatEnergyVisualizer = new EnergyVisualizer(800, 100, 100);
 
+    document
+      .getElementById("startButton")
+      ?.addEventListener("click", async () => {
+        await this.load();
+      });
+
     this.update();
   }
+
+  load = async () => {
+    try {
+      // Initialize audio context first
+      await soundAnalyzer.initialize();
+
+      await soundAnalyzer.loadAndPlayAudio(
+        "/assets/sounds/klangkuenstler-untergang.mp3",
+      );
+      soundAnalyzer.play();
+      console.log("Audio loaded successfully - ready to play");
+    } catch (error) {
+      console.error("Failed to load audio:", error);
+    }
+  };
 
   update = () => {
     requestAnimationFrame(this.update);

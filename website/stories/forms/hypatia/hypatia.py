@@ -13,7 +13,7 @@ ORBIT_PROFILE_RADIUS = 0.5
 HYPATIA_RADIUS = 0.05
 
 # Orbit
-ORBIT_THICKNESS = 0.0025
+ORBIT_THICKNESS = 0.005
 ORBIT_HEIGHT = HYPATIA_RADIUS*2
 
 # ----------------------------------------------------
@@ -276,7 +276,7 @@ def create_orbit():
 
         circle_path = pm.circle(radius=ring_radius, normal=(0, 1, 0), 
                                 sections=TORUS_SUBDIVISIONS, name="torusPath")[0]
-        pm.xform(circle_path, scale=(perspective_factor_y, 1, 1))  # Apply elliptical scaling
+        # pm.xform(circle_path, scale=(perspective_factor_y, 1, 1))  # Apply elliptical scaling
         
         # Align the profile: move it so its origin sits at the torus edge.
         pm.xform(profile_curve, translation=(ring_radius, 0, 0))
@@ -305,6 +305,7 @@ def create_orbit():
         pm.xform(poly_mesh, centerPivots=True)
         # pm.rotate(poly_mesh, lerp(-45, 45, p), 0, lerp(0, 270, p))
 
+
             # --- Separate the inner side of poly_mesh ---
         # Here we calculate the full 3D distance from (0,0,0) for each face's center.
 
@@ -313,6 +314,7 @@ def create_orbit():
         # Duplicate the mesh
         inner_side = pm.duplicate(mm, name="SM_Inner%s" % i)[0]
         outer_side = pm.duplicate(mm, name="SM_Outer%s" % i)[0]
+
 
         # Define face range (adjust dynamically if needed)
         face_count = len(mm.faces)-1
@@ -329,6 +331,7 @@ def create_orbit():
         pm.parent(inner_side, ringGroup)
         pm.parent(outer_side, ringGroup)
 
+
         pm.parent(ringGroup, group)
 
         # Cleanup
@@ -340,6 +343,9 @@ def create_orbit():
         # UV Mapping using Cylindrical Projection
         adjust_uvs_to_range(outer_side, projection_scale_u=1, projection_scale_v=1)
         adjust_uvs_to_range(inner_side, projection_scale_u=1, projection_scale_v=1)
+
+        pm.polySmooth(inner_side, subdivisionType=0, divisions=2, keepBorder=1, name="SM_Orbit_Smooth%s" % i)
+        # pm.select(inner_side)
 
     pm.select(clear=True)
     return orbit_meshes, ring_speeds, planets
