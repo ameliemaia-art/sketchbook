@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -13,24 +17,63 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@styles/*": ["./styles/*"],
-      "@interfaces/*": ["./interfaces/*"],
-      "@services/*": ["./services/*"],
-      "@components/*": ["./components/*"],
-      "@lib/*": ["./lib/*"],
-      "@utils/*": ["./utils/*"],
-      "@artifacts/*": ["./artifacts/*"],
-      "@contracts/*": ["./contracts/*"],
-      "@pages/*": ["./pages/*"],
-      "@hooks/*": ["./hooks/*"],
-      "@layout/*": ["./layout/*"],
-      "@middleware/*": ["./middleware/*"],
-      "@schemas/*": ["./schemas/*"],
-      "@shared/*": ["../shared/*"],
-      "@contexts/*": ["./contexts/*"],
-      "@/*": ["./*"]
-    }
+      "@styles/*": [
+        "./styles/*"
+      ],
+      "@interfaces/*": [
+        "./interfaces/*"
+      ],
+      "@services/*": [
+        "./services/*"
+      ],
+      "@components/*": [
+        "./components/*"
+      ],
+      "@lib/*": [
+        "./lib/*"
+      ],
+      "@utils/*": [
+        "./utils/*"
+      ],
+      "@artifacts/*": [
+        "./artifacts/*"
+      ],
+      "@contracts/*": [
+        "./contracts/*"
+      ],
+      "@pages/*": [
+        "./pages/*"
+      ],
+      "@hooks/*": [
+        "./hooks/*"
+      ],
+      "@layout/*": [
+        "./layout/*"
+      ],
+      "@middleware/*": [
+        "./middleware/*"
+      ],
+      "@schemas/*": [
+        "./schemas/*"
+      ],
+      "@shared/*": [
+        "../shared/*"
+      ],
+      "@contexts/*": [
+        "./contexts/*"
+      ],
+      "@/*": [
+        "./*"
+      ]
+    },
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

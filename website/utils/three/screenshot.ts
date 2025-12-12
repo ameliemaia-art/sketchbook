@@ -11,9 +11,12 @@ import {
   WebGLRenderTarget,
 } from "three";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
-import { clearBindings, generateBindingOptions } from "@utils/gui/gui-utils";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
+import {
+  clearBindings,
+  generateBindingOptions,
+} from "@utils/editor/gui/gui-utils";
 import createCanvas from "./canvas";
 import { getRenderBufferSize, RenderTargetHelper } from "./rendering";
 

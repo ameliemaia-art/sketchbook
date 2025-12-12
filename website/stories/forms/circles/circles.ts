@@ -8,8 +8,8 @@ import {
   Shape,
 } from "three";
 
-import GUIController from "@utils/gui/gui";
-import { GUIType } from "@utils/gui/gui-types";
+import GUIController from "@utils/editor/gui/gui";
+import { GUIType } from "@utils/editor/gui/gui-types";
 import { TWO_PI } from "@utils/three/math";
 import WebGLApp, { GUIWebGLApp } from "../webgl-app";
 

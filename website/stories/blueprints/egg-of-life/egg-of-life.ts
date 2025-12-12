@@ -1,0 +1,63 @@
+import paper from "paper";
+import { FolderApi } from "tweakpane";
+
+import Sketch, {
+  GUISketch,
+  SketchSettings,
+  sketchSettings,
+} from "../sketch/sketch";
+import { eggOfLife, EggOfLifeSettings } from "./egg-of-life-geometry";
+
+export default class EggOfLife extends Sketch {
+  settings: SketchSettings & EggOfLifeSettings = {
+    ...sketchSettings,
+    blueprint: {
+      visible: false,
+      opacity: 0.5,
+      cosmos: true,
+    },
+    form: {
+      visible: true,
+      opacity: 1,
+      seed: true,
+      petals: true,
+    },
+  };
+
+  constructor(
+    public root: HTMLElement,
+    public canvas: HTMLCanvasElement,
+  ) {
+    super(root, canvas, "Egg Of Life");
+  }
+
+  draw() {
+    super.draw();
+    if (!this.layers.blueprint || !this.layers.form) return;
+    const radius = (paper.view.size.width / 2) * this.settings.scale;
+    const center = paper.view.bounds.center;
+    eggOfLife(
+      this.layers.blueprint,
+      this.layers.form,
+      center,
+      radius,
+      this.settings,
+    );
+  }
+}
+
+export class GUIEggOfLife extends GUISketch {
+  constructor(
+    gui: FolderApi,
+    public target: EggOfLife,
+  ) {
+    super(gui, target, target.name());
+
+    this.folders.form
+      .addBinding(target.settings.form, "seed")
+      .on("change", this.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "petals")
+      .on("change", this.draw);
+  }
+}

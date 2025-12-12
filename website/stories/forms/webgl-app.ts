@@ -3,6 +3,7 @@ import {
   AxesHelper,
   CameraHelper,
   Clock,
+  EventDispatcher,
   GridHelper,
   NeutralToneMapping,
   Object3D,
@@ -25,20 +26,19 @@ import {
   UnrealBloomPass,
   VignetteShader,
 } from "three/examples/jsm/Addons.js";
+import { Pane } from "tweakpane";
 
-import GUIController from "@utils/gui/gui";
-import {
-  bloomPassBinding,
-  fxaaPassBinding,
-  n8AOPassBinding,
-  vignettePassBinding,
-} from "@utils/gui/gui-post-processing-bindings";
-import { GUIType } from "@utils/gui/gui-types";
+import { n8AOPassBinding } from "@utils/editor/bindings/gui-post-processing-bindings";
+import GUIController from "@utils/editor/gui/gui";
+import GUISceneController from "@utils/editor/gui/scene/gui-scene";
+import BookmarkManager, {
+  GUIBookmarkManager,
+} from "@utils/three/bookmark-manager";
 import { resetCamera } from "@utils/three/camera";
 import { getRenderBufferSize } from "@utils/three/rendering";
 import Screenshot, { GUIScreenshot } from "@utils/three/screenshot";
 
-export default class WebGLApp {
+export default class WebGLApp extends EventDispatcher {
   renderer: WebGLRenderer;
   postProcessing: EffectComposer;
   cameras = {
@@ -61,8 +61,8 @@ export default class WebGLApp {
     debugCamera: true,
     orthCamera: false,
     stats: true,
-    helpers: false,
-    frustumSize: 25,
+    helpers: true,
+    frustumSize: 750,
   };
 
   renderPass: RenderPass;
@@ -78,8 +78,13 @@ export default class WebGLApp {
   scene = new Scene();
 
   screenshot: Screenshot;
+  parent: HTMLDivElement | null = null;
+
+  bookmarkManager: BookmarkManager;
 
   constructor() {
+    super();
+
     // Renderer
     this.renderer = new WebGLRenderer({
       antialias: false,
@@ -111,20 +116,20 @@ export default class WebGLApp {
     );
     this.aoPass.configuration.gammaCorrection = false;
     this.aoPass.enabled = false;
-    this.aoPass.setQualityMode("High");
+    this.aoPass.setQualityMode("Ultra");
     // this.aoPass.configuration.accumulate = true;
-    this.aoPass.configuration.aoRadius = 5;
-    this.aoPass.configuration.distanceFalloff = 5;
-    this.aoPass.configuration.intensity = 10;
+    // this.aoPass.configuration.aoRadius = 5;
+    // this.aoPass.configuration.distanceFalloff = 5;
+    this.aoPass.configuration.intensity = 1;
     // this.aoPass.setDisplayMode("AO"); // Or any other display mode
     this.copyPassToRenderTarget = new ShaderPass(CopyShader);
 
     this.postProcessing.addPass(this.renderPass);
     this.postProcessing.addPass(this.aoPass);
-    this.postProcessing.addPass(this.bloomPass);
+    // this.postProcessing.addPass(this.bloomPass);
     this.postProcessing.addPass(this.fxaaPass);
     this.postProcessing.addPass(this.outputPass);
-    this.postProcessing.addPass(this.vignettePass);
+    // this.postProcessing.addPass(this.vignettePass);
 
     this.screenshot = new Screenshot(
       this.renderer,
@@ -143,13 +148,16 @@ export default class WebGLApp {
       this.renderer.domElement,
     );
 
-    this.helpers.gridHelperX = new GridHelper(50, 50);
-    this.helpers.gridHelperY = new GridHelper(50, 50);
-    this.helpers.gridHelperZ = new GridHelper(50, 50);
-    this.helpers.gridHelperY.rotateX(Math.PI / 2);
-    this.helpers.gridHelperZ.rotateX(Math.PI / 2);
-    this.helpers.gridHelperZ.rotateZ(Math.PI / 2);
-    this.helpers.axes = new AxesHelper(5);
+    this.helpers.gridHelperX = new GridHelper(500, 50);
+
+    // this.helpers.gridHelperY = new GridHelper(500, 50);
+    // this.helpers.gridHelperY.rotateX(Math.PI / 2);
+
+    // this.helpers.gridHelperZ = new GridHelper(500, 50);
+    // this.helpers.gridHelperZ.rotateX(Math.PI / 2);
+    // this.helpers.gridHelperZ.rotateZ(Math.PI / 2);
+
+    this.helpers.axes = new AxesHelper(50);
     this.helpers.camera = new CameraHelper(this.cameras.main);
     this.helpersGroup.add(...Object.values(this.helpers));
 
@@ -157,9 +165,9 @@ export default class WebGLApp {
 
     this.cameras.main.position.z = 5;
     this.cameras.main.lookAt(0, 0, 0);
-    this.orthographicCamera.position.z = 5;
+    this.orthographicCamera.position.z = 750;
 
-    resetCamera(this.cameras.dev, 10, new Vector3(0, 0.5, 1));
+    resetCamera(this.cameras.dev, 100, new Vector3(0, 0.5, 1));
 
     const element = document.querySelector(
       ".sb-show-main.sb-main-padded",
@@ -167,6 +175,12 @@ export default class WebGLApp {
     if (element) {
       element.style.padding = "0px";
     }
+
+    this.bookmarkManager = new BookmarkManager(
+      "app",
+      this.cameras.dev,
+      this.controls,
+    );
   }
 
   async loadAssets() {
@@ -176,6 +190,7 @@ export default class WebGLApp {
   }
 
   async setup(parent: HTMLDivElement) {
+    this.parent = parent;
     parent.appendChild(this.renderer.domElement);
 
     await this.loadAssets();
@@ -265,8 +280,8 @@ export default class WebGLApp {
     this.orthographicCamera.right = (this.settings.frustumSize * aspect) / 2;
     this.orthographicCamera.top = this.settings.frustumSize / 2;
     this.orthographicCamera.bottom = this.settings.frustumSize / -2;
-    this.orthographicCamera.near = 0.01;
-    this.orthographicCamera.far = 10000;
+    this.orthographicCamera.near = 0.1;
+    this.orthographicCamera.far = 1000;
 
     this.cameras.dev.updateProjectionMatrix();
     this.cameras.main.updateProjectionMatrix();
@@ -314,61 +329,86 @@ export default class WebGLApp {
 
 /// #if DEBUG
 export class GUIWebGLApp extends GUIController {
-  constructor(gui: GUIType, target: WebGLApp) {
-    super(gui);
-    this.gui = gui;
+  constructor(title: string, target: WebGLApp) {
+    const rightPanel = new Pane({
+      title: title,
+    });
+
+    super(rightPanel);
+
+    const leftPanel = new Pane({
+      title: "Editor",
+      expanded: false,
+    });
+
+    this.gui = rightPanel;
+
+    // @ts-expect-error ignore
+    Object.assign(rightPanel.containerElem_.style, {
+      zIndex: "10000",
+      position: "fixed",
+    }).position = "fixed";
+    // @ts-expect-error ignore
+    Object.assign(leftPanel.containerElem_.style, {
+      zIndex: "10000",
+      position: "fixed",
+    }).position = "fixed";
+
+    // @ts-expect-error ignore
+    leftPanel.containerElem_.classList.add("gui-webgl-left-panel");
+
+    // @ts-expect-error ignore
+    leftPanel.containerElem_.classList.add("gui-webgl-scrollbar");
+
+    // @ts-expect-error ignore
+    rightPanel.containerElem_.classList.add("gui-webgl-right-panel");
+
+    // @ts-expect-error ignore
+    rightPanel.containerElem_.classList.add("gui-webgl-scrollbar");
+
+    this.gui = rightPanel;
 
     this.folders.settings = this.addFolder(this.gui, { title: "Settings" });
-    this.addBinding(this.folders.settings, target.settings, "debugCamera");
-    this.addBinding(this.folders.settings, target.settings, "orthCamera");
-    this.addBinding(this.folders.settings, target.settings, "helpers");
-
-    this.folders.cameras = this.addFolder(this.gui, { title: "Cameras" });
-    this.folders.mainCamera = this.addFolder(this.folders.cameras, {
-      title: "Main",
-    });
-
-    this.addBinding(this.folders.mainCamera, target.cameras.main.position, "z");
-    this.addBinding(this.folders.mainCamera, target.cameras.main, "fov", {
-      min: 1,
-    });
-
-    this.folders.orthCamera = this.addFolder(this.folders.cameras, {
-      title: "Orth",
-    });
-    this.addBinding(
-      this.folders.orthCamera,
-      target.orthographicCamera.position,
-      "z",
-    );
-    this.addBinding(this.folders.orthCamera, target.settings, "frustumSize", {
-      min: 1,
-    }).on(
-      "change",
-      target.resize.bind(target, window.innerWidth, window.innerHeight),
-    );
+    this.gui.addBinding(target.settings, "debugCamera");
+    this.gui.addBinding(target.settings, "orthCamera");
+    this.gui.addBinding(target.settings, "helpers");
 
     this.folders.passes = this.addFolder(this.gui, { title: "Passes" });
 
-    this.folders.fxaa = this.addFolder(this.folders.passes, { title: "FXAA" });
-    fxaaPassBinding(this.folders.fxaa, target.fxaaPass);
+    // this.folders.fxaa = this.addFolder(this.folders.passes, { title: "FXAA" });
+    // fxaaPassBinding(this.folders.fxaa, target.fxaaPass);
 
-    this.folders.bloom = this.addFolder(this.folders.passes, {
-      title: "Bloom",
-    });
-    bloomPassBinding(this.folders.bloom, target.bloomPass);
+    // this.folders.bloom = this.addFolder(this.folders.passes, {
+    //   title: "Bloom",
+    // });
+    // bloomPassBinding(this.folders.bloom, target.bloomPass);
 
-    this.folders.vignette = this.addFolder(this.folders.passes, {
-      title: "Vignette",
-    });
-    vignettePassBinding(this.folders.vignette, target.vignettePass);
+    // this.folders.vignette = this.addFolder(this.folders.passes, {
+    //   title: "Vignette",
+    // });
+    // vignettePassBinding(this.folders.vignette, target.vignettePass);
 
     this.folders.ao = this.addFolder(this.folders.passes, {
       title: "Ambient Occlusion",
     });
     n8AOPassBinding(this.folders.ao, target.aoPass);
 
-    this.controllers.screenshot = new GUIScreenshot(gui, target.screenshot);
+    this.controllers.screenshot = new GUIScreenshot(
+      this.gui,
+      target.screenshot,
+    );
+    this.controllers.bookmarkManager = new GUIBookmarkManager(
+      this.gui,
+      target.bookmarkManager,
+    );
+
+    GUIController.state.renderer = target.renderer;
+    GUIController.state.camera = target.cameras.dev;
+    GUIController.state.scene = target.scene;
+    GUIController.state.controls = target.controls;
+    GUIController.state.activeObject = target.scene;
+
+    this.controllers.sceneController = new GUISceneController(leftPanel);
   }
 }
 /// #endif

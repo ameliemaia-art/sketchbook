@@ -1,11 +1,76 @@
+body {
+  background-color: rgba(0, 0, 0, 1);
+}
+
+.sb-show-main canvas {
+  /* outline: 1px solid rgba(255, 255, 255, 0.5); */
+  /* box-sizing: border-box; */
+}
+
+@font-face {
+  font-family: "Berlingske Serif Stencil";
+  src: url("/assets/fonts/BerlingskeSerifStencil-Rg.eot");
+  src:
+    url("/assets/fonts/BerlingskeSerifStencil-Rg.eot?#iefix")
+      format("embedded-opentype"),
+    url("/assets/fonts/BerlingskeSerifStencil-Rg.woff2") format("woff2"),
+    url("/assets/fonts/BerlingskeSerifStencil-Rg.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Berlingske Serif Text";
+  src: url("/assets/fonts/BerlingskeSerifText-Regular.eot");
+  src:
+    url("/assets/fonts/BerlingskeSerifText-Regular.eot?#iefix")
+      format("embedded-opentype"),
+    url("/assets/fonts/BerlingskeSerifText-Regular.woff2") format("woff2"),
+    url("/assets/fonts/BerlingskeSerifText-Regular.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+
+.load-font-stencil {
+  color: white;
+  font-family: "Berlingske Serif Stencil";
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.load-font-regular {
+  color: white;
+  font-family: "Berlingske Serif Text";
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sketch {
+  position: relative;
+}
+
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-color-thumb);
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-color-track);
+  }
+  ::-webkit-scrollbar {
+    width: 5px;
+    max-width: var(--scrollbar-width-legacy);
+    max-height: var(--scrollbar-width-legacy);
+  }
+}
+
 :root {
-  --gui-editor-width: 400px;
   --scrollbar-color-thumb: rgba(0, 0, 0, 0.25);
   --scrollbar-color-track: transparent;
   --scrollbar-width: thin;
-  --scrollbar-width-legacy: 5px;
-  --tp-base-border-radius: 0;
-
+  --scrollbar-width-legacy: thin;
+  --tp-base-border-radius: 5px;
   --tp-base-background-color: hsla(0, 0%, 0%, 1);
   --tp-base-shadow-color: hsla(0, 0%, 0%, 0.2);
   --tp-button-background-color: hsla(0, 0%, 70%, 1);
@@ -29,36 +94,139 @@
   --tp-monitor-foreground-color: hsla(0, 0%, 48%, 1);
 }
 
-body {
-  background-color: rgba(0, 0, 0, 1);
+.gui-webgl-left-panel {
+  left: 1rem;
 }
 
 .tp-dfwv {
-  width: 320px !important;
+  min-width: 350px;
+  height: 100%;
+  overflow-y: scroll;
   position: fixed !important;
+  z-index: 1000;
 }
 
-.sb-show-main canvas {
-  /* outline: 1px solid rgba(255, 255, 255, 0.5); */
-  /* box-sizing: border-box; */
+.tp-rotv canvas {
+  position: relative !important;
+  top: 0 !important;
 }
 
-@font-face {
-  font-family: "Berlingske Serif Stencil";
-  src: url("/assets/fonts/BerlingskeSerifStencil-Rg.eot");
-  src:
-    url("/assets/fonts/BerlingskeSerifStencil-Rg.eot?#iefix")
-      format("embedded-opentype"),
-    url("/assets/fonts/BerlingskeSerifStencil-Rg.woff2") format("woff2"),
-    url("/assets/fonts/BerlingskeSerifStencil-Rg.woff") format("woff");
-  font-weight: 400;
-  font-style: normal;
+.tp-dfwv canvas {
+  position: relative !important;
+  top: 0 !important;
 }
 
-.load-font {
-  color: white;
-  font-family: "Berlingske Serif Stencil";
+/* Scrollbar */
+.gui-webgl-scrollbar {
+  scrollbar-color: var(--scrollbar-color-thumb) var(--scrollbar-color-track);
+  scrollbar-width: var(--scrollbar-width);
+}
+
+@supports selector(::-webkit-scrollbar) {
+  .gui-webgl-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-color-thumb);
+  }
+  .gui-webgl-scrollbar::-webkit-scrollbar-track {
+    background: var(--scrollbar-color-track);
+  }
+  .gui-webgl-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    max-width: var(--scrollbar-width-legacy);
+    max-height: var(--scrollbar-width-legacy);
+  }
+}
+
+/* Scene Inspector */
+.scene-inspector-root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search highlighting */
+.scene-inspector-root mark {
+  background-color: #ffeb3b;
+  color: #000;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.gui-webgl-scene-object-parent {
+  padding-left: 15px;
+  margin-right: 5px;
+}
+
+.gui-webgl-scene-object-node {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+}
+
+.gui-webgl-scene-object-arrow {
+  display: inline-block;
+  color: #ddd;
+  text-align: center;
   position: absolute;
-  opacity: 0;
-  pointer-events: none;
+  /* color: var(--cnt-fg); */
+  top: 5px;
+  left: -10px;
+}
+
+.gui-webgl-scene-object-label {
+  margin-left: 5px;
+  min-width: 100px;
+  line-height: 20px;
+  color: white;
+}
+
+.gui-webgl-scene-object-label:before {
+  content: "●";
+  /* margin-left: 5px; */
+}
+
+.scene-inspector-root .Scene.gui-webgl-scene-object-label:before {
+  color: #8888dd;
+}
+
+.scene-inspector-root .Camera.gui-webgl-scene-object-label:before {
+  color: #dd8888;
+}
+
+.scene-inspector-root .Light.gui-webgl-scene-object-label:before {
+  color: #dddd88;
+}
+
+/* */
+
+.scene-inspector-root .Object3D.gui-webgl-scene-object-label:before {
+  color: #aaaaee;
+}
+
+.scene-inspector-root .Mesh.gui-webgl-scene-object-label:before {
+  color: #8888ee;
+}
+
+.scene-inspector-root .Line.gui-webgl-scene-object-label:before {
+  color: #88ee88;
+}
+
+.scene-inspector-root .LineSegments.gui-webgl-scene-object-label:before {
+  color: #88ee88;
+}
+
+.scene-inspector-root .Points.gui-webgl-scene-object-label:before {
+  color: #ee8888;
+}
+
+.scene-inspector-root .Helper.gui-webgl-scene-object-label:before {
+  color: #8888ee;
+}
+
+.webgl-app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }

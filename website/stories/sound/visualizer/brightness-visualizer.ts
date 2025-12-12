@@ -1,7 +1,7 @@
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
-import GUIController from "@utils/gui/gui";
+import GUIController from "@utils/editor/gui/gui";
 
 export default class BrightnessVisualizer {
   settings = {

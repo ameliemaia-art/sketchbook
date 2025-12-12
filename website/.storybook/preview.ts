@@ -1,10 +1,4 @@
-import type { Preview } from "@storybook/react";
-
-export const globals = {
-  backgrounds: {
-    grid: true, //enable grid by default
-  },
-};
+import type { Preview } from "@storybook/nextjs";
 
 const preview: Preview = {
   parameters: {
@@ -44,6 +38,12 @@ const preview: Preview = {
       },
     },
   },
+
+  initialGlobals: {
+    backgrounds: {
+      grid: true, //enable grid by default
+    },
+  }
 };
 
 export default preview;

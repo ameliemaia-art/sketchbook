@@ -1,4 +1,4 @@
-import { create } from "@storybook/theming/create";
+import { create } from "storybook/theming/create";
 
 const black = "rgba(0, 0, 0, 0.95)";
 const text = "rgba(255, 255, 255, 0.5)";

@@ -53,3 +53,11 @@ export function composite(
 
   return canvas;
 }
+
+export function saveJsonFile(json: string, filename = "data") {
+  saveAs(
+    new File([json], `${filename}.json`, {
+      type: "application/json;charset=utf-8",
+    }),
+  );
+}
