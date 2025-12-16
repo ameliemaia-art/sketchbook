@@ -8,9 +8,9 @@ import QuantumInterferanceSketch, {
   QuantumInterferanceGUI,
 } from "./quantum-interference";
 
-export default { title: "Sketchbook/Blueprints/Quantum/Interference" };
+export default { title: "Sketchbook/Blueprints/Quantum/Interference/v1" };
 
-export const Interference = () => {
+export const v1 = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
