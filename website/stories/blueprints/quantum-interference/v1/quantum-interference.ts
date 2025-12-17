@@ -17,13 +17,9 @@ export default class QuantumInterferance {
     form: {
       emitters: 2,
       waves: 10,
-      jitter: 10,
-      opacity: 0.5,
-      enableJitter: true,
-      waveThickness: 50,
-      waveJitter: 10,
-      pointsPerPositionOnWave: 50,
-      particleSize: { x: 0.5, y: 0.5 },
+      jitter: 5,
+      jitterEnabled: true,
+      power: 3,
     },
   };
 
@@ -35,14 +31,7 @@ export default class QuantumInterferance {
 
   size: Vector2; // canvas size
 
-  photon: Photon;
-
-  count = 0;
-  max = 200;
-
   phase = 0;
-
-  interval: any = null;
 
   constructor(
     public root: HTMLElement,
@@ -57,8 +46,6 @@ export default class QuantumInterferance {
       this.canvas.width / this.dpi,
       this.canvas.height / this.dpi,
     );
-
-    this.photon = new Photon(this.ctx!, this.size);
 
     this.draw();
   }
@@ -84,14 +71,11 @@ export default class QuantumInterferance {
     this.ctx.fillStyle = "#000000";
     this.ctx.fillRect(0, 0, this.size.x, this.size.y);
 
-    // this.photon.draw();
-
     this.phase -= TWO_PI * 0.1;
 
-    const count = 4;
     const radius = this.size.x / 2;
-    for (let i = 0; i < count; i++) {
-      const theta = i * (TWO_PI / count);
+    for (let i = 0; i < this.settings.form.emitters; i++) {
+      const theta = i * (TWO_PI / this.settings.form.emitters);
       const x = this.size.x / 2 + Math.cos(theta) * radius;
       const y = this.size.y / 2 + Math.sin(theta) * radius;
       this.quantumWave(x, y, radius * 2);
@@ -113,38 +97,31 @@ export default class QuantumInterferance {
       const rayDx = centerX + Math.cos(theta) * radius;
       const rayDy = centerY + Math.sin(theta) * radius;
 
-      const waveCount = 25;
-
       for (let j = 0; j < steps; j++) {
         const progress = j / steps;
         const x = MathUtils.lerp(raySx, rayDx, progress);
         const y = MathUtils.lerp(raySy, rayDy, progress);
 
-        const waveOpacity =
-          Math.sin(this.phase + progress * TWO_PI * waveCount) * 0.5 + 0.5;
+        const waveOpacity = Math.pow(
+          Math.sin(this.phase + progress * TWO_PI * this.settings.form.waves) *
+            0.5 +
+            0.5,
+          this.settings.form.power,
+        );
+
+        const jitterX = MathUtils.randFloatSpread(
+          this.settings.form.jitterEnabled ? this.settings.form.jitter : 0,
+        );
+        const jitterY = MathUtils.randFloatSpread(
+          this.settings.form.jitterEnabled ? this.settings.form.jitter : 0,
+        );
 
         this.ctx.beginPath();
-        this.ctx.arc(
-          // x,
-          // y,
-          x + MathUtils.randFloatSpread(5),
-          y + MathUtils.randFloatSpread(5),
-          0.5,
-          0,
-          Math.PI * 2,
-        );
+        this.ctx.arc(x + jitterX, y + jitterY, 0.5, 0, Math.PI * 2);
         this.ctx.fillStyle = `rgba(255, 255, 255, ${waveOpacity})`;
         this.ctx.fill();
         this.ctx.closePath();
       }
-
-      // this.ctx.beginPath();
-      // this.ctx.lineWidth = 1;
-      // this.ctx.strokeStyle = `rgba(255, 255, 255, ${waveOpacity})`;
-      // this.ctx.moveTo(this.size.x / 2, this.size.y / 2);
-      // this.ctx.lineTo(x, y);
-      // this.ctx.stroke();
-      // this.ctx.closePath();
     }
   }
 }
@@ -167,5 +144,21 @@ export class QuantumInterferanceGUI extends GUIController {
     // Form
     this.folders.form = this.addFolder(this.gui, { title: "Form" });
     this.folders.form.addButton({ title: "Draw" }).on("click", target.draw);
+
+    this.folders.form
+      .addBinding(target.settings.form, "emitters", { min: 1, max: 8, step: 1 })
+      .on("change", target.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "waves", { min: 1, max: 50, step: 1 })
+      .on("change", target.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "jitter", { min: 1, max: 50 })
+      .on("change", target.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "jitterEnabled")
+      .on("change", target.draw);
+    this.folders.form
+      .addBinding(target.settings.form, "power", { min: 0, max: 10 })
+      .on("change", target.draw);
   }
 }

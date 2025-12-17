@@ -9,13 +9,9 @@ export type QuantumInterferenceSettings = {
   form: {
     emitters: number;
     waves: number;
-    enableJitter: boolean;
     jitter: number;
-    opacity: number;
-    waveThickness: number;
-    pointsPerPositionOnWave: number;
-    waveJitter: number;
-    particleSize: { x: number; y: number };
+    jitterEnabled: boolean;
+    power: number;
   };
 };
 
