@@ -37,6 +37,11 @@ export default class QuantumInterferance {
 
   photon: Photon;
 
+  count = 0;
+  max = 200;
+
+  interval: any = null;
+
   constructor(
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
@@ -46,20 +51,13 @@ export default class QuantumInterferance {
 
     this.resize();
 
-    const canvasWidth = this.canvas.width / this.dpi;
-    const canvasHeight = this.canvas.height / this.dpi;
-
-    this.size = new Vector2(canvasWidth, canvasHeight);
+    this.canvasWidth = this.canvas.width / this.dpi;
+    this.canvasHeight = this.canvas.height / this.dpi;
+    this.size = new Vector2(this.canvasWidth, this.canvasHeight);
 
     this.photon = new Photon(this.ctx!, this.size);
-    this.photon.origin.set(canvasWidth / 2, canvasHeight / 2);
-    this.photon.direction.set(
-      MathUtils.randFloatSpread(1),
-      MathUtils.randFloatSpread(1),
-    );
-    this.photon.direction.normalize();
 
-    this.draw();
+    this.startSimulation();
 
     // Todo - better wave function implementation
     // better opacity ramp falloff
@@ -78,35 +76,53 @@ export default class QuantumInterferance {
     }
   }
 
+  randomizePhoton() {
+    this.photon.setOrigin(this.size.x / 2, 0);
+    this.photon.setDirection(0, 1);
+    this.photon.setPhase(MathUtils.randFloat(0, TWO_PI));
+  }
+
+  startSimulation() {
+    if (!this.ctx) return;
+
+    this.ctx.clearRect(0, 0, this.size.x, this.size.y);
+
+    if (this.settings.blueprint.darkness) {
+      this.ctx.fillStyle = "rgba(0, 0, 0, 1)";
+      this.ctx.fillRect(0, 0, this.size.x, this.size.y);
+    }
+    this.interval = setInterval(() => {
+      this.photon.setOrigin(this.size.x / 2, this.size.y / 2);
+
+      const t = this.count / (this.max - 1);
+      const theta = MathUtils.lerp(
+        MathUtils.degToRad(360),
+        MathUtils.degToRad(0),
+        t,
+      );
+      this.photon.setDirection(Math.cos(theta), Math.sin(theta));
+      this.photon.setPhase(MathUtils.randFloat(0, TWO_PI));
+
+      requestAnimationFrame(this.draw);
+    }, 10);
+  }
+
+  randomize = () => {
+    this.randomizePhoton();
+    this.draw();
+  };
+
   draw = () => {
     // Circle
     if (!this.ctx) return;
 
-    requestAnimationFrame(this.draw);
+    this.photon.draw();
 
-    const ctx = this.ctx;
-    const width = this.canvas.width / this.dpi;
-    const height = this.canvas.height / this.dpi;
-    // const radius = width / 2;
-    // const centerX = width / 2;
-    // const centerY = height / 2;
-
-    // Clear canvas
-    // ctx.clearRect(0, 0, width, height);
-
-    // Set background
-    if (this.settings.blueprint.darkness) {
-      ctx.fillStyle = "rgba(0, 0, 0, 1)";
-      ctx.fillRect(0, 0, width, height);
+    if (this.count >= this.max) {
+      clearInterval(this.interval);
     }
 
-    this.photon.draw(this.clock.getDelta());
-
-    // ctx.beginPath();
-    // ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    // ctx.strokeStyle = "#ffffff";
-    // ctx.lineWidth = 2;
-    // ctx.stroke();
+    this.count++;
   };
 }
 
@@ -127,61 +143,10 @@ export class QuantumInterferanceGUI extends GUIController {
 
     // Form
     this.folders.form = this.addFolder(this.gui, { title: "Form" });
+    this.folders.form
+      .addButton({ title: "randomize", label: "" })
+      .on("click", target.randomize);
 
-    this.folders.form.addBinding(target.settings.form, "emitters", {
-      min: 1,
-      max: 10,
-      step: 1,
-    });
-
-    this.folders.form.addBinding(target.settings.form, "waves", {
-      min: 1,
-      max: 50,
-      step: 1,
-    });
-
-    this.folders.form.addBinding(target.settings.form, "enableJitter");
-
-    this.folders.form.addBinding(target.settings.form, "jitter", {
-      min: 0,
-      max: 20,
-    });
-
-    this.folders.form.addBinding(target.settings.form, "opacity", {
-      min: 0,
-      max: 1,
-    });
-
-    this.folders.form.addBinding(target.settings.form, "waveThickness", {
-      min: 1,
-      max: 100,
-    });
-
-    this.folders.form.addBinding(target.settings.form, "waveJitter", {
-      min: 0,
-      max: 40,
-    });
-
-    this.folders.form.addBinding(
-      target.settings.form,
-      "pointsPerPositionOnWave",
-      {
-        min: 1,
-        max: 100,
-        step: 1,
-      },
-    );
-
-    this.folders.form.addBinding(target.settings.form.particleSize, "x", {
-      min: 0.01,
-      max: 1,
-      label: "particleSize.x",
-    });
-
-    this.folders.form.addBinding(target.settings.form.particleSize, "y", {
-      min: 0.01,
-      max: 1,
-      label: "particleSize.y",
-    });
+    this.folders.form.addBinding(target, "count", { readonly: true });
   }
 }
