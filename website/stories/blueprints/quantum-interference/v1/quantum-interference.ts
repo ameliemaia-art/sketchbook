@@ -71,22 +71,27 @@ export default class QuantumInterferance {
     this.ctx.fillStyle = "#000000";
     this.ctx.fillRect(0, 0, this.size.x, this.size.y);
 
-    this.phase -= TWO_PI * 0.1;
+    this.phase -= TWO_PI * 0.05;
 
     const radius = this.size.x / 2;
     for (let i = 0; i < this.settings.form.emitters; i++) {
       const theta = i * (TWO_PI / this.settings.form.emitters);
       const x = this.size.x / 2 + Math.cos(theta) * radius;
       const y = this.size.y / 2 + Math.sin(theta) * radius;
-      this.quantumWave(x, y, radius * 2);
+      this.quantumWave(x, y, radius * 2, theta);
     }
   };
 
-  quantumWave(centerX: number, centerY: number, radius: number) {
+  quantumWave(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    phaseOffset: number,
+  ) {
     if (!this.ctx) return;
 
     const count = 200;
-    const steps = 200;
+    const steps = 300;
     for (let i = 0; i < count; i++) {
       const t = i / count;
 
@@ -118,7 +123,7 @@ export default class QuantumInterferance {
 
         this.ctx.beginPath();
         this.ctx.arc(x + jitterX, y + jitterY, 0.5, 0, Math.PI * 2);
-        this.ctx.fillStyle = `rgba(255, 255, 255, ${waveOpacity})`;
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * (waveOpacity + Math.sin(theta * TWO_PI + this.phase) * 0.5 + 0.5)})`;
         this.ctx.fill();
         this.ctx.closePath();
       }
