@@ -1,9 +1,10 @@
+import Frame, { GUIFrame } from "@/stories/frame/frame";
 import { Box2, Clock, MathUtils, Vector2 } from "three";
 import { FolderApi } from "tweakpane";
 
+import { saveImage } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { TWO_PI } from "@utils/three/math";
-import Photon from "./photon";
 import {
   QuantumInterferenceSettings,
   quantumWaveCanvas,
@@ -33,6 +34,11 @@ export default class QuantumInterferance {
 
   phase = 0;
 
+  frameEnabled = false;
+  frame: Frame;
+
+  title = "Quantum Interference";
+
   constructor(
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
@@ -40,27 +46,37 @@ export default class QuantumInterferance {
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
 
-    this.resize();
+    this.frame = new Frame(root, this.canvas, this.title);
 
-    this.size = new Vector2(
-      this.canvas.width / this.dpi,
-      this.canvas.height / this.dpi,
-    );
+    this.size = new Vector2(this.canvas.width, this.canvas.height);
 
-    this.draw();
+    this.setup();
   }
 
-  resize() {
-    const width = 500;
-    const height = 500;
-    this.canvas.width = width * this.dpi;
-    this.canvas.height = height * this.dpi;
-    this.canvas.style.width = width + "px";
-    this.canvas.style.height = height + "px";
-    if (this.ctx) {
-      this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
-      this.ctx.scale(this.dpi, this.dpi); // Apply DPI scaling
-    }
+  async setup(exporting = false) {
+    const exportScale = this.frameEnabled ? 3 : 5;
+    await this.frame.setup(exporting);
+    return new Promise<void>((resolve) => {
+      const scale = exporting ? exportScale : 1;
+      // this.settings.strokeWidth = 1 * scale;
+
+      const width = 500;
+      const height = 500;
+      this.canvas.width = width * this.dpi;
+      this.canvas.height = height * this.dpi;
+      this.canvas.style.width = width + "px";
+      this.canvas.style.height = height + "px";
+      this.size = new Vector2(width, height); // Update size to logical dimensions
+      if (this.ctx) {
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+        this.ctx.scale(this.dpi, this.dpi); // Apply DPI scaling
+      }
+
+      requestAnimationFrame(() => {
+        this.draw();
+        resolve();
+      });
+    });
   }
 
   draw = () => {
@@ -78,7 +94,14 @@ export default class QuantumInterferance {
       const theta = i * (TWO_PI / this.settings.form.emitters);
       const x = this.size.x / 2 + Math.cos(theta) * radius;
       const y = this.size.y / 2 + Math.sin(theta) * radius;
+      // this.quantumWave(this.size.x / 2, this.size.y / 2, radius * 2, theta);
       this.quantumWave(x, y, radius * 2, theta);
+    }
+
+    this.frame.toggle(this.frameEnabled);
+
+    if (this.frameEnabled) {
+      this.frame.draw();
     }
   };
 
@@ -90,6 +113,7 @@ export default class QuantumInterferance {
   ) {
     if (!this.ctx) return;
 
+    // todo
     const count = 200;
     const steps = 300;
     for (let i = 0; i < count; i++) {
@@ -123,11 +147,32 @@ export default class QuantumInterferance {
 
         this.ctx.beginPath();
         this.ctx.arc(x + jitterX, y + jitterY, 0.5, 0, Math.PI * 2);
-        this.ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * (waveOpacity + Math.sin(theta * TWO_PI + this.phase) * 0.5 + 0.5)})`;
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * (waveOpacity + Math.cos(theta * TWO_PI + this.phase) * 0.5 + 0.5)})`;
+        // this.ctx.fillStyle = `rgba(255, 255, 255, ${waveOpacity})`;
         this.ctx.fill();
         this.ctx.closePath();
       }
     }
+  }
+
+  name() {
+    return this.title;
+  }
+
+  fileName() {
+    return this.name().replace(/ /g, "-").toLowerCase();
+  }
+
+  async saveImage() {
+    await this.setup(true);
+
+    if (this.frameEnabled) {
+      await saveImage(this.frame.textCanvas, this.fileName());
+    } else {
+      await saveImage(this.canvas, this.fileName());
+    }
+
+    await this.setup(false);
   }
 }
 
@@ -148,7 +193,9 @@ export class QuantumInterferanceGUI extends GUIController {
 
     // Form
     this.folders.form = this.addFolder(this.gui, { title: "Form" });
-    this.folders.form.addButton({ title: "Draw" }).on("click", target.draw);
+    this.folders.form
+      .addButton({ title: "Draw", label: "" })
+      .on("click", target.draw);
 
     this.folders.form
       .addBinding(target.settings.form, "emitters", { min: 1, max: 8, step: 1 })
@@ -165,5 +212,15 @@ export class QuantumInterferanceGUI extends GUIController {
     this.folders.form
       .addBinding(target.settings.form, "power", { min: 0, max: 10 })
       .on("change", target.draw);
+
+    this.gui
+      .addBinding(target, "frameEnabled", { label: "frame" })
+      .on("change", target.draw);
+
+    this.gui.addButton({ title: "Save Image", label: "" }).on("click", () => {
+      target.saveImage();
+    });
+
+    this.controllers.frame = new GUIFrame(this.gui, target.frame);
   }
 }
