@@ -12,6 +12,10 @@ export type QuantumInterferenceSettings = {
     jitter: number;
     jitterEnabled: boolean;
     power: number;
+    phaseDelta: number;
+    photonRadius: number;
+    particleDensity: number;
+    waveFunctionHeight: number;
   };
 };
 
