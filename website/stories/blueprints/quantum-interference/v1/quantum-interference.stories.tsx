@@ -8,6 +8,8 @@ import QuantumInterferanceSketch, {
   QuantumInterferanceGUI,
 } from "./quantum-interference";
 
+import "../../../global.css";
+
 export default { title: "Sketchbook/Blueprints/Quantum/Interference/v1" };
 
 export const v1 = () => {

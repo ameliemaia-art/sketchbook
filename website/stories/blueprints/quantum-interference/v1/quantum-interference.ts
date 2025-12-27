@@ -5,10 +5,7 @@ import { FolderApi } from "tweakpane";
 import { saveImage } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { TWO_PI } from "@utils/three/math";
-import {
-  QuantumInterferenceSettings,
-  quantumWaveCanvas,
-} from "./quantum-interference-geometry";
+import { QuantumInterferenceSettings } from "./quantum-interference-geometry";
 import { drawDot, drawLine } from "./utils";
 
 const tmp0 = new Vector2();
@@ -26,15 +23,15 @@ export default class QuantumInterferance {
       darkness: true,
     },
     form: {
-      emitters: 2,
+      emitters: 1,
       waves: 10,
       jitter: 5,
       jitterEnabled: false,
-      power: 2,
+      power: 0,
       phaseDelta: 0.01,
       photonRadius: 0.5,
-      particleDensity: 2,
-      waveFunctionHeight: 3,
+      particleDensity: 1,
+      waveFunctionHeight: 10,
     },
   };
 
@@ -103,8 +100,8 @@ export default class QuantumInterferance {
     const radius = this.size.x / 2;
     for (let i = 0; i < this.settings.form.emitters; i++) {
       const theta = i * (TWO_PI / this.settings.form.emitters);
-      const x = this.size.x / 2 + Math.cos(theta) * radius;
-      const y = this.size.y / 2 + Math.sin(theta) * radius;
+      const x = this.size.x / 2 + (Math.cos(theta) * radius) / 2;
+      const y = this.size.y / 2 + (Math.sin(theta) * radius) / 2;
       this.quantumWave(x, y, radius * 3, theta);
       // this.quantumWave(this.size.x / 2, this.size.y / 2, radius * 3, theta);
     }
@@ -122,7 +119,7 @@ export default class QuantumInterferance {
     // drawDot(this.ctx, pointAlongWaveX, pointAlongWaveY, 2, "#ffffff");
 
     const waveHeight =
-      Math.sin(Math.PI * t) * this.settings.form.waveFunctionHeight;
+      Math.sin(Math.PI * t) ** 2 * this.settings.form.waveFunctionHeight;
 
     const t0x = pointAlongWaveX + tangent.x * -waveHeight;
     const t0y = pointAlongWaveY + tangent.y * -waveHeight;
@@ -138,6 +135,18 @@ export default class QuantumInterferance {
       t1x,
       t1y,
     };
+  }
+
+  samplePhaseFromSinSquared(): number {
+    const u = Math.random(); // uniform [0,1]
+    const root = Math.asin(Math.sqrt(u)); // inverse CDF
+    const phase = Math.random() < 0.5 ? root : Math.PI - root; // reflect for symmetry
+    return phase;
+  }
+
+  sampleTFromWaveFunction(): number {
+    const phase = this.samplePhaseFromSinSquared();
+    return phase / Math.PI;
   }
 
   waveFunction(x: number, y: number, normal: Vector2, debug = false) {
@@ -169,19 +178,19 @@ export default class QuantumInterferance {
 
     tangent.set(-normal.y, normal.x);
 
-    // const t0x = x + tangent.x * -waveHeight;
-    // const t0y = y + tangent.y * -waveHeight;
-    // const t1x = x + tangent.x * waveHeight;
-    // const t1y = y + tangent.y * waveHeight;
-
-    // drawLine(this.ctx, t0x, t0y, t1x, t1y);
-
     // Draw steps along wave function distance
 
     // Draw dots for debugging
 
     // if (debug) {
-    //   const steps = 10;
+    //   const t0x = x + tangent.x * -waveHeight;
+    //   const t0y = y + tangent.y * -waveHeight;
+    //   const t1x = x + tangent.x * waveHeight;
+    //   const t1y = y + tangent.y * waveHeight;
+
+    //   drawLine(this.ctx, t0x, t0y, t1x, t1y);
+
+    //   const steps = 20;
     //   for (let i = 0; i < steps; i++) {
     //     const t = i / (steps - 1);
 
@@ -194,7 +203,7 @@ export default class QuantumInterferance {
     //       t1y,
     //     } = this.computeRandomPointInWaveFunction(t, Math.random());
 
-    //     drawDot(this.ctx, x0, y0, 2, "#ff0000");
+    //     // drawDot(this.ctx, x0, y0, 2, "#ff0000");
 
     //     drawLine(this.ctx, t0x, t0y, t1x, t1y);
     //   }
@@ -206,7 +215,10 @@ export default class QuantumInterferance {
     // }
 
     const { x: waveFunctionProbabilityX, y: waveFunctionProbabilityY } =
-      this.computeRandomPointInWaveFunction(Math.random(), Math.random());
+      this.computeRandomPointInWaveFunction(
+        this.sampleTFromWaveFunction(),
+        Math.random(),
+      );
 
     return {
       waveFunctionProbabilityX,
@@ -214,17 +226,11 @@ export default class QuantumInterferance {
     };
   }
 
-  quantumWave(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    phaseOffset: number,
-  ) {
+  quantumWave(centerX: number, centerY: number, radius: number) {
     if (!this.ctx) return;
 
     // todo
-    const linesPerWave = 100;
-    // const steps = 300;
+    const linesPerWave = 300;
     for (let i = 0; i < linesPerWave; i++) {
       const t = i / linesPerWave;
 
@@ -249,15 +255,6 @@ export default class QuantumInterferance {
             0.5,
           this.settings.form.power,
         );
-        const waveSpectrum = Math.cos(theta * TWO_PI + this.phase) * 0.5 + 0.5;
-
-        // wave function + probability
-        // const jitterX = MathUtils.randFloatSpread(
-        //   this.settings.form.jitterEnabled ? this.settings.form.jitter : 0,
-        // );
-        // const jitterY = MathUtils.randFloatSpread(
-        //   this.settings.form.jitterEnabled ? this.settings.form.jitter : 0,
-        // );
 
         normal.set(dx - x, dy - y).normalize();
 
@@ -272,9 +269,7 @@ export default class QuantumInterferance {
           0,
           Math.PI * 2,
         );
-        // this.ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * (waveOpacity + Math.cos(theta * TWO_PI + this.phase) * 0.5 + 0.5)})`;
         this.ctx.fillStyle = `rgba(255, 255, 255, ${waveOpacity})`;
-        // this.ctx.fillStyle = `rgba(255, 255, 255, ${waveOpacity})`;
         this.ctx.fill();
         this.ctx.closePath();
       }
@@ -328,12 +323,6 @@ export class QuantumInterferanceGUI extends GUIController {
       .on("change", target.draw);
     this.folders.form
       .addBinding(target.settings.form, "waves", { min: 1, max: 50, step: 1 })
-      .on("change", target.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "jitter", { min: 1, max: 50 })
-      .on("change", target.draw);
-    this.folders.form
-      .addBinding(target.settings.form, "jitterEnabled")
       .on("change", target.draw);
     this.folders.form
       .addBinding(target.settings.form, "power", { min: 0, max: 10 })
