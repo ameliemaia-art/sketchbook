@@ -63,7 +63,7 @@ export function graph(
   }
 
   const particleCount = 500;
-  const particleColor = new paper.Color(1, 0, 0, 0.8);
+  const particleColor = new paper.Color(1, 1, 1, 1);
 
   for (let i = 0; i < particleCount; i++) {
     // 1. Sample phase according to sin² (Born rule)
@@ -80,7 +80,7 @@ export function graph(
     const y = size.height - probability * size.height;
 
     // 4. Draw particle
-    dot(new paper.Point(x, y), 2, blueprint, particleColor);
+    dot(new paper.Point(x, y), 1, blueprint, particleColor);
   }
 
   return form;

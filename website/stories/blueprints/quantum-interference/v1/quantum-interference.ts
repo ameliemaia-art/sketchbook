@@ -2,11 +2,11 @@ import Frame, { GUIFrame } from "@/stories/frame/frame";
 import { Box2, Clock, MathUtils, Vector2 } from "three";
 import { FolderApi } from "tweakpane";
 
-import { saveImage } from "@utils/common/file";
+import { saveImage, saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
-import { TWO_PI } from "@utils/three/math";
+import { PI, TWO_PI } from "@utils/three/math";
+import settings from "./data/preset-0.json";
 import { QuantumInterferenceSettings } from "./quantum-interference-geometry";
-import { drawDot, drawLine } from "./utils";
 
 const tmp0 = new Vector2();
 const tmp1 = new Vector2();
@@ -19,6 +19,7 @@ const tangent = new Vector2();
 
 export default class QuantumInterferance {
   settings: QuantumInterferenceSettings = {
+    scale: 1,
     blueprint: {
       darkness: true,
     },
@@ -58,7 +59,12 @@ export default class QuantumInterferance {
     this.frame = new Frame(root, this.canvas, this.title);
     this.size = new Vector2(this.canvas.width, this.canvas.height);
 
+    this.loadSettings();
     this.setup();
+  }
+
+  loadSettings() {
+    this.settings.form = JSON.parse(JSON.stringify(settings));
   }
 
   async setup(exporting = false) {
@@ -66,10 +72,10 @@ export default class QuantumInterferance {
     await this.frame.setup(exporting);
     return new Promise<void>((resolve) => {
       const scale = exporting ? exportScale : 1;
-      // this.settings.strokeWidth = 1 * scale;
+      this.settings.scale = scale;
 
-      const width = 500;
-      const height = 500;
+      const width = 500 * scale;
+      const height = 500 * scale;
       this.canvas.width = width * this.dpi;
       this.canvas.height = height * this.dpi;
       this.canvas.style.width = width + "px";
@@ -95,15 +101,15 @@ export default class QuantumInterferance {
     this.ctx.fillStyle = "#000000";
     this.ctx.fillRect(0, 0, this.size.x, this.size.y);
 
-    this.phase -= TWO_PI * this.settings.form.phaseDelta;
+    this.phase = 0; //-= TWO_PI * this.settings.form.phaseDelta;
 
     const radius = this.size.x / 2;
     for (let i = 0; i < this.settings.form.emitters; i++) {
-      const theta = i * (TWO_PI / this.settings.form.emitters);
+      const theta = Math.PI / 2 + i * (TWO_PI / this.settings.form.emitters);
       const x = this.size.x / 2 + (Math.cos(theta) * radius) / 2;
       const y = this.size.y / 2 + (Math.sin(theta) * radius) / 2;
-      this.quantumWave(x, y, radius * 3, theta);
-      // this.quantumWave(this.size.x / 2, this.size.y / 2, radius * 3, theta);
+      this.quantumWave(x, y, radius * 3);
+      // this.quantumWave(this.size.x / 2, this.size.y / 2, radius * 3);
     }
 
     this.frame.toggle(this.frameEnabled);
@@ -118,8 +124,7 @@ export default class QuantumInterferance {
     const pointAlongWaveY = MathUtils.lerp(p2.y, p3.y, t);
     // drawDot(this.ctx, pointAlongWaveX, pointAlongWaveY, 2, "#ffffff");
 
-    const waveHeight =
-      Math.sin(Math.PI * t) ** 2 * this.settings.form.waveFunctionHeight;
+    const waveHeight = Math.sin(Math.PI * t) ** 2 * this.waveFunctionHeight;
 
     const t0x = pointAlongWaveX + tangent.x * -waveHeight;
     const t0y = pointAlongWaveY + tangent.y * -waveHeight;
@@ -159,9 +164,9 @@ export default class QuantumInterferance {
     // Draw lines for the curve
     // The offset of the particle position could be lerped from the
     // current line position to a sign of the wave curve on either side
-    const waveLength = 10;
     // const waveHeight = 10;
-    const dotRadius = 10;
+    const waveLength = 10 * this.settings.scale;
+    const dotRadius = 10 * this.settings.scale;
     p0.set(x, y).add(new Vector2(-waveLength, -waveLength).multiply(normal));
     p1.set(x, y).add(new Vector2(waveLength, waveLength).multiply(normal));
 
@@ -230,7 +235,7 @@ export default class QuantumInterferance {
     if (!this.ctx) return;
 
     // todo
-    const linesPerWave = 300;
+    const linesPerWave = 150;
     for (let i = 0; i < linesPerWave; i++) {
       const t = i / linesPerWave;
 
@@ -241,7 +246,7 @@ export default class QuantumInterferance {
 
       // line length / px
       const length = tmp0.set(centerX, centerY).distanceTo(tmp1.set(dx, dy));
-      const steps = Math.floor(length) / this.settings.form.particleDensity;
+      const steps = Math.floor(length) / this.particleDensity;
 
       for (let j = 0; j < steps; j++) {
         const progress = j / steps;
@@ -265,7 +270,7 @@ export default class QuantumInterferance {
         this.ctx.arc(
           waveFunctionProbabilityX,
           waveFunctionProbabilityY,
-          this.settings.form.photonRadius,
+          this.photonRadius,
           0,
           Math.PI * 2,
         );
@@ -274,6 +279,19 @@ export default class QuantumInterferance {
         this.ctx.closePath();
       }
     }
+  }
+
+  // Scale dependent settings
+  get waveFunctionHeight() {
+    return this.settings.scale * this.settings.form.waveFunctionHeight;
+  }
+
+  get particleDensity() {
+    return this.settings.scale * this.settings.form.particleDensity;
+  }
+
+  get photonRadius() {
+    return this.settings.scale * this.settings.form.photonRadius;
   }
 
   name() {
@@ -353,5 +371,18 @@ export class QuantumInterferanceGUI extends GUIController {
     });
 
     this.controllers.frame = new GUIFrame(this.gui, target.frame);
+
+    this.gui
+      .addButton({ title: "Save Settings", label: "" })
+      .on("click", () => {
+        this.saveSettings();
+      });
+  }
+
+  saveSettings() {
+    saveJsonFile(
+      JSON.stringify(this.target.settings.form),
+      this.target.fileName() + "-settings",
+    );
   }
 }

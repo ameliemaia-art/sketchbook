@@ -33,7 +33,7 @@ export default class Graph extends Sketch {
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
   ) {
-    super(root, canvas, "Graph");
+    super(root, canvas, "Wavefunction Probability Density");
   }
 
   draw() {

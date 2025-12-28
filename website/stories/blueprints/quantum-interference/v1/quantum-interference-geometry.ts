@@ -3,6 +3,7 @@ import { MathUtils } from "three";
 import { TWO_PI } from "@utils/three/math";
 
 export type QuantumInterferenceSettings = {
+  scale: number;
   blueprint: {
     darkness: boolean;
   };

@@ -1,0 +1,11 @@
+{
+  "emitters": 1,
+  "waves": 10,
+  "jitter": 5,
+  "jitterEnabled": false,
+  "power": 0,
+  "phaseDelta": 0.01,
+  "photonRadius": 0.25,
+  "particleDensity": 1,
+  "waveFunctionHeight": 10
+}
