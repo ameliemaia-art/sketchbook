@@ -6,12 +6,15 @@ import Sketch, {
   SketchSettings,
   sketchSettings,
 } from "../../sketch/sketch";
-import { graph, GraphSettings } from "./graph-geometry";
+import {
+  graph,
+  QuantumWaveFunctionGraphSettings,
+} from "./quantum-wave-function-graph-geometry";
 
-export default class Graph extends Sketch {
-  settings: SketchSettings & GraphSettings = {
+export default class QuantumWaveFunctionGraph extends Sketch {
+  settings: SketchSettings & QuantumWaveFunctionGraphSettings = {
     ...sketchSettings,
-    strokeDepthColor: new paper.Color(1, 1, 1, 0.5),
+    darkness: true,
     grid: {
       visible: true,
       divisions: 25,
@@ -21,11 +24,13 @@ export default class Graph extends Sketch {
       opacity: 1,
       visible: true,
       cosmos: false,
-      architecture: true,
+      curve: true,
+      curveStrokeWidth: 0.1,
     },
     form: {
       opacity: 1,
       visible: true,
+      particles: 1000,
     },
   };
 
@@ -52,21 +57,14 @@ export default class Graph extends Sketch {
   }
 }
 
-export class GUIGraph extends GUISketch {
+export class GUIQuantumWaveFunctionGraph extends GUISketch {
   constructor(
     gui: FolderApi,
-    public target: Graph,
+    public target: QuantumWaveFunctionGraph,
   ) {
     super(gui, target, target.name());
-    this.gui
-      .addBinding(target.settings.strokeDepthColor, "alpha", {
-        label: "strokeDepthColor",
-        min: 0,
-        max: 1,
-        index: 3,
-      })
-      .on("change", this.draw);
-    this.folders.grid = this.addFolder(this.gui, { title: "Grid", index: 5 });
+
+    this.folders.grid = this.addFolder(this.gui, { title: "Grid" });
     this.folders.grid
       .addBinding(target.settings.grid, "visible")
       .on("change", this.draw);
@@ -74,6 +72,25 @@ export class GUIGraph extends GUISketch {
       .addBinding(target.settings.grid, "opacity", {
         min: 0,
         max: 1,
+      })
+      .on("change", this.draw);
+
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "curve")
+      .on("change", this.draw);
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "curveStrokeWidth", {
+        min: 0.1,
+        max: 5,
+        step: 0.1,
+      })
+      .on("change", this.draw);
+
+    this.folders.form
+      .addBinding(target.settings.form, "particles", {
+        min: 100,
+        max: 2000,
+        step: 1,
       })
       .on("change", this.draw);
   }

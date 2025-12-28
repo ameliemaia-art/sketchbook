@@ -1,21 +1,21 @@
 import paper from "paper";
 import { MathUtils } from "three";
 
-import { createGrid, dot } from "@utils/paper/utils";
+import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../../sketch/sketch";
-import { drawDot } from "./utils";
+import { drawDot, drawLine } from "./utils";
 
-export type GraphSettings = {
-  strokeDepthColor: paper.Color;
+export type QuantumWaveFunctionGraphSettings = {
   grid: {
     visible: boolean;
     opacity: number;
     divisions: number;
   };
   blueprint: {
-    architecture: boolean;
+    curve: boolean;
+    curveStrokeWidth: number;
   };
-  form: {};
+  form: { particles: number };
 };
 
 function curve(phase: number) {
@@ -28,7 +28,7 @@ export function graph(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: SketchSettings & GraphSettings,
+  settings: SketchSettings & QuantumWaveFunctionGraphSettings,
 ) {
   const gridColor = new paper.Color(1, 1, 1, settings.grid.opacity);
 
@@ -39,9 +39,9 @@ export function graph(
       gridColor,
       settings.strokeWidth,
       settings.grid.divisions,
-      form,
+      blueprint,
     );
-    createGrid(center, size, gridColor, settings.strokeWidth, 5, form);
+    createGrid(center, size, gridColor, settings.strokeWidth, 5, blueprint);
   }
 
   if (settings.blueprint.cosmos) {
@@ -51,21 +51,38 @@ export function graph(
     blueprint.addChild(path);
   }
 
-  // Draw  curve
+  const padding = 20 * settings.exportScale;
+  const height = size.height - padding;
 
+  // Draw  curve
   const count = 100;
+  const points = [];
   for (let i = 0; i < count; i++) {
     const t = i / (count - 1);
     const phase = t * Math.PI;
-    const x = MathUtils.lerp(0, size.width, t);
-    const y = size.height - curve(phase) * size.height;
-    dot(new paper.Point(x, y), 1, blueprint, settings.strokeColor);
+    const x = MathUtils.lerp(padding, size.width - padding, t);
+    const y = size.height - padding - curve(phase) * (height - padding);
+    points.push(new paper.Point(x, y));
+    // dot(new paper.Point(x, y), 1, blueprint, settings.strokeColor);
   }
 
-  const particleCount = 500;
+  if (settings.blueprint.curve) {
+    const path = createLine(
+      points,
+      settings.strokeColor,
+      settings.blueprint.curveStrokeWidth,
+      form,
+    );
+    path.strokeColor = settings.strokeColor;
+    path.strokeWidth = settings.blueprint.curveStrokeWidth;
+    blueprint.addChild(path);
+  }
+
+  // Draw particles according to probability density
+
   const particleColor = new paper.Color(1, 1, 1, 1);
 
-  for (let i = 0; i < particleCount; i++) {
+  for (let i = 0; i < settings.form.particles; i++) {
     // 1. Sample phase according to sin² (Born rule)
     const u = Math.random();
     const rootPhase = Math.asin(Math.sqrt(u));
@@ -73,14 +90,14 @@ export function graph(
 
     // 2. Phase → x
     const t = phase / Math.PI;
-    const x = MathUtils.lerp(0, size.width, t);
+    const x = MathUtils.lerp(padding, size.width - padding, t);
 
     // 3. Evaluate curve at that phase (single-valued)
     const probability = curve(phase);
-    const y = size.height - probability * size.height;
+    const y = size.height - padding - probability * (height - padding);
 
     // 4. Draw particle
-    dot(new paper.Point(x, y), 1, blueprint, particleColor);
+    dot(new paper.Point(x, y), 0.5 * settings.exportScale, form, particleColor);
   }
 
   return form;

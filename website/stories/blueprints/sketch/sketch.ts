@@ -14,6 +14,7 @@ export type SketchSettings = {
   opacity: number;
   seed: number;
   darkness: boolean;
+  exportScale: number;
   blueprint: { [key: string]: unknown };
   form: { [key: string]: unknown };
 };
@@ -25,6 +26,7 @@ export const sketchSettings: SketchSettings = {
   seed: 0,
   strokeColor: new paper.Color(1, 1, 1, 1),
   darkness: false,
+  exportScale: 1,
   blueprint: {
     opacity: 0.5,
     visible: false,
@@ -61,6 +63,7 @@ export default class Sketch {
     return new Promise<void>((resolve) => {
       const scale = exporting ? exportScale : 1;
       this.settings.strokeWidth = 1 * scale;
+      this.settings.exportScale = scale;
       this.canvas.width = 500;
       this.canvas.height = 500;
       paper.view.viewSize = new paper.Size(

@@ -1,21 +1,23 @@
 import { useEffect, useRef } from "react";
 import { Pane } from "tweakpane";
 
-import GraphSketch, { GUIGraph } from "./graph";
+import GraphSketch, {
+  GUIQuantumWaveFunctionGraph,
+} from "./quantum-wave-function-graph";
 
 export default {
-  title: "Sketchbook/Math/Graph",
+  title: "Sketchbook/Blueprints/Quantum/Interference/Wave Function Graph",
 };
 
-export const Graph = () => {
+export const WaveFunctionGraph = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (rootRef.current && canvasRef.current) {
       const pane = new Pane({ title: "Graph" });
-      const sacred = new GraphSketch(rootRef.current, canvasRef.current);
-      new GUIGraph(pane, sacred);
+      const sketch = new GraphSketch(rootRef.current, canvasRef.current);
+      new GUIQuantumWaveFunctionGraph(pane, sketch);
     }
 
     return () => {};
