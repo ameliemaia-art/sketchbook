@@ -51,8 +51,89 @@ export function graph(
     blueprint.addChild(path);
   }
 
-  const padding = 20 * settings.exportScale;
+  const padding = 100 * settings.exportScale;
   const height = size.height - padding;
+
+  const lineColor = new paper.Color(1, 1, 1, 0.25);
+  // Graph lines
+  createLine(
+    [
+      new paper.Point(padding, paper.view.size.height - padding),
+      new paper.Point(
+        paper.view.size.width - padding,
+        paper.view.size.height - padding,
+      ),
+    ],
+    lineColor,
+    settings.strokeWidth,
+    blueprint,
+  );
+  createLine(
+    [
+      new paper.Point(padding, padding),
+      new paper.Point(padding, paper.view.size.height - padding),
+    ],
+    lineColor,
+    settings.strokeWidth,
+    blueprint,
+  );
+
+  // Draw labels with paperjs
+  const legendFontSize = 10 * settings.exportScale;
+  const legendOffset = 10 * settings.exportScale;
+  const labelColor = settings.strokeColor;
+
+  // Amplitude labels (vertical, left side)
+  const amplitudeLabelCount = 3;
+  for (let i = 0; i < amplitudeLabelCount; i++) {
+    const labelY = MathUtils.lerp(
+      paper.view.size.height - padding,
+      padding + legendFontSize,
+      i / (amplitudeLabelCount - 1),
+    );
+    const amplitudeValue = (i / (amplitudeLabelCount - 1)).toFixed(1);
+
+    const label = new paper.PointText({
+      point: [padding - legendOffset, labelY],
+      content: amplitudeValue,
+      fillColor: labelColor,
+      fontSize: legendFontSize,
+      justification: "right",
+    });
+
+    blueprint.addChild(label);
+  }
+
+  // Frequency labels (horizontal, bottom side)
+  const frequencyLabelCount = 5;
+  const frequencyStart = 0;
+  const frequencyEnd = 180; // Phase in degrees (0 to π)
+
+  for (let i = 0; i < frequencyLabelCount; i++) {
+    const percent = i / (frequencyLabelCount - 1);
+    const labelX = MathUtils.lerp(padding, size.width - padding, percent);
+
+    let justification: "left" | "center" | "right" = "center";
+    if (i === 0) {
+      justification = "left";
+    } else if (i === frequencyLabelCount - 1) {
+      justification = "right";
+    }
+
+    const frequencyValue = Math.round(
+      MathUtils.lerp(frequencyStart, frequencyEnd, percent),
+    );
+
+    const label = new paper.PointText({
+      point: [labelX, paper.view.size.height - padding + legendOffset * 2],
+      content: `${frequencyValue}°`,
+      fillColor: labelColor,
+      fontSize: legendFontSize,
+      justification,
+    });
+
+    blueprint.addChild(label);
+  }
 
   // Draw  curve
   const count = 100;
@@ -83,18 +164,28 @@ export function graph(
   const particleColor = new paper.Color(1, 1, 1, 1);
 
   for (let i = 0; i < settings.form.particles; i++) {
-    // 1. Sample phase according to sin² (Born rule)
-    const u = Math.random();
-    const rootPhase = Math.asin(Math.sqrt(u));
-    const phase = Math.random() < 0.5 ? rootPhase : Math.PI - rootPhase;
+    // 1. Uniform x
+    const t = Math.random();
+    const phase = t * Math.PI;
 
     // 2. Phase → x
-    const t = phase / Math.PI;
     const x = MathUtils.lerp(padding, size.width - padding, t);
 
     // 3. Evaluate curve at that phase (single-valued)
     const probability = curve(phase);
-    const y = size.height - padding - probability * (height - padding);
+
+    const yNorm = Math.random();
+    if (yNorm > probability) continue;
+
+    // 4. Sample vertically under the curve
+    const v = Math.random();
+    let y = probability * v * (height - padding);
+
+    // const y = size.height - padding - probability * ((height*Math.random()) - padding);
+    // flip y to match graph orientation
+    y = size.height - y;
+    // Add padding offset
+    y -= padding;
 
     // 4. Draw particle
     dot(new paper.Point(x, y), 0.5 * settings.exportScale, form, particleColor);

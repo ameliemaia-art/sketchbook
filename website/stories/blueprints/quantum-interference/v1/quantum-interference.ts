@@ -231,6 +231,76 @@ export default class QuantumInterferance {
     };
   }
 
+  drawAmplitudeLabels(
+    x: number,
+    y: number,
+    size: number,
+    color: string = "#ffffff",
+    fontSize: number = 12,
+    offset: number = 10,
+  ) {
+    if (!this.ctx) return;
+
+    const labelCount = 3;
+    this.ctx.font = `${fontSize}px sans-serif`;
+    this.ctx.fillStyle = color;
+    this.ctx.textAlign = "right";
+    this.ctx.textBaseline = "middle";
+
+    for (let i = 0; i < labelCount; i++) {
+      const labelY = MathUtils.lerp(
+        y + size,
+        y + fontSize,
+        i / (labelCount - 1),
+      );
+      const amplitudeValue = (i / (labelCount - 1)).toFixed(1);
+
+      this.ctx.fillText(amplitudeValue, x - offset, labelY);
+    }
+  }
+
+  drawFrequencyLabels(
+    x: number,
+    y: number,
+    size: number,
+    frequencyStart: number,
+    frequencyEnd: number,
+    color: string = "#ffffff",
+    fontSize: number = 12,
+    offset: number = 10,
+  ) {
+    if (!this.ctx) return;
+
+    const labelCount = 5;
+    this.ctx.font = `${fontSize}px sans-serif`;
+    this.ctx.fillStyle = color;
+    this.ctx.textBaseline = "top";
+
+    for (let i = 0; i < labelCount; i++) {
+      const percent = i / (labelCount - 1);
+      const labelX = MathUtils.lerp(x, x + size, percent);
+
+      // Adjust alignment based on position
+      if (i === 0) {
+        this.ctx.textAlign = "left";
+      } else if (i === labelCount - 1) {
+        this.ctx.textAlign = "right";
+      } else {
+        this.ctx.textAlign = "center";
+      }
+
+      const frequencyValue = Math.round(
+        MathUtils.lerp(frequencyStart, frequencyEnd, percent),
+      );
+
+      this.ctx.fillText(
+        frequencyValue.toString(),
+        labelX,
+        y + size + offset * 2,
+      );
+    }
+  }
+
   quantumWave(centerX: number, centerY: number, radius: number) {
     if (!this.ctx) return;
 

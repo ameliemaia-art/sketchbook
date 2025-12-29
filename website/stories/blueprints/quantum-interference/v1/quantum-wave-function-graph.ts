@@ -89,7 +89,7 @@ export class GUIQuantumWaveFunctionGraph extends GUISketch {
     this.folders.form
       .addBinding(target.settings.form, "particles", {
         min: 100,
-        max: 2000,
+        max: 10000,
         step: 1,
       })
       .on("change", this.draw);
