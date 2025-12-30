@@ -36,8 +36,9 @@ export default class QuantumWaveFunctionGraph extends Sketch {
         visible: true,
       },
       curve: {
-        visible: false,
-        strokeWidth: 0.25,
+        visible: true,
+        strokeWidth: 0.1,
+        strokeColor: 0.25,
       },
       legend: {
         fontSize: 12,
@@ -113,6 +114,12 @@ export class GUIQuantumWaveFunctionGraph extends GUISketch {
         min: 0.1,
         max: 5,
         step: 0.1,
+      })
+      .on("change", this.draw);
+    this.folders.curve
+      .addBinding(this.target.settings.graph.curve, "strokeColor", {
+        min: 0,
+        max: 1,
       })
       .on("change", this.draw);
 

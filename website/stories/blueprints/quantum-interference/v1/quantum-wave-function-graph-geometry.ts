@@ -20,6 +20,7 @@ export type QuantumWaveFunctionGraphSettings = {
     };
     curve: {
       visible: boolean;
+      strokeColor: number;
       strokeWidth: number;
     };
     legend: {
@@ -36,6 +37,32 @@ export type QuantumWaveFunctionGraphSettings = {
 
 function curve(phase: number) {
   return Math.pow(Math.sin(phase), 2);
+}
+
+function drawCurve(
+  form: paper.Group,
+  size: paper.Size,
+  padding: number,
+  height: number,
+  amplitude: number,
+  strokeColor: paper.Color,
+  strokeWidth: number,
+) {
+  // Draw  curve
+  const count = 100;
+  const points = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1);
+    const phase = t * Math.PI;
+    const x = MathUtils.lerp(padding, size.width - padding, t);
+    let y = curve(phase) * (height - padding) * amplitude;
+    // Flip
+    y = size.height - padding - y;
+    points.push(new paper.Point(x, y));
+  }
+
+  const path = createLine(points, strokeColor, strokeWidth, form);
+  form.addChild(path);
 }
 
 export function graph(
@@ -165,31 +192,27 @@ export function graph(
   });
   blueprint.addChild(graphTitle);
 
-  // Draw  curve
-  const count = 100;
-  const points = [];
-  for (let i = 0; i < count; i++) {
-    const t = i / (count - 1);
-    const phase = t * Math.PI;
-    const x = MathUtils.lerp(padding, size.width - padding, t);
-    const y = size.height - padding - curve(phase) * (height - padding);
-    points.push(new paper.Point(x, y));
-  }
-
-  if (settings.graph.curve.visible) {
-    const path = createLine(
-      points,
-      settings.strokeColor,
-      settings.graph.curve.strokeWidth,
-      form,
-    );
-    path.strokeColor = settings.strokeColor;
-    path.strokeWidth = settings.graph.curve.strokeWidth;
-    form.addChild(path);
-  }
+  // Draw curve here
+  // if (settings.graph.curve.visible) {
+  //   drawCurve(
+  //     form,
+  //     size,
+  //     padding,
+  //     height,
+  //     1,
+  //     settings.strokeColor,
+  //     settings.graph.curve.strokeWidth,
+  //   );
+  // }
 
   // Draw particles according to probability density
   const particleColor = new paper.Color(1, 1, 1, 1);
+  const curveStrokeColor = new paper.Color(
+    1,
+    1,
+    1,
+    settings.graph.curve.strokeColor,
+  );
 
   for (let i = 0; i < settings.graph.particles.count; i++) {
     // 1. Uniform x
@@ -209,11 +232,22 @@ export function graph(
     const v = Math.random();
     let y = probability * v * (height - padding);
 
-    // const y = size.height - padding - probability * ((height*Math.random()) - padding);
     // flip y to match graph orientation
     y = size.height - y;
     // Add padding offset
     y -= padding;
+
+    if (settings.graph.curve.visible) {
+      drawCurve(
+        form,
+        size,
+        padding,
+        height,
+        v,
+        curveStrokeColor,
+        settings.graph.curve.strokeWidth * settings.exportScale,
+      );
+    }
 
     // 4. Draw particle
     if (settings.graph.particles.visible) {
