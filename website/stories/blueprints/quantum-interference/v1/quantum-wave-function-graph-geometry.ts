@@ -11,11 +11,27 @@ export type QuantumWaveFunctionGraphSettings = {
     opacity: number;
     divisions: number;
   };
-  blueprint: {
-    curve: boolean;
-    curveStrokeWidth: number;
+  blueprint: {};
+  graph: {
+    particles: {
+      count: number;
+      visible: boolean;
+      radius: number;
+    };
+    curve: {
+      visible: boolean;
+      strokeWidth: number;
+    };
+    legend: {
+      fontSize: number;
+      offset: number;
+    };
+    title: {
+      fontSize: number;
+    };
+    padding: number;
+    lineColor: number;
   };
-  form: { particles: number };
 };
 
 function curve(phase: number) {
@@ -32,6 +48,7 @@ export function graph(
 ) {
   const gridColor = new paper.Color(1, 1, 1, settings.grid.opacity);
 
+  // Graph grid
   if (settings.grid.visible) {
     createGrid(
       center,
@@ -51,10 +68,10 @@ export function graph(
     blueprint.addChild(path);
   }
 
-  const padding = 100 * settings.exportScale;
+  const padding = settings.graph.padding * settings.exportScale;
   const height = size.height - padding;
 
-  const lineColor = new paper.Color(1, 1, 1, 0.25);
+  const lineColor = new paper.Color(1, 1, 1, settings.graph.lineColor);
   // Graph lines
   createLine(
     [
@@ -79,49 +96,51 @@ export function graph(
   );
 
   // Draw labels with paperjs
-  const legendFontSize = 10 * settings.exportScale;
-  const legendOffset = 10 * settings.exportScale;
+  const titleFontSize = settings.graph.title.fontSize * settings.exportScale;
+  const legendFontSize = settings.graph.legend.fontSize * settings.exportScale;
+  const legendOffset = settings.graph.legend.offset * settings.exportScale;
   const labelColor = settings.strokeColor;
 
-  // Amplitude labels (vertical, left side)
-  const amplitudeLabelCount = 3;
-  for (let i = 0; i < amplitudeLabelCount; i++) {
+  // Y Axis labels
+  const yAxisLabelCount = 3;
+  for (let i = 0; i < yAxisLabelCount; i++) {
     const labelY = MathUtils.lerp(
       paper.view.size.height - padding,
       padding + legendFontSize,
-      i / (amplitudeLabelCount - 1),
+      i / (yAxisLabelCount - 1),
     );
-    const amplitudeValue = (i / (amplitudeLabelCount - 1)).toFixed(1);
+    const yAxisValue = (i / (yAxisLabelCount - 1)).toFixed(1);
 
     const label = new paper.PointText({
       point: [padding - legendOffset, labelY],
-      content: amplitudeValue,
+      content: yAxisValue,
       fillColor: labelColor,
       fontSize: legendFontSize,
       justification: "right",
+      fontFamily: "Berlingske Serif Regular",
     });
 
     blueprint.addChild(label);
   }
 
-  // Frequency labels (horizontal, bottom side)
-  const frequencyLabelCount = 5;
-  const frequencyStart = 0;
-  const frequencyEnd = 180; // Phase in degrees (0 to π)
+  // X Axis labels
+  const xAxisLabelCount = 5;
+  const xAxisValueStart = 0;
+  const xAxisValueEnd = 180; // Phase in degrees (0 to π)
 
-  for (let i = 0; i < frequencyLabelCount; i++) {
-    const percent = i / (frequencyLabelCount - 1);
+  for (let i = 0; i < xAxisLabelCount; i++) {
+    const percent = i / (xAxisLabelCount - 1);
     const labelX = MathUtils.lerp(padding, size.width - padding, percent);
 
     let justification: "left" | "center" | "right" = "center";
     if (i === 0) {
       justification = "left";
-    } else if (i === frequencyLabelCount - 1) {
+    } else if (i === xAxisLabelCount - 1) {
       justification = "right";
     }
 
     const frequencyValue = Math.round(
-      MathUtils.lerp(frequencyStart, frequencyEnd, percent),
+      MathUtils.lerp(xAxisValueStart, xAxisValueEnd, percent),
     );
 
     const label = new paper.PointText({
@@ -130,10 +149,21 @@ export function graph(
       fillColor: labelColor,
       fontSize: legendFontSize,
       justification,
+      fontFamily: "Berlingske Serif Regular",
     });
 
     blueprint.addChild(label);
   }
+
+  const graphTitle = new paper.PointText({
+    point: [center.x, paper.view.size.height - padding / 2],
+    content: "p(x) = |ψ(x)|²",
+    fillColor: labelColor,
+    fontSize: titleFontSize,
+    justification: "center",
+    fontFamily: "Berlingske Serif Regular",
+  });
+  blueprint.addChild(graphTitle);
 
   // Draw  curve
   const count = 100;
@@ -144,26 +174,24 @@ export function graph(
     const x = MathUtils.lerp(padding, size.width - padding, t);
     const y = size.height - padding - curve(phase) * (height - padding);
     points.push(new paper.Point(x, y));
-    // dot(new paper.Point(x, y), 1, blueprint, settings.strokeColor);
   }
 
-  if (settings.blueprint.curve) {
+  if (settings.graph.curve.visible) {
     const path = createLine(
       points,
       settings.strokeColor,
-      settings.blueprint.curveStrokeWidth,
+      settings.graph.curve.strokeWidth,
       form,
     );
     path.strokeColor = settings.strokeColor;
-    path.strokeWidth = settings.blueprint.curveStrokeWidth;
-    blueprint.addChild(path);
+    path.strokeWidth = settings.graph.curve.strokeWidth;
+    form.addChild(path);
   }
 
   // Draw particles according to probability density
-
   const particleColor = new paper.Color(1, 1, 1, 1);
 
-  for (let i = 0; i < settings.form.particles; i++) {
+  for (let i = 0; i < settings.graph.particles.count; i++) {
     // 1. Uniform x
     const t = Math.random();
     const phase = t * Math.PI;
@@ -188,7 +216,14 @@ export function graph(
     y -= padding;
 
     // 4. Draw particle
-    dot(new paper.Point(x, y), 0.5 * settings.exportScale, form, particleColor);
+    if (settings.graph.particles.visible) {
+      dot(
+        new paper.Point(x, y),
+        settings.graph.particles.radius * settings.exportScale,
+        form,
+        particleColor,
+      );
+    }
   }
 
   return form;

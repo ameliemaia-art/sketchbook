@@ -24,13 +24,30 @@ export default class QuantumWaveFunctionGraph extends Sketch {
       opacity: 1,
       visible: true,
       cosmos: false,
-      curve: true,
-      curveStrokeWidth: 0.1,
     },
     form: {
       opacity: 1,
       visible: true,
-      particles: 1000,
+    },
+    graph: {
+      particles: {
+        radius: 0.5,
+        count: 2500,
+        visible: true,
+      },
+      curve: {
+        visible: false,
+        strokeWidth: 0.25,
+      },
+      legend: {
+        fontSize: 12,
+        offset: 10,
+      },
+      title: {
+        fontSize: 14,
+      },
+      padding: 100,
+      lineColor: 0.25,
     },
   };
 
@@ -64,33 +81,86 @@ export class GUIQuantumWaveFunctionGraph extends GUISketch {
   ) {
     super(gui, target, target.name());
 
+    this.addGridControls();
+    this.addGraphControls();
+  }
+
+  addGridControls() {
     this.folders.grid = this.addFolder(this.gui, { title: "Grid" });
     this.folders.grid
-      .addBinding(target.settings.grid, "visible")
+      .addBinding(this.target.settings.grid, "visible")
       .on("change", this.draw);
     this.folders.grid
-      .addBinding(target.settings.grid, "opacity", {
+      .addBinding(this.target.settings.grid, "opacity", {
         min: 0,
         max: 1,
       })
       .on("change", this.draw);
+  }
 
-    this.folders.blueprint
-      .addBinding(target.settings.blueprint, "curve")
+  addGraphControls() {
+    // Graph
+    this.folders.graph = this.addFolder(this.gui, { title: "Graph" });
+
+    // Curve
+    this.folders.curve = this.addFolder(this.folders.graph, { title: "Curve" });
+
+    this.folders.curve
+      .addBinding(this.target.settings.graph.curve, "visible")
       .on("change", this.draw);
-    this.folders.blueprint
-      .addBinding(target.settings.blueprint, "curveStrokeWidth", {
+    this.folders.curve
+      .addBinding(this.target.settings.graph.curve, "strokeWidth", {
         min: 0.1,
         max: 5,
         step: 0.1,
       })
       .on("change", this.draw);
 
-    this.folders.form
-      .addBinding(target.settings.form, "particles", {
+    // Legend
+    this.folders.legend = this.addFolder(this.folders.graph, {
+      title: "Legend",
+    });
+    this.folders.legend
+      .addBinding(this.target.settings.graph.legend, "offset", {
+        min: 0,
+        step: 1,
+      })
+      .on("change", this.draw);
+    this.folders.legend
+      .addBinding(this.target.settings.graph.legend, "fontSize", {
+        min: 1,
+      })
+      .on("change", this.draw);
+
+    // Legend
+    this.folders.title = this.addFolder(this.folders.graph, {
+      title: "Title",
+    });
+    this.folders.title
+      .addBinding(this.target.settings.graph.title, "fontSize", {
+        min: 1,
+      })
+      .on("change", this.draw);
+
+    // Particles
+    this.folders.particles = this.addFolder(this.folders.graph, {
+      title: "Particles",
+    });
+
+    this.folders.particles
+      .addBinding(this.target.settings.graph.particles, "visible")
+      .on("change", this.draw);
+    this.folders.particles
+      .addBinding(this.target.settings.graph.particles, "count", {
         min: 100,
         max: 10000,
         step: 1,
+      })
+      .on("change", this.draw);
+    this.folders.particles
+      .addBinding(this.target.settings.graph.particles, "radius", {
+        min: 0,
+        max: 1,
       })
       .on("change", this.draw);
   }
