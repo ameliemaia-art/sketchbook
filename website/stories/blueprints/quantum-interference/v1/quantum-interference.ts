@@ -1,5 +1,6 @@
 import Frame, { GUIFrame } from "@/stories/frame/frame";
 import { Clock, MathUtils, Vector2 } from "three";
+import { seededRandom } from "three/src/math/MathUtils.js";
 import { FolderApi } from "tweakpane";
 
 import { saveImage, saveJsonFile } from "@utils/common/file";
@@ -21,8 +22,11 @@ const tangent = new Vector2();
 export default class QuantumInterferance {
   title = "Quantum Interference";
 
+  isExporting = false;
+
   settings: QuantumInterferenceSettings = {
     scale: 1,
+    seed: 5,
     blueprint: {
       darkness: true,
     },
@@ -30,16 +34,17 @@ export default class QuantumInterferance {
       lights: {
         count: 2,
         startAngle: 90,
-        rays: 300,
+        rays: 500,
       },
       waves: {
         count: 25,
         power: Math.PI,
-        phase: 0,
+        phase: 130,
       },
       photon: {
-        radius: 0.3,
+        radius: 0.25,
         density: 1,
+        opacity: 0.5,
       },
       quantum: {
         waveFunctionHeight: 10,
@@ -63,7 +68,7 @@ export default class QuantumInterferance {
     this.frame = new Frame(root, this.canvas, this.title);
     this.size = new Vector2(this.canvas.width, this.canvas.height);
 
-    // this.loadSettings();
+    this.loadSettings();
     this.setup();
   }
 
@@ -99,6 +104,7 @@ export default class QuantumInterferance {
 
   draw = () => {
     if (!this.ctx) return;
+    seededRandom(this.settings.seed);
 
     this.ctx.clearRect(0, 0, this.size.x, this.size.y);
     this.ctx.fillStyle = "#000000";
@@ -201,7 +207,12 @@ export default class QuantumInterferance {
           t0y,
           t1x,
           t1y,
-        } = this.computeRandomPointInWaveFunction(p2, p3, t, Math.random());
+        } = this.computeRandomPointInWaveFunction(
+          p2,
+          p3,
+          t,
+          seededRandom.ran(),
+        );
 
         drawDot(this.ctx!, x0, y0, 2, "#ff0000");
         drawLine(this.ctx!, t0x, t0y, t1x, t1y);
@@ -218,7 +229,7 @@ export default class QuantumInterferance {
         p2,
         p3,
         this.sampleTFromWaveFunction(),
-        Math.random(),
+        seededRandom(),
       );
 
     return {
@@ -228,9 +239,9 @@ export default class QuantumInterferance {
   }
 
   samplePhaseFromSinSquared(): number {
-    const u = Math.random(); // uniform [0,1]
+    const u = seededRandom(); // uniform [0,1]
     const root = Math.asin(Math.sqrt(u)); // inverse CDF
-    const phase = Math.random() < 0.5 ? root : Math.PI - root; // reflect for symmetry
+    const phase = seededRandom() < 0.5 ? root : Math.PI - root; // reflect for symmetry
     return phase;
   }
 
@@ -242,10 +253,17 @@ export default class QuantumInterferance {
   quantumWave(centerX: number, centerY: number, radius: number) {
     if (!this.ctx) return;
 
-    const phase = this.settings.form.waves.phase * TWO_PI;
+    const phase = MathUtils.degToRad(this.settings.form.waves.phase);
+    const photonOpacity = this.isExporting
+      ? this.settings.form.photon.opacity
+      : 1;
 
     for (let i = 0; i < this.settings.form.lights.rays; i++) {
       const t = i / this.settings.form.lights.rays;
+
+      // TODO: add param for this
+      // const phase =
+      //   MathUtils.degToRad(this.settings.form.waves.phase) + Math.sqrt(i);
 
       // arc
       const theta = t * TWO_PI;
@@ -281,7 +299,7 @@ export default class QuantumInterferance {
           0,
           Math.PI * 2,
         );
-        this.ctx.fillStyle = `rgba(255, 255, 255, ${MathUtils.clamp(waveOpacity, 0, 1)})`;
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${MathUtils.clamp(waveOpacity * photonOpacity, 0, 1)})`;
         this.ctx.fill();
         this.ctx.closePath();
       }
@@ -294,7 +312,7 @@ export default class QuantumInterferance {
   }
 
   get particleDensity() {
-    return this.settings.scale * this.settings.form.photon.density;
+    return this.settings.scale / this.settings.form.photon.density;
   }
 
   get photonRadius() {
@@ -310,6 +328,8 @@ export default class QuantumInterferance {
   }
 
   async saveImage() {
+    this.isExporting = true;
+
     await this.setup(true);
 
     if (this.frameEnabled) {
@@ -317,6 +337,8 @@ export default class QuantumInterferance {
     } else {
       await saveImage(this.canvas, this.fileName());
     }
+
+    this.isExporting = false;
 
     await this.setup(false);
   }
@@ -338,6 +360,16 @@ export class QuantumInterferanceGUI extends GUIController {
 
     // Form
     this.folders.form = this.addFolder(this.gui, { title: "Form" });
+    this.folders.form
+      .addBinding(target.settings, "seed", { min: 0, step: 1 })
+      .on("change", target.draw);
+
+    this.folders.form
+      .addButton({ title: "Increment seed", label: "" })
+      .on("click", () => {
+        target.draw();
+        this.gui.refresh();
+      });
     this.folders.form
       .addButton({ title: "Draw", label: "" })
       .on("click", target.draw);
@@ -369,7 +401,7 @@ export class QuantumInterferanceGUI extends GUIController {
     this.folders.lights
       .addBinding(target.settings.form.lights, "rays", {
         min: 1,
-        max: 300,
+        max: 1000,
         step: 1,
       })
       .on("change", target.draw);
@@ -387,7 +419,7 @@ export class QuantumInterferanceGUI extends GUIController {
       .addBinding(target.settings.form.waves, "power", { min: 0 })
       .on("change", target.draw);
     this.folders.form
-      .addBinding(target.settings.form.waves, "phase", { min: 0, max: 1 })
+      .addBinding(target.settings.form.waves, "phase", { min: 0 })
       .on("change", target.draw);
 
     // Photon
@@ -395,11 +427,17 @@ export class QuantumInterferanceGUI extends GUIController {
     this.folders.photon
       .addBinding(target.settings.form.photon, "radius", { min: 0, max: 1 })
       .on("change", target.draw);
-    this.folders.form
+    this.folders.photon
       .addBinding(target.settings.form.photon, "density", {
         min: 1,
         max: 50,
         step: 1,
+      })
+      .on("change", target.draw);
+    this.folders.photon
+      .addBinding(target.settings.form.photon, "opacity", {
+        min: 0,
+        max: 1,
       })
       .on("change", target.draw);
 

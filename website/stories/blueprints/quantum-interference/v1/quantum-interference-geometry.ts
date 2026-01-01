@@ -4,6 +4,7 @@ import { TWO_PI } from "@utils/three/math";
 
 export type QuantumInterferenceSettings = {
   scale: number;
+  seed: number;
   blueprint: {
     darkness: boolean;
   };
@@ -25,6 +26,7 @@ export type QuantumInterferenceSettings = {
       // Photon
       radius: number;
       density: number;
+      opacity: number;
     };
     quantum: {
       waveFunctionHeight: number;
