@@ -28,23 +28,22 @@ export default class QuantumInterferance {
     },
     form: {
       lights: {
-        count: 1,
+        count: 2,
         startAngle: 90,
         rays: 300,
       },
       waves: {
-        count: 10,
-        power: 0, //Math.PI,
+        count: 25,
+        power: Math.PI,
         phase: 0,
       },
       photon: {
-        radius: 0.25,
+        radius: 0.3,
         density: 1,
       },
       quantum: {
         waveFunctionHeight: 10,
         waveLength: 20,
-        dotRadius: 10,
       },
     },
   };
@@ -154,8 +153,9 @@ export default class QuantumInterferance {
   }
 
   waveFunction(x: number, y: number, normal: Vector2, debug = false) {
-    const waveLength = 20 * this.settings.scale;
-    const dotRadius = 10 * this.settings.scale;
+    const waveLength =
+      this.settings.form.quantum.waveLength * this.settings.scale;
+    const halfWaveLength = waveLength / 2;
     // Back
     p0.set(x, y).add(new Vector2(-waveLength, -waveLength).multiply(normal));
     // Forward
@@ -163,15 +163,17 @@ export default class QuantumInterferance {
 
     // Wave start
     p2.set(x, y).add(
-      new Vector2(-waveLength - dotRadius, -waveLength - dotRadius).multiply(
-        normal,
-      ),
+      new Vector2(
+        -waveLength - halfWaveLength,
+        -waveLength - halfWaveLength,
+      ).multiply(normal),
     );
     // Wave end
     p3.set(x, y).add(
-      new Vector2(waveLength + dotRadius, waveLength + dotRadius).multiply(
-        normal,
-      ),
+      new Vector2(
+        waveLength + halfWaveLength,
+        waveLength + halfWaveLength,
+      ).multiply(normal),
     );
 
     tangent.set(-normal.y, normal.x);
@@ -205,17 +207,17 @@ export default class QuantumInterferance {
         drawLine(this.ctx!, t0x, t0y, t1x, t1y);
       }
 
-      // drawDot(this.ctx, p0.x, p0.y, dotRadius, "#ffff00");
-      // drawDot(this.ctx, p1.x, p1.y, dotRadius, "#00ffff");
-      // drawDot(this.ctx, p2.x, p2.y, 5, "#ffffff");
-      // drawDot(this.ctx, p3.x, p3.y, 5, "#ffffff");
+      drawDot(this.ctx, p0.x, p0.y, halfWaveLength, "#ffff00");
+      drawDot(this.ctx, p1.x, p1.y, halfWaveLength, "#00ffff");
+      drawDot(this.ctx, p2.x, p2.y, 5, "#ffffff");
+      drawDot(this.ctx, p3.x, p3.y, 5, "#ffffff");
     }
 
     const { x: waveFunctionProbabilityX, y: waveFunctionProbabilityY } =
       this.computeRandomPointInWaveFunction(
         p2,
         p3,
-        Math.random(),
+        this.sampleTFromWaveFunction(),
         Math.random(),
       );
 
@@ -223,6 +225,18 @@ export default class QuantumInterferance {
       waveFunctionProbabilityX,
       waveFunctionProbabilityY,
     };
+  }
+
+  samplePhaseFromSinSquared(): number {
+    const u = Math.random(); // uniform [0,1]
+    const root = Math.asin(Math.sqrt(u)); // inverse CDF
+    const phase = Math.random() < 0.5 ? root : Math.PI - root; // reflect for symmetry
+    return phase;
+  }
+
+  sampleTFromWaveFunction(): number {
+    const phase = this.samplePhaseFromSinSquared();
+    return phase / Math.PI;
   }
 
   quantumWave(centerX: number, centerY: number, radius: number) {
@@ -249,15 +263,12 @@ export default class QuantumInterferance {
 
         // photon wave from origin
         const waveOpacity = Math.pow(
-          Math.sin(phase + progress * TWO_PI * this.settings.form.waves.count) *
-            0.5 +
-            0.5,
+          Math.sin(phase + progress * TWO_PI * this.settings.form.waves.count),
           this.settings.form.waves.power,
         );
 
         normal.set(dx - x, dy - y).normalize();
 
-        // for (let k = 0; k < 10; k++) {
         const { waveFunctionProbabilityX, waveFunctionProbabilityY } =
           this.waveFunction(x, y, normal, false);
         // this.waveFunction(x, y, normal, j === 0);
@@ -270,10 +281,9 @@ export default class QuantumInterferance {
           0,
           Math.PI * 2,
         );
-        this.ctx.fillStyle = `rgba(255, 255, 255, ${waveOpacity})`;
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${MathUtils.clamp(waveOpacity, 0, 1)})`;
         this.ctx.fill();
         this.ctx.closePath();
-        // }
       }
     }
   }

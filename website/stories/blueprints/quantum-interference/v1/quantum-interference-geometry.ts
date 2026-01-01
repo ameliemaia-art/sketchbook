@@ -29,7 +29,6 @@ export type QuantumInterferenceSettings = {
     quantum: {
       waveFunctionHeight: number;
       waveLength: number;
-      dotRadius: number;
     };
   };
 };
