@@ -8,15 +8,29 @@ export type QuantumInterferenceSettings = {
     darkness: boolean;
   };
   form: {
-    emitters: number;
-    waves: number;
-    jitter: number;
-    jitterEnabled: boolean;
-    power: number;
-    phaseDelta: number;
-    photonRadius: number;
-    particleDensity: number;
-    waveFunctionHeight: number;
+    // Light sources
+    lights: {
+      startAngle: number;
+      count: number;
+      rays: number;
+    };
+    waves: {
+      // How many waves appear
+      count: number;
+      // Wave banding
+      power: number;
+      phase: number;
+    };
+    photon: {
+      // Photon
+      radius: number;
+      density: number;
+    };
+    quantum: {
+      waveFunctionHeight: number;
+      waveLength: number;
+      dotRadius: number;
+    };
   };
 };
 

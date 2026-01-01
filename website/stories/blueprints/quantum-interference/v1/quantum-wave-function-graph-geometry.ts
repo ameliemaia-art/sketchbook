@@ -1,6 +1,7 @@
 import paper from "paper";
 import { MathUtils } from "three";
 
+import mathSeeded from "@utils/math-seeded";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../../sketch/sketch";
 import { drawDot, drawLine } from "./utils";
@@ -74,6 +75,8 @@ export function graph(
   settings: SketchSettings & QuantumWaveFunctionGraphSettings,
 ) {
   const gridColor = new paper.Color(1, 1, 1, settings.grid.opacity);
+
+  // Update random calls to use seed
 
   // Graph grid
   if (settings.grid.visible) {
@@ -216,7 +219,7 @@ export function graph(
 
   for (let i = 0; i < settings.graph.particles.count; i++) {
     // 1. Uniform x
-    const t = Math.random();
+    const t = mathSeeded.random();
     const phase = t * Math.PI;
 
     // 2. Phase → x
@@ -225,11 +228,11 @@ export function graph(
     // 3. Evaluate curve at that phase (single-valued)
     const probability = curve(phase);
 
-    const yNorm = Math.random();
+    const yNorm = mathSeeded.random();
     if (yNorm > probability) continue;
 
     // 4. Sample vertically under the curve
-    const v = Math.random();
+    const v = mathSeeded.random();
     let y = probability * v * (height - padding);
 
     // flip y to match graph orientation
