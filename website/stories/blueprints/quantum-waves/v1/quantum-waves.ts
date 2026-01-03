@@ -5,10 +5,25 @@ import { FolderApi } from "tweakpane";
 
 import { saveImage, saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
+import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { PI, TWO_PI } from "@utils/three/math";
-import settings from "./data/preset-dimensional.json";
+import preset0 from "./data/preset-0-main.json";
+import preset1 from "./data/preset-1-waves.json";
+import preset2 from "./data/preset-2-dimensional.json";
+import preset3 from "./data/preset-3-rays.json";
+import preset4 from "./data/preset-4-single.json";
 import { QuantumWavesSettings } from "./quantum-waves-geometry";
 import { drawDot, drawLine } from "./utils";
+
+enum PresetName {
+  MAIN = "Main",
+  WAVES = "Waves",
+  DIMENSIONAL = "Dimensional",
+  RAYS = "Rays",
+  SINGLE = "Single",
+}
+
+const presets = [preset0, preset1, preset2, preset3, preset4];
 
 const tmp0 = new Vector2();
 const tmp1 = new Vector2();
@@ -35,6 +50,7 @@ export default class QuantumWaves {
   opacityStep = 0;
   renderProgress = 0;
   stopRendering = false;
+  preset = PresetName.MAIN;
 
   settings: QuantumWavesSettings = {
     scale: 1,
@@ -88,7 +104,9 @@ export default class QuantumWaves {
   }
 
   loadSettings() {
-    this.settings.form = JSON.parse(JSON.stringify(settings));
+    this.settings.form = JSON.parse(
+      JSON.stringify(presets[Object.values(PresetName).indexOf(this.preset)]),
+    );
   }
 
   async setup(exporting = false) {
@@ -112,8 +130,6 @@ export default class QuantumWaves {
 
       requestAnimationFrame(() => {
         this.render().then(() => {
-          console.log("complete!");
-
           resolve();
         });
       });
@@ -125,9 +141,12 @@ export default class QuantumWaves {
 
     this.stopRendering = false;
 
-    this.ctx.clearRect(0, 0, this.size.x, this.size.y);
-    this.ctx.fillStyle = "#000000";
-    this.ctx.fillRect(0, 0, this.size.x, this.size.y);
+    if (this.settings.blueprint.darkness) {
+      this.ctx.fillStyle = "#000000";
+      this.ctx.fillRect(0, 0, this.size.x, this.size.y);
+    } else {
+      this.ctx.clearRect(0, 0, this.size.x, this.size.y);
+    }
 
     if (this.settings.accumulate) {
       this.renderCount = 0;
@@ -404,11 +423,13 @@ export class QuantumWavesGUI extends GUIController {
     super(gui);
     this.gui = this.addFolder(gui, { title: "Quantum Waves" });
 
+    const render = target.render.bind(target);
+
     // Blueprint
     this.folders.blueprint = this.addFolder(this.gui, { title: "Blueprint" });
-    this.folders.blueprint.addBinding(target.settings.blueprint, "darkness");
-
-    const render = target.render.bind(target);
+    this.folders.blueprint
+      .addBinding(target.settings.blueprint, "darkness")
+      .on("change", render);
 
     // Render
     this.folders.render = this.addFolder(this.gui, { title: "Render" });
@@ -426,9 +447,7 @@ export class QuantumWavesGUI extends GUIController {
 
     this.folders.render
       .addButton({ title: "Render", label: "" })
-      .on("click", () => {
-        render();
-      });
+      .on("click", render);
     this.folders.render
       .addButton({ title: "Cancel", label: "" })
       .on("click", () => {
@@ -437,6 +456,15 @@ export class QuantumWavesGUI extends GUIController {
 
     // Form
     this.folders.form = this.addFolder(this.gui, { title: "Form" });
+    this.folders.form
+      .addBinding(target, "preset", {
+        options: generateBindingOptions(Object.values(PresetName)),
+      })
+      .on("change", () => {
+        target.loadSettings();
+        target.render();
+        this.gui.refresh();
+      });
     this.folders.form
       .addBinding(target.settings, "seed", { min: 0, step: 1 })
       .on("change", render);
@@ -447,9 +475,6 @@ export class QuantumWavesGUI extends GUIController {
         render();
         this.gui.refresh();
       });
-    this.folders.form
-      .addButton({ title: "Render", label: "" })
-      .on("click", render);
     this.folders.form
       .addButton({ title: "Save Settings", label: "" })
       .on("click", () => {
