@@ -5,6 +5,8 @@ import { TWO_PI } from "@utils/three/math";
 export type QuantumInterferenceSettings = {
   scale: number;
   seed: number;
+  renderSteps: number;
+  accumulate: boolean;
   blueprint: {
     darkness: boolean;
   };
@@ -14,6 +16,7 @@ export type QuantumInterferenceSettings = {
       startAngle: number;
       count: number;
       rays: number;
+      offset: number;
     };
     waves: {
       // How many waves appear

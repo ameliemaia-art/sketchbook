@@ -6,7 +6,7 @@ import { FolderApi } from "tweakpane";
 import { saveImage, saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { PI, TWO_PI } from "@utils/three/math";
-import settings from "./data/preset-0.json";
+import settings from "./data/preset-1.json";
 import { QuantumInterferenceSettings } from "./quantum-interference-geometry";
 import { drawDot, drawLine } from "./utils";
 
@@ -18,23 +18,37 @@ const p2 = new Vector2();
 const p3 = new Vector2();
 const normal = new Vector2();
 const tangent = new Vector2();
+const waveFnTmp0 = new Vector2();
+const waveFnTmp1 = new Vector2();
+const waveFnTmp2 = new Vector2();
+const waveFnTmp3 = new Vector2();
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export default class QuantumInterferance {
   title = "Quantum Interference";
 
   isExporting = false;
+  renderCount = 0;
+  opacityStep = 0;
+  renderProgress = 0;
 
   settings: QuantumInterferenceSettings = {
     scale: 1,
     seed: 5,
+    renderSteps: 25,
+    accumulate: true,
     blueprint: {
       darkness: true,
     },
     form: {
       lights: {
         count: 2,
-        startAngle: 90,
+        startAngle: 0,
         rays: 500,
+        offset: 1,
       },
       waves: {
         count: 25,
@@ -55,7 +69,7 @@ export default class QuantumInterferance {
 
   ctx: CanvasRenderingContext2D | null;
   dpi = MathUtils.clamp(window.devicePixelRatio, 1, 2);
-  size: Vector2;
+  size = new Vector2();
   frameEnabled = false;
   frame: Frame;
 
@@ -66,7 +80,7 @@ export default class QuantumInterferance {
     this.ctx = this.canvas.getContext("2d");
 
     this.frame = new Frame(root, this.canvas, this.title);
-    this.size = new Vector2(this.canvas.width, this.canvas.height);
+    this.size.set(this.canvas.width, this.canvas.height);
 
     this.loadSettings();
     this.setup();
@@ -89,26 +103,58 @@ export default class QuantumInterferance {
       this.canvas.height = height * this.dpi;
       this.canvas.style.width = width + "px";
       this.canvas.style.height = height + "px";
-      this.size = new Vector2(width, height);
+      this.size.set(width, height);
       if (this.ctx) {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
         this.ctx.scale(this.dpi, this.dpi); // Apply DPI scaling
       }
 
       requestAnimationFrame(() => {
-        this.draw();
-        resolve();
+        this.render().then(() => {
+          console.log("complete!");
+
+          resolve();
+        });
       });
     });
   }
 
-  draw = () => {
+  async render() {
     if (!this.ctx) return;
-    seededRandom(this.settings.seed);
 
     this.ctx.clearRect(0, 0, this.size.x, this.size.y);
     this.ctx.fillStyle = "#000000";
     this.ctx.fillRect(0, 0, this.size.x, this.size.y);
+
+    if (this.settings.accumulate) {
+      this.renderCount = 0;
+      this.opacityStep = (1 / this.settings.renderSteps) * Math.PI;
+      for (let i = 0; i < this.settings.renderSteps; i++) {
+        if (!this.settings.accumulate) break;
+
+        this.renderCount = i;
+
+        seededRandom(this.settings.seed + i);
+
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(async () => {
+            await this.draw();
+            resolve();
+          });
+        });
+
+        await wait(1);
+      }
+    } else {
+      this.opacityStep = 1;
+      this.draw();
+    }
+  }
+
+  async draw() {
+    if (!this.ctx) return;
+
+    this.renderProgress = this.renderCount / (this.settings.renderSteps - 1);
 
     const totalLights = this.settings.form.lights.count;
     const startAngle = MathUtils.degToRad(this.settings.form.lights.startAngle);
@@ -116,8 +162,12 @@ export default class QuantumInterferance {
     const radius = this.size.x / 2;
     for (let i = 0; i < totalLights; i++) {
       const theta = startAngle + i * (TWO_PI / totalLights);
-      const x = this.size.x / 2 + (Math.cos(theta) * radius) / 2;
-      const y = this.size.y / 2 + (Math.sin(theta) * radius) / 2;
+      const x =
+        this.size.x / 2 +
+        Math.cos(theta) * radius * this.settings.form.lights.offset;
+      const y =
+        this.size.y / 2 +
+        Math.sin(theta) * radius * this.settings.form.lights.offset;
       this.quantumWave(x, y, radius * 3);
       // this.quantumWave(this.size.x / 2, this.size.y / 2, radius * 3);
     }
@@ -127,7 +177,7 @@ export default class QuantumInterferance {
     if (this.frameEnabled) {
       this.frame.draw();
     }
-  };
+  }
 
   computeRandomPointInWaveFunction(
     p0: Vector2,
@@ -163,30 +213,28 @@ export default class QuantumInterferance {
       this.settings.form.quantum.waveLength * this.settings.scale;
     const halfWaveLength = waveLength / 2;
     // Back
-    p0.set(x, y).add(new Vector2(-waveLength, -waveLength).multiply(normal));
+    p0.set(x, y).add(waveFnTmp0.set(-waveLength, -waveLength).multiply(normal));
     // Forward
-    p1.set(x, y).add(new Vector2(waveLength, waveLength).multiply(normal));
+    p1.set(x, y).add(waveFnTmp1.set(waveLength, waveLength).multiply(normal));
 
     // Wave start
     p2.set(x, y).add(
-      new Vector2(
-        -waveLength - halfWaveLength,
-        -waveLength - halfWaveLength,
-      ).multiply(normal),
+      waveFnTmp2
+        .set(-waveLength - halfWaveLength, -waveLength - halfWaveLength)
+        .multiply(normal),
     );
     // Wave end
     p3.set(x, y).add(
-      new Vector2(
-        waveLength + halfWaveLength,
-        waveLength + halfWaveLength,
-      ).multiply(normal),
+      waveFnTmp3
+        .set(waveLength + halfWaveLength, waveLength + halfWaveLength)
+        .multiply(normal),
     );
 
     tangent.set(-normal.y, normal.x);
 
     // Draw dots for debugging
 
-    if (debug) {
+    if (debug && this.ctx) {
       const t0x = x + tangent.x * -waveLength;
       const t0y = y + tangent.y * -waveLength;
       const t1x = x + tangent.x * waveLength;
@@ -207,12 +255,7 @@ export default class QuantumInterferance {
           t0y,
           t1x,
           t1y,
-        } = this.computeRandomPointInWaveFunction(
-          p2,
-          p3,
-          t,
-          seededRandom.ran(),
-        );
+        } = this.computeRandomPointInWaveFunction(p2, p3, t, seededRandom());
 
         drawDot(this.ctx!, x0, y0, 2, "#ff0000");
         drawLine(this.ctx!, t0x, t0y, t1x, t1y);
@@ -281,7 +324,9 @@ export default class QuantumInterferance {
 
         // photon wave from origin
         const waveOpacity = Math.pow(
-          Math.sin(phase + progress * TWO_PI * this.settings.form.waves.count),
+          Math.sin(phase + progress * TWO_PI * this.settings.form.waves.count) *
+            0.5 +
+            0.5,
           this.settings.form.waves.power,
         );
 
@@ -299,7 +344,7 @@ export default class QuantumInterferance {
           0,
           Math.PI * 2,
         );
-        this.ctx.fillStyle = `rgba(255, 255, 255, ${MathUtils.clamp(waveOpacity * photonOpacity, 0, 1)})`;
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${MathUtils.clamp(waveOpacity * photonOpacity * this.opacityStep, 0, 1)})`;
         this.ctx.fill();
         this.ctx.closePath();
       }
@@ -358,21 +403,37 @@ export class QuantumInterferanceGUI extends GUIController {
     this.folders.blueprint = this.addFolder(this.gui, { title: "Blueprint" });
     this.folders.blueprint.addBinding(target.settings.blueprint, "darkness");
 
+    const render = target.render.bind(target);
+
+    // Render
+    this.folders.render = this.addFolder(this.gui, { title: "Render" });
+    this.folders.render
+      .addBinding(target.settings, "accumulate")
+      .on("change", render);
+    this.folders.render
+      .addBinding(target.settings, "renderSteps", { min: 1, max: 100, step: 1 })
+      .on("change", render);
+    this.folders.render.addBinding(target, "renderProgress", {
+      min: 0,
+      max: 1,
+      readonly: true,
+    });
+
     // Form
     this.folders.form = this.addFolder(this.gui, { title: "Form" });
     this.folders.form
       .addBinding(target.settings, "seed", { min: 0, step: 1 })
-      .on("change", target.draw);
+      .on("change", render);
 
     this.folders.form
       .addButton({ title: "Increment seed", label: "" })
       .on("click", () => {
-        target.draw();
+        render();
         this.gui.refresh();
       });
     this.folders.form
-      .addButton({ title: "Draw", label: "" })
-      .on("click", target.draw);
+      .addButton({ title: "Render", label: "" })
+      .on("click", render);
     this.folders.form
       .addButton({ title: "Save Settings", label: "" })
       .on("click", () => {
@@ -391,20 +452,26 @@ export class QuantumInterferanceGUI extends GUIController {
         max: 8,
         step: 1,
       })
-      .on("change", target.draw);
+      .on("change", render);
     this.folders.lights
       .addBinding(target.settings.form.lights, "startAngle", {
         min: 0,
         max: 360,
       })
-      .on("change", target.draw);
+      .on("change", render);
     this.folders.lights
       .addBinding(target.settings.form.lights, "rays", {
         min: 1,
         max: 1000,
         step: 1,
       })
-      .on("change", target.draw);
+      .on("change", render);
+    this.folders.lights
+      .addBinding(target.settings.form.lights, "offset", {
+        min: 0,
+        max: 2,
+      })
+      .on("change", render);
 
     // Waves
     this.folders.waves = this.addFolder(this.gui, { title: "Waves" });
@@ -414,32 +481,32 @@ export class QuantumInterferanceGUI extends GUIController {
         max: 50,
         step: 1,
       })
-      .on("change", target.draw);
+      .on("change", render);
     this.folders.form
       .addBinding(target.settings.form.waves, "power", { min: 0 })
-      .on("change", target.draw);
+      .on("change", render);
     this.folders.form
       .addBinding(target.settings.form.waves, "phase", { min: 0 })
-      .on("change", target.draw);
+      .on("change", render);
 
     // Photon
     this.folders.photon = this.addFolder(this.gui, { title: "Photon" });
     this.folders.photon
       .addBinding(target.settings.form.photon, "radius", { min: 0, max: 1 })
-      .on("change", target.draw);
+      .on("change", render);
     this.folders.photon
       .addBinding(target.settings.form.photon, "density", {
         min: 1,
         max: 50,
         step: 1,
       })
-      .on("change", target.draw);
+      .on("change", render);
     this.folders.photon
       .addBinding(target.settings.form.photon, "opacity", {
         min: 0,
         max: 1,
       })
-      .on("change", target.draw);
+      .on("change", render);
 
     this.folders.quantum = this.addFolder(this.gui, { title: "Quantum" });
 
@@ -448,13 +515,13 @@ export class QuantumInterferanceGUI extends GUIController {
         min: 0,
         max: 20,
       })
-      .on("change", target.draw);
+      .on("change", render);
     this.folders.quantum
       .addBinding(target.settings.form.quantum, "waveLength", {
         min: 0,
         max: 20,
       })
-      .on("change", target.draw);
+      .on("change", render);
 
     // Frame
     this.controllers.frame = new GUIFrame(this.gui, target.frame);
