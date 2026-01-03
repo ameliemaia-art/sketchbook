@@ -6,7 +6,7 @@ import GraphSketch, {
 } from "./quantum-wave-function-graph";
 
 export default {
-  title: "Sketchbook/Blueprints/Quantum/Waves/v1/Wave Function Graph",
+  title: "Sketchbook/Forms/Quantum/Waves/v1/Wave Function Graph",
 };
 
 export const WaveFunctionGraph = () => {

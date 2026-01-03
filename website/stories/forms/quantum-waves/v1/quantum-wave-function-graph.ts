@@ -7,7 +7,7 @@ import Sketch, {
   GUISketch,
   SketchSettings,
   sketchSettings,
-} from "../../sketch/sketch";
+} from "../../../blueprints/sketch/sketch";
 import {
   graph,
   QuantumWaveFunctionGraphSettings,

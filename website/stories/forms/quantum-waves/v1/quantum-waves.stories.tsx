@@ -8,7 +8,7 @@ import QuantumWavesSketch, { QuantumWavesGUI } from "./quantum-waves";
 
 import "../../../global.css";
 
-export default { title: "Sketchbook/Blueprints/Quantum/Waves/v1" };
+export default { title: "Sketchbook/Forms/Quantum/Waves/v1" };
 
 export const v1 = () => {
   const rootRef = useRef<HTMLDivElement>(null);

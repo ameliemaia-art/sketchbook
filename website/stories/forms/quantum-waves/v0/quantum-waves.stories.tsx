@@ -6,7 +6,7 @@ import { Pane } from "tweakpane";
 
 import QuantumWavesSketch, { QuantumWavesGUI } from "./quantum-waves";
 
-export default { title: "Sketchbook/Blueprints/Quantum/Waves/v0" };
+export default { title: "Sketchbook/Forms/Quantum/Waves/v0" };
 
 export const v0 = () => {
   const rootRef = useRef<HTMLDivElement>(null);
