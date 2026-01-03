@@ -14,6 +14,7 @@ export type SketchSettings = {
   opacity: number;
   seed: number;
   darkness: boolean;
+  exportScale: number;
   blueprint: { [key: string]: unknown };
   form: { [key: string]: unknown };
 };
@@ -25,6 +26,7 @@ export const sketchSettings: SketchSettings = {
   seed: 0,
   strokeColor: new paper.Color(1, 1, 1, 1),
   darkness: false,
+  exportScale: 1,
   blueprint: {
     opacity: 0.5,
     visible: false,
@@ -61,6 +63,7 @@ export default class Sketch {
     return new Promise<void>((resolve) => {
       const scale = exporting ? exportScale : 1;
       this.settings.strokeWidth = 1 * scale;
+      this.settings.exportScale = scale;
       this.canvas.width = 500;
       this.canvas.height = 500;
       paper.view.viewSize = new paper.Size(
@@ -162,12 +165,6 @@ export class GUISketch extends GUIController {
     this.gui
       .addBinding(target.settings, "seed", { min: 0, step: 1 })
       .on("change", this.draw);
-    this.gui
-      .addButton({ title: "Increment seed", label: "" })
-      .on("click", () => {
-        target.incrementSeed();
-        this.gui.refresh();
-      });
 
     this.gui
       .addBinding(target.settings, "opacity", { min: 0, max: 1 })
@@ -176,6 +173,20 @@ export class GUISketch extends GUIController {
     this.gui
       .addBinding(target, "frameEnabled", { label: "frame" })
       .on("change", this.draw);
+
+    this.gui
+      .addButton({ title: "Increment seed", label: "" })
+      .on("click", () => {
+        target.incrementSeed();
+        this.gui.refresh();
+      });
+
+    this.gui.addButton({ title: "Export Image", label: "" }).on("click", () => {
+      target.saveImage();
+    });
+    this.gui
+      .addButton({ title: "Export SVG", label: "" })
+      .on("click", target.saveSVG);
 
     this.folders.blueprint = this.addFolder(this.gui, { title: "Blueprint" });
     this.folders.blueprint
@@ -195,13 +206,6 @@ export class GUISketch extends GUIController {
     this.folders.form
       .addBinding(target.settings.form, "visible")
       .on("change", this.draw);
-
-    this.gui.addButton({ title: "Save Image", label: "" }).on("click", () => {
-      target.saveImage();
-    });
-    this.gui
-      .addButton({ title: "Save SVG", label: "" })
-      .on("click", target.saveSVG);
   }
 
   draw = () => {

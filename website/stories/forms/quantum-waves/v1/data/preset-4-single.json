@@ -1,0 +1,7 @@
+{
+  "preset": "Single",
+  "lights": { "count": 1, "startAngle": 45, "rays": 500, "offset": 0.5 },
+  "waves": { "count": 25, "power": 3.141592653589793, "phase": 120 },
+  "photon": { "radius": 0.25, "density": 1, "opacity": 0.5 },
+  "quantum": { "waveFunctionHeight": 10, "waveLength": 20 }
+}

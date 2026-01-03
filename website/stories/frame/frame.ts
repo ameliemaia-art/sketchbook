@@ -8,6 +8,7 @@ export default class Frame {
   settings = {
     darkness: true,
     imageScale: 0.1,
+    padding: 20,
   };
 
   assets: {
@@ -25,7 +26,7 @@ export default class Frame {
     root: HTMLElement,
     public sketchCanvas: HTMLCanvasElement,
     title: string = "IXIIIIIXI",
-    year: string = "MMXXV",
+    year: string = "MMXXVI",
   ) {
     // Canvas
     this.textCanvas = document.createElement("canvas");
@@ -64,6 +65,8 @@ export default class Frame {
       this.textCanvas.width = 1080 * scale;
       this.textCanvas.height = 1920 * scale;
       this.textCtx?.scale(2, 2);
+
+      this.settings.padding = 20 * scale;
 
       Object.assign(this.textCanvas.style, {
         position: "absolute",
@@ -143,12 +146,13 @@ export default class Frame {
       outline,
     );
 
+    const padding = this.settings.padding;
     this.drawImage(
       this.sketchCanvas,
-      0,
-      height / 2 - canvasWidth / 2,
-      canvasWidth,
-      canvasWidth,
+      padding,
+      height / 2 - canvasWidth / 2 + padding,
+      canvasWidth - padding * 2,
+      canvasWidth - padding * 2,
       outline,
     );
   };
@@ -211,6 +215,9 @@ export class GUIFrame extends GUIController {
     this.gui.addBinding(target.settings, "darkness").on("change", target.draw);
     this.gui
       .addBinding(target.settings, "imageScale", { min: 0, max: 1 })
+      .on("change", target.draw);
+    this.gui
+      .addBinding(target.settings, "padding", { min: 0, max: 100, step: 1 })
       .on("change", target.draw);
   }
 }
