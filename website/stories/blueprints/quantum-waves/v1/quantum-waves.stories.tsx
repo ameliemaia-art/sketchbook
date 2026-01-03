@@ -1,16 +1,14 @@
 import { useEffect, useRef } from "react";
 
-import "./quantum-interference";
+import "./quantum-waves";
 
 import { Pane } from "tweakpane";
 
-import QuantumInterferanceSketch, {
-  QuantumInterferanceGUI,
-} from "./quantum-interference";
+import QuantumWavesSketch, { QuantumWavesGUI } from "./quantum-waves";
 
 import "../../../global.css";
 
-export default { title: "Sketchbook/Blueprints/Quantum/Interference/v1" };
+export default { title: "Sketchbook/Blueprints/Quantum/Waves/v1" };
 
 export const v1 = () => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -18,14 +16,8 @@ export const v1 = () => {
 
   useEffect(() => {
     if (rootRef.current && canvasRef.current) {
-      const sketch = new QuantumInterferanceSketch(
-        rootRef.current,
-        canvasRef.current,
-      );
-      new QuantumInterferanceGUI(
-        new Pane({ title: "Quantum Interferance" }),
-        sketch,
-      );
+      const sketch = new QuantumWavesSketch(rootRef.current, canvasRef.current);
+      new QuantumWavesGUI(new Pane({ title: "Quantum Interferance" }), sketch);
     }
 
     return () => {};

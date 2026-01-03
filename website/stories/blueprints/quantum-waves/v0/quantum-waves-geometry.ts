@@ -2,7 +2,7 @@ import { MathUtils } from "three";
 
 import { TWO_PI } from "@utils/three/math";
 
-export type QuantumInterferenceSettings = {
+export type QuantumWavesSettings = {
   blueprint: {
     darkness: boolean;
   };
@@ -23,7 +23,7 @@ export function quantumWaveCanvas(
   ctx: CanvasRenderingContext2D,
   center: { x: number; y: number },
   radius: number,
-  settings: QuantumInterferenceSettings,
+  settings: QuantumWavesSettings,
 ) {
   for (let i = 0; i < settings.form.waves; i++) {
     const r = MathUtils.lerp(

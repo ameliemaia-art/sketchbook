@@ -3,12 +3,12 @@ import { FolderApi } from "tweakpane";
 import GUIController from "@utils/editor/gui/gui";
 import { TWO_PI } from "@utils/three/math";
 import {
-  QuantumInterferenceSettings,
   quantumWaveCanvas,
-} from "./quantum-interference-geometry";
+  QuantumWavesSettings,
+} from "./quantum-waves-geometry";
 
-export default class QuantumInterferance {
-  settings: QuantumInterferenceSettings = {
+export default class QuantumWaves {
+  settings: QuantumWavesSettings = {
     blueprint: {
       darkness: true,
     },
@@ -92,15 +92,15 @@ export default class QuantumInterferance {
   quantumWave() {}
 }
 
-export class QuantumInterferanceGUI extends GUIController {
+export class QuantumWavesGUI extends GUIController {
   gui: FolderApi;
 
   constructor(
     gui: FolderApi,
-    public target: QuantumInterferance,
+    public target: QuantumWaves,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Quantum Interference" });
+    this.gui = this.addFolder(gui, { title: "Quantum Waves" });
 
     // Blueprint
     this.folders.blueprint = this.addFolder(this.gui, { title: "Blueprint" });

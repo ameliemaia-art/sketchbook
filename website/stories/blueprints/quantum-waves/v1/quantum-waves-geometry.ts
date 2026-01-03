@@ -2,7 +2,7 @@ import { MathUtils } from "three";
 
 import { TWO_PI } from "@utils/three/math";
 
-export type QuantumInterferenceSettings = {
+export type QuantumWavesSettings = {
   scale: number;
   seed: number;
   renderSteps: number;
@@ -42,5 +42,5 @@ export function quantumWaveCanvas(
   ctx: CanvasRenderingContext2D,
   center: { x: number; y: number },
   radius: number,
-  settings: QuantumInterferenceSettings,
+  settings: QuantumWavesSettings,
 ) {}

@@ -6,8 +6,8 @@ import { FolderApi } from "tweakpane";
 import { saveImage, saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { PI, TWO_PI } from "@utils/three/math";
-import settings from "./data/preset-main.json";
-import { QuantumInterferenceSettings } from "./quantum-interference-geometry";
+import settings from "./data/preset-dimensional.json";
+import { QuantumWavesSettings } from "./quantum-waves-geometry";
 import { drawDot, drawLine } from "./utils";
 
 const tmp0 = new Vector2();
@@ -27,19 +27,20 @@ function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export default class QuantumInterferance {
+export default class QuantumWaves {
   title = "Quantum Waves";
 
   isExporting = false;
   renderCount = 0;
   opacityStep = 0;
   renderProgress = 0;
+  stopRendering = false;
 
-  settings: QuantumInterferenceSettings = {
+  settings: QuantumWavesSettings = {
     scale: 1,
     seed: 5,
     renderSteps: 25,
-    accumulate: true,
+    accumulate: false,
     blueprint: {
       darkness: true,
     },
@@ -122,6 +123,8 @@ export default class QuantumInterferance {
   async render() {
     if (!this.ctx) return;
 
+    this.stopRendering = false;
+
     this.ctx.clearRect(0, 0, this.size.x, this.size.y);
     this.ctx.fillStyle = "#000000";
     this.ctx.fillRect(0, 0, this.size.x, this.size.y);
@@ -130,7 +133,7 @@ export default class QuantumInterferance {
       this.renderCount = 0;
       this.opacityStep = (1 / this.settings.renderSteps) * Math.PI;
       for (let i = 0; i < this.settings.renderSteps; i++) {
-        if (!this.settings.accumulate) break;
+        if (this.stopRendering) break;
 
         this.renderCount = i;
 
@@ -168,7 +171,7 @@ export default class QuantumInterferance {
       const y =
         this.size.y / 2 +
         Math.sin(theta) * radius * this.settings.form.lights.offset;
-      this.quantumWave(x, y, radius * 3);
+      this.quantumWave(x, y, radius * 3, i, i * (TWO_PI / totalLights));
       // this.quantumWave(this.size.x / 2, this.size.y / 2, radius * 3);
     }
 
@@ -293,7 +296,13 @@ export default class QuantumInterferance {
     return phase / Math.PI;
   }
 
-  quantumWave(centerX: number, centerY: number, radius: number) {
+  quantumWave(
+    centerX: number,
+    centerY: number,
+    radius: number,
+    index: number,
+    theta2: number,
+  ) {
     if (!this.ctx) return;
 
     const phase = MathUtils.degToRad(this.settings.form.waves.phase);
@@ -303,10 +312,6 @@ export default class QuantumInterferance {
 
     for (let i = 0; i < this.settings.form.lights.rays; i++) {
       const t = i / this.settings.form.lights.rays;
-
-      // TODO: add param for this
-      // const phase =
-      //   MathUtils.degToRad(this.settings.form.waves.phase) + Math.sqrt(i);
 
       // arc
       const theta = t * TWO_PI;
@@ -389,15 +394,15 @@ export default class QuantumInterferance {
   }
 }
 
-export class QuantumInterferanceGUI extends GUIController {
+export class QuantumWavesGUI extends GUIController {
   gui: FolderApi;
 
   constructor(
     gui: FolderApi,
-    public target: QuantumInterferance,
+    public target: QuantumWaves,
   ) {
     super(gui);
-    this.gui = this.addFolder(gui, { title: "Quantum Interference" });
+    this.gui = this.addFolder(gui, { title: "Quantum Waves" });
 
     // Blueprint
     this.folders.blueprint = this.addFolder(this.gui, { title: "Blueprint" });
@@ -407,17 +412,28 @@ export class QuantumInterferanceGUI extends GUIController {
 
     // Render
     this.folders.render = this.addFolder(this.gui, { title: "Render" });
-    this.folders.render
-      .addBinding(target.settings, "accumulate")
-      .on("change", render);
-    this.folders.render
-      .addBinding(target.settings, "renderSteps", { min: 1, max: 100, step: 1 })
-      .on("change", render);
+    this.folders.render.addBinding(target.settings, "accumulate");
+    this.folders.render.addBinding(target.settings, "renderSteps", {
+      min: 1,
+      max: 100,
+      step: 1,
+    });
     this.folders.render.addBinding(target, "renderProgress", {
       min: 0,
       max: 1,
       readonly: true,
     });
+
+    this.folders.render
+      .addButton({ title: "Render", label: "" })
+      .on("click", () => {
+        render();
+      });
+    this.folders.render
+      .addButton({ title: "Cancel", label: "" })
+      .on("click", () => {
+        target.stopRendering = true;
+      });
 
     // Form
     this.folders.form = this.addFolder(this.gui, { title: "Form" });

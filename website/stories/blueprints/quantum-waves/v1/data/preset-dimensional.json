@@ -1,0 +1,6 @@
+{
+  "lights": { "count": 3, "startAngle": 90, "rays": 50, "offset": 0.5 },
+  "waves": { "count": 5, "power": 3.141592653589793, "phase": 45 },
+  "photon": { "radius": 0.35, "density": 1, "opacity": 1 },
+  "quantum": { "waveFunctionHeight": 10, "waveLength": 20 }
+}
