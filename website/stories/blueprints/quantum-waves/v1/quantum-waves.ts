@@ -50,17 +50,17 @@ export default class QuantumWaves {
   opacityStep = 0;
   renderProgress = 0;
   stopRendering = false;
-  preset = PresetName.MAIN;
 
   settings: QuantumWavesSettings = {
     scale: 1,
     seed: 5,
-    renderSteps: 25,
-    accumulate: false,
+    renderSteps: 50,
+    accumulate: true,
     blueprint: {
       darkness: true,
     },
     form: {
+      preset: PresetName.SINGLE,
       lights: {
         count: 2,
         startAngle: 0,
@@ -105,7 +105,13 @@ export default class QuantumWaves {
 
   loadSettings() {
     this.settings.form = JSON.parse(
-      JSON.stringify(presets[Object.values(PresetName).indexOf(this.preset)]),
+      JSON.stringify(
+        presets[
+          Object.values(PresetName).indexOf(
+            this.settings.form.preset as PresetName,
+          )
+        ],
+      ),
     );
   }
 
@@ -455,9 +461,10 @@ export class QuantumWavesGUI extends GUIController {
       });
 
     // Form
+
     this.folders.form = this.addFolder(this.gui, { title: "Form" });
     this.folders.form
-      .addBinding(target, "preset", {
+      .addBinding(target.settings.form, "preset", {
         options: generateBindingOptions(Object.values(PresetName)),
       })
       .on("change", () => {

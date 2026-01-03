@@ -11,6 +11,7 @@ export type QuantumWavesSettings = {
     darkness: boolean;
   };
   form: {
+    preset: string;
     // Light sources
     lights: {
       startAngle: number;
