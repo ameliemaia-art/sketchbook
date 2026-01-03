@@ -1,12 +1,13 @@
 import paper from "paper";
 import { MathUtils } from "three";
+import { seededRandom } from "three/src/math/MathUtils.js";
 
-import mathSeeded from "@utils/math-seeded";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
 import { SketchSettings } from "../../sketch/sketch";
 import { drawDot, drawLine } from "./utils";
 
 export type QuantumWaveFunctionGraphSettings = {
+  seed: number;
   grid: {
     visible: boolean;
     opacity: number;
@@ -219,7 +220,7 @@ export function graph(
 
   for (let i = 0; i < settings.graph.particles.count; i++) {
     // 1. Uniform x
-    const t = mathSeeded.random();
+    const t = seededRandom();
     const phase = t * Math.PI;
 
     // 2. Phase → x
@@ -228,11 +229,11 @@ export function graph(
     // 3. Evaluate curve at that phase (single-valued)
     const probability = curve(phase);
 
-    const yNorm = mathSeeded.random();
+    const yNorm = seededRandom();
     if (yNorm > probability) continue;
 
     // 4. Sample vertically under the curve
-    const v = mathSeeded.random();
+    const v = seededRandom();
     let y = probability * v * (height - padding);
 
     // flip y to match graph orientation

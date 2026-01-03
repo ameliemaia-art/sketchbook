@@ -6,7 +6,7 @@ import { FolderApi } from "tweakpane";
 import { saveImage, saveJsonFile } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { PI, TWO_PI } from "@utils/three/math";
-import settings from "./data/preset-1.json";
+import settings from "./data/preset-main.json";
 import { QuantumInterferenceSettings } from "./quantum-interference-geometry";
 import { drawDot, drawLine } from "./utils";
 
@@ -28,7 +28,7 @@ function wait(ms: number) {
 }
 
 export default class QuantumInterferance {
-  title = "Quantum Interference";
+  title = "Quantum Waves";
 
   isExporting = false;
   renderCount = 0;

@@ -26,7 +26,7 @@ export default class Frame {
     root: HTMLElement,
     public sketchCanvas: HTMLCanvasElement,
     title: string = "IXIIIIIXI",
-    year: string = "MMXXV",
+    year: string = "MMXXVI",
   ) {
     // Canvas
     this.textCanvas = document.createElement("canvas");

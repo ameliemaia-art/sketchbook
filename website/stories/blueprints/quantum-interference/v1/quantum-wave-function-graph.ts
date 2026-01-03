@@ -1,4 +1,6 @@
+import { GUIFrame } from "@/stories/frame/frame";
 import paper from "paper";
+import { seededRandom } from "three/src/math/MathUtils.js";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
@@ -15,6 +17,7 @@ export default class QuantumWaveFunctionGraph extends Sketch {
   settings: SketchSettings & QuantumWaveFunctionGraphSettings = {
     ...sketchSettings,
     darkness: true,
+    seed: 5,
     grid: {
       visible: true,
       divisions: 25,
@@ -56,7 +59,7 @@ export default class QuantumWaveFunctionGraph extends Sketch {
     public root: HTMLElement,
     public canvas: HTMLCanvasElement,
   ) {
-    super(root, canvas, "Wavefunction Probability Density");
+    super(root, canvas, "Wavefunction Density");
   }
 
   draw() {
@@ -64,6 +67,7 @@ export default class QuantumWaveFunctionGraph extends Sketch {
     if (!this.layers.blueprint || !this.layers.form) return;
     const radius = (paper.view.size.width / 2) * this.settings.scale;
     const center = paper.view.bounds.center;
+    seededRandom(this.settings.seed);
     graph(
       this.layers.blueprint,
       this.layers.form,
@@ -84,6 +88,8 @@ export class GUIQuantumWaveFunctionGraph extends GUISketch {
 
     this.addGridControls();
     this.addGraphControls();
+
+    this.controllers.frame = new GUIFrame(this.gui, this.target.frame);
   }
 
   addGridControls() {
