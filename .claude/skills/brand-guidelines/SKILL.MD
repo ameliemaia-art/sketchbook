@@ -29,23 +29,28 @@ I X I
 
 **Identity** (Primary)
 
-- The original and primary logo for IXIIIIIXI
-- File: `assets/logo/identity-with-background.png`
+- With background: `assets/logo/identity-with-background.png`
+- Without background: `assets/logo/identity-without-background.png`
 
 **Identity with Wordmark**
 
-- Combined logo featuring identity and wordmark as one
-- File: `assets/logo/identity-with-wordmark-background.png`
+- With background: `assets/logo/identity-with-workmark-with-background.png`
+- Without background: `assets/logo/identity-with-workmark-without-background.png`
+
+**Identity with Alternative Wordmark**
+
+- With background: `assets/logo/identity-with-alt-workmark-with-background.png`
+- Without background: `assets/logo/identity-with-alt-workmark-without-background.png`
 
 **Wordmark**
 
-- Primary type logo for IXIIIIIXI
-- File: `assets/logo/wordmark-main-with-background.png`
+- With background: `assets/logo/wordmark-with-background.png`
+- Without background: `assets/logo/wordmark-without-background.png`
 
-**Wordmark Alternative**
+**Wordmark Alternative** (tattooed on Amelie Maia's left wrist)
 
-- Alternative type logo (tattooed on Amelie Maia's left wrist)
-- File: `assets/logo/wordmark-alt-with-background.png`
+- With background: `assets/logo/wordmark-alt-with-background.png`
+- Without background: `assets/logo/wordmark-alt-without-background.png`
 
 ### Colors
 
