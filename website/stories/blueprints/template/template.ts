@@ -1,6 +1,7 @@
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
+import { gridSettings } from "@utils/paper/utils";
 import Sketch, {
   BlueprintSettings,
   blueprintSettings,
@@ -11,6 +12,7 @@ import { template, TemplateSettings } from "./template-geometry";
 export default class Template extends Sketch {
   settings: BlueprintSettings & TemplateSettings = {
     ...blueprintSettings,
+    grid: gridSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -38,6 +40,7 @@ export default class Template extends Sketch {
       this.layers.blueprint,
       this.layers.form,
       center,
+      paper.view.size,
       radius,
       this.settings,
     );

@@ -1,7 +1,6 @@
 import paper from "paper";
 
-import { TWO_PI } from "@utils/three/math";
-import { createCircle } from "../../../utils/paper/utils";
+import { createCircle, createGrid } from "../../../utils/paper/utils";
 import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type TemplateSettings = {
@@ -13,6 +12,7 @@ export function template(
   blueprint: paper.Group,
   form: paper.Group,
   center: paper.Point,
+  size: paper.Size,
   radius: number,
   settings: BlueprintSettings & TemplateSettings,
 ) {
@@ -23,11 +23,7 @@ export function template(
     blueprint.addChild(path);
   }
 
-  // Line from center
-  const total = 6;
   const innerRadius = radius / 3;
-  const outlineRadius = radius - innerRadius;
-  const startAngle = -Math.PI / 6;
 
   // Center Circle
   if (settings.form.seed) {
@@ -39,5 +35,19 @@ export function template(
       undefined,
       form,
     );
+  }
+
+  const gridColor = new paper.Color(1, 1, 1, settings.grid.opacity);
+
+  if (settings.grid.visible) {
+    createGrid(
+      center,
+      size,
+      gridColor,
+      settings.strokeWidth,
+      settings.grid.divisions,
+      form,
+    );
+    createGrid(center, size, gridColor, settings.strokeWidth, 5, form);
   }
 }

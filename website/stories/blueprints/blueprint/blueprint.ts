@@ -6,6 +6,7 @@ import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
 import mathSeeded from "@utils/math-seeded";
+import { gridSettings, GridSettings } from "@utils/paper/utils";
 
 export type BlueprintSettings = {
   strokeColor: paper.Color;
@@ -17,6 +18,7 @@ export type BlueprintSettings = {
   exportScale: number;
   blueprint: { [key: string]: unknown };
   form: { [key: string]: unknown };
+  grid: GridSettings;
 };
 
 export const blueprintSettings: BlueprintSettings = {
@@ -27,6 +29,7 @@ export const blueprintSettings: BlueprintSettings = {
   strokeColor: new paper.Color(1, 1, 1, 1),
   darkness: false,
   exportScale: 1,
+  grid: gridSettings,
   blueprint: {
     opacity: 0.5,
     visible: false,
@@ -197,6 +200,17 @@ export class GUIBlueprint extends GUIController {
       .on("change", this.draw);
     this.folders.blueprint
       .addBinding(target.settings.blueprint, "cosmos")
+      .on("change", this.draw);
+
+    this.folders.grid = this.addFolder(this.gui, { title: "Grid", index: 5 });
+    this.folders.grid
+      .addBinding(target.settings.grid, "visible")
+      .on("change", this.draw);
+    this.folders.grid
+      .addBinding(target.settings.grid, "opacity", {
+        min: 0,
+        max: 1,
+      })
       .on("change", this.draw);
 
     this.folders.form = this.addFolder(this.gui, { title: "Form" });

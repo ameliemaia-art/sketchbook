@@ -107,6 +107,18 @@ export function filterIntersectionPositions(
   });
 }
 
+export type GridSettings = {
+  visible: boolean;
+  divisions: number;
+  opacity: number;
+};
+
+export const gridSettings: GridSettings = {
+  visible: true,
+  divisions: 25,
+  opacity: 0.1,
+};
+
 export function createGrid(
   center: paper.Point,
   size: paper.Size,
