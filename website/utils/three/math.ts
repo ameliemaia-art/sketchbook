@@ -8,6 +8,7 @@ export const VECTOR_ZERO = new Vector3();
 export const VECTOR_ONE = new Vector3(1, 1, 1);
 export const VECTOR_UP = new Vector3(0, 1, 0);
 export const EULER_ZERO = new Euler(0, 0, 0);
+export const GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2;
 
 export function randomSpherePoint(
   x0: number,
