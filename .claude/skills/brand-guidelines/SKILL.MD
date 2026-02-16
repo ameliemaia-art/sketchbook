@@ -7,7 +7,7 @@ description: Brand identity, visual symbols, colors, and typography for IXIIIIIX
 
 ## Overview
 
-This skill provides comprehensive brand guidelines and art philosophy for IXIIIIIXI (Amelie Maia), including visual identity, creative approach, and stylistic principles.
+This skill provides comprehensive brand guidelines and art philosophy for IXIIIIIXI (David), including visual identity, creative approach, and stylistic principles.
 
 ## Brand Identity
 
@@ -47,7 +47,7 @@ I X I
 - With background: `assets/logo/wordmark-with-background.png`
 - Without background: `assets/logo/wordmark-without-background.png`
 
-**Wordmark Alternative** (tattooed on Amelie Maia's left wrist)
+**Wordmark Alternative** (tattooed on David's left wrist)
 
 - With background: `assets/logo/wordmark-alt-with-background.png`
 - Without background: `assets/logo/wordmark-alt-without-background.png`
@@ -68,12 +68,13 @@ I X I
 ### Signature Shapes
 
 **2D**
+
 - Circle
 - Golden Rectangle
 
 **3D**
+
 - Torus
 - Icosahedron
 - Hexahedron
 - Dodecahedron
-
