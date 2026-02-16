@@ -3,7 +3,7 @@ import { MathUtils } from "three";
 import { seededRandom } from "three/src/math/MathUtils.js";
 
 import { createGrid, createLine, dot } from "@utils/paper/utils";
-import { SketchSettings } from "../../sketch/sketch";
+import { BlueprintSettings } from "../../sketch/sketch";
 import { drawDot, drawLine } from "./utils";
 
 export type QuantumWaveFunctionGraphSettings = {
@@ -73,7 +73,7 @@ export function graph(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: SketchSettings & QuantumWaveFunctionGraphSettings,
+  settings: BlueprintSettings & QuantumWaveFunctionGraphSettings,
 ) {
   const gridColor = new paper.Color(1, 1, 1, settings.grid.opacity);
 

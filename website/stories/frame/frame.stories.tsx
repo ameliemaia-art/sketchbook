@@ -14,12 +14,16 @@ export const Frame = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current) {
+      pane = new Pane({ title: "Frame" });
       const wordmark = new FrameComponent(rootRef.current);
-      new GUIFrame(new Pane({ title: "Frame" }), wordmark);
+      new GUIFrame(pane, wordmark);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (

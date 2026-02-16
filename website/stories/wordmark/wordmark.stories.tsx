@@ -14,19 +14,23 @@ export const Wordmark = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
+      pane = new Pane({ title: "Wordmark" });
       const wordmark = new WordmarkSketch(rootRef.current, canvasRef.current);
-      new WordmarkGUI(new Pane({ title: "Wordmark" }), wordmark);
+      new WordmarkGUI(pane, wordmark);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (
     <>
       <p className="load-font-stencil">IXIIIIIXI</p>
       <div className="wordmark" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </>
   );

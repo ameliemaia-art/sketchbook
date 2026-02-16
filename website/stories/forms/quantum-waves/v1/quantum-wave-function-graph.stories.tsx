@@ -14,19 +14,22 @@ export const WaveFunctionGraph = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
-      const pane = new Pane({ title: "Graph" });
+      pane = new Pane({ title: "Graph" });
       const sketch = new GraphSketch(rootRef.current, canvasRef.current);
       new GUIQuantumWaveFunctionGraph(pane, sketch);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (
     <div className="sketch">
       <div ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </div>
   );

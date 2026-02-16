@@ -7,7 +7,7 @@ import {
   createLine,
   filterIntersectionPositions,
 } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type PlatonicSettings = {
   strokeDepthColor: paper.Color;
@@ -53,7 +53,7 @@ export function platonic(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: SketchSettings & PlatonicSettings,
+  settings: BlueprintSettings & PlatonicSettings,
 ) {
   const total = 6;
   const innerRadius = radius / 5;

@@ -35,6 +35,7 @@ export const Hypatia = () => {
     window.addEventListener("resize", resize);
 
     return () => {
+      gui.dispose();
       app.dispose();
     };
   }, []);

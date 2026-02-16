@@ -2,18 +2,18 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  sketchSettings,
-  SketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import {
   metatronsCube,
   MetatronsCubeSettings,
 } from "./metatrons-cube-geometry";
 
 export default class MetatronsCube extends Sketch {
-  settings: SketchSettings & MetatronsCubeSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & MetatronsCubeSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -53,7 +53,7 @@ export default class MetatronsCube extends Sketch {
   }
 }
 
-export class GUIMetatronsCube extends GUISketch {
+export class GUIMetatronsCube extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: MetatronsCube,

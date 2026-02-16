@@ -17,8 +17,9 @@ export const Tetrahedron64Star = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const pane = new Pane({ title: "Sacred Geometry" });
+    let pane: Pane | undefined
     if (rootRef.current && canvasRef.current) {
+      pane = new Pane({ title: "Sacred Geometry" })
       const sacred = new Tetrahedron64StarSketch(
         rootRef.current,
         canvasRef.current,
@@ -27,7 +28,7 @@ export const Tetrahedron64Star = () => {
     }
 
     return () => {
-      pane.dispose();
+      pane?.dispose();
     };
   }, []);
 
@@ -35,7 +36,7 @@ export const Tetrahedron64Star = () => {
     <div className="sketch">
       <p className="load-font-stencil load-font-regular">IXIIIIIXI</p>
       <div className="wordmark" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </div>
   );

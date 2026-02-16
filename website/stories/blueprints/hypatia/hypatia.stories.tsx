@@ -15,14 +15,15 @@ export const Hypatia = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const pane = new Pane({ title: "Human" });
+    let pane: Pane | undefined
     if (rootRef.current && canvasRef.current) {
+      pane = new Pane({ title: "Human" })
       const hypatia = new HypatiaSketch(rootRef.current, canvasRef.current);
       new GUIHypatia(pane, hypatia);
     }
 
     return () => {
-      pane.dispose();
+      pane?.dispose();
     };
   }, []);
 
@@ -30,7 +31,7 @@ export const Hypatia = () => {
     <div className="sketch">
       <p className="load-font-stencil load-font-regular">IXIIIIIXI</p>
       <div className="wordmark" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </div>
   );

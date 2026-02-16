@@ -2,10 +2,10 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import acanthusBaseSettings from "./data/acanthus-base-settings.json";
 import acanthusMiddleSettings from "./data/acanthus-middle-settings.json";
 import acanthusVoluteCenterSettings from "./data/acanthus-volute-center-settings.json";
@@ -18,8 +18,8 @@ import {
   PathProfileSettings,
 } from "./path-profile-geometry";
 
-export const pathProfileSettings: SketchSettings & PathProfileSettings = {
-  ...sketchSettings,
+export const pathProfileSettings: BlueprintSettings & PathProfileSettings = {
+  ...blueprintSettings,
   scale: 1,
   darkness: true,
   grid: {
@@ -110,7 +110,7 @@ export const pathProfileSettings: SketchSettings & PathProfileSettings = {
 };
 
 export default class PathProfile extends Sketch {
-  settings: SketchSettings & PathProfileSettings = pathProfileSettings;
+  settings: BlueprintSettings & PathProfileSettings = pathProfileSettings;
 
   constructor(
     public root: HTMLElement,
@@ -147,7 +147,7 @@ export default class PathProfile extends Sketch {
   }
 }
 
-export class GUIPathProfile extends GUISketch {
+export class GUIPathProfile extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: PathProfile,

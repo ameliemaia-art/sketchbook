@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { flowerOfLife, FlowerOfLifeSettings } from "./flower-of-life-geometry";
 
 export default class FlowerOfLife extends Sketch {
-  settings: SketchSettings & FlowerOfLifeSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & FlowerOfLifeSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -49,7 +49,7 @@ export default class FlowerOfLife extends Sketch {
   }
 }
 
-export class GUIFlowerOfLife extends GUISketch {
+export class GUIFlowerOfLife extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: FlowerOfLife,

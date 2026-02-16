@@ -2,7 +2,7 @@ import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
 import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type Tetrahedron64StarSettings = {
   blueprint: {
@@ -39,7 +39,7 @@ export function tetrahedron64Star(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & Tetrahedron64StarSettings,
+  settings: BlueprintSettings & Tetrahedron64StarSettings,
 ) {
   const group = new paper.Group();
   const total = 6;

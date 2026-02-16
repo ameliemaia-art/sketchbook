@@ -1,7 +1,7 @@
 import paper from "paper";
 
 import { createCircle } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type VesicaPiscisSettings = {
   blueprint: {};
@@ -18,7 +18,7 @@ export function vesciaPiscis(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & VesicaPiscisSettings,
+  settings: BlueprintSettings & VesicaPiscisSettings,
 ) {
   const innerRadius = radius * (2 / 3);
 

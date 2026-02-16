@@ -2,12 +2,12 @@ import Frame from "@/stories/frame/frame";
 import paper from "paper";
 import { FolderApi } from "tweakpane";
 
-import { composite, saveImage, saveSVG } from "@utils/common/file";
+import { saveImage, saveSVG } from "@utils/common/file";
 import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
 import mathSeeded from "@utils/math-seeded";
 
-export type SketchSettings = {
+export type BlueprintSettings = {
   strokeColor: paper.Color;
   strokeWidth: number;
   scale: number;
@@ -19,7 +19,7 @@ export type SketchSettings = {
   form: { [key: string]: unknown };
 };
 
-export const sketchSettings: SketchSettings = {
+export const blueprintSettings: BlueprintSettings = {
   scale: 0.85,
   opacity: 1,
   strokeWidth: 1,
@@ -38,8 +38,8 @@ export const sketchSettings: SketchSettings = {
   },
 };
 
-export default class Sketch {
-  settings = sketchSettings;
+export default class Blueprint {
+  settings = blueprintSettings;
 
   group?: paper.Group;
   layers: { blueprint?: paper.Group; form?: paper.Group } = {};
@@ -145,12 +145,12 @@ export default class Sketch {
   };
 }
 
-export class GUISketch extends GUIController {
+export class GUIBlueprint extends GUIController {
   gui: FolderApi;
 
   constructor(
     gui: GUIType,
-    public target: Sketch,
+    public target: Blueprint,
     title: string,
   ) {
     super(gui);

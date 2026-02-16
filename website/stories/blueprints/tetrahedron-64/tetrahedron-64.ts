@@ -2,18 +2,18 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  sketchSettings,
-  SketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import {
   tetrahedron64,
   Tetrahedron64Settings,
 } from "./tetrahedron-64-geometry";
 
 export default class Tetrahedron64 extends Sketch {
-  settings: SketchSettings & Tetrahedron64Settings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & Tetrahedron64Settings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -51,7 +51,7 @@ export default class Tetrahedron64 extends Sketch {
   }
 }
 
-export class GUITetrahedron64 extends GUISketch {
+export class GUITetrahedron64 extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: Tetrahedron64,

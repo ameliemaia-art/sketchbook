@@ -2,7 +2,7 @@ import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
 import { createCircle } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type MetatronsCubeSettings = {
   blueprint: {};
@@ -21,7 +21,7 @@ export function metatronsCube(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & MetatronsCubeSettings,
+  settings: BlueprintSettings & MetatronsCubeSettings,
 ) {
   const total = 6;
   const innerRadius = radius / 5;

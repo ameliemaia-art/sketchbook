@@ -5,7 +5,7 @@ import GUIController from "@utils/editor/gui/gui";
 import { GUIType } from "@utils/editor/gui/gui-types";
 import { generateBindingOptions } from "@utils/editor/gui/gui-utils";
 import { createGrid, createLine, dot } from "@utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 import { abacusPath, AbacusPath, GUIAbacusPath } from "./abacus-geometry";
 import {
   acanthusPath,
@@ -55,7 +55,7 @@ export function pathProfile(
   center: paper.Point,
   size: paper.Size,
   radius: number,
-  settings: SketchSettings & PathProfileSettings,
+  settings: BlueprintSettings & PathProfileSettings,
 ) {
   if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);

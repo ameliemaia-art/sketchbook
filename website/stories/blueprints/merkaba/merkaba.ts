@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  sketchSettings,
-  SketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { merkaba, MerkabaSettings } from "./merkaba-geometry";
 
 export default class Merkaba extends Sketch {
-  settings: SketchSettings & MerkabaSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & MerkabaSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -48,7 +48,7 @@ export default class Merkaba extends Sketch {
   }
 }
 
-export class GUIMerkaba extends GUISketch {
+export class GUIMerkaba extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: Merkaba,

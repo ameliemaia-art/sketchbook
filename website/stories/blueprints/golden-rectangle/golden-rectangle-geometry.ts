@@ -1,7 +1,7 @@
 import paper from "paper";
 
 import { createCircle } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type GoldenRectangleSettings = {
   blueprint: {};
@@ -18,7 +18,7 @@ export function goldenRectangle(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & GoldenRectangleSettings,
+  settings: BlueprintSettings & GoldenRectangleSettings,
 ) {
   const transparentColor = new paper.Color(0, 0, 0, 0);
 

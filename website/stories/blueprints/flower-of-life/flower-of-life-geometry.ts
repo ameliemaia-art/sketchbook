@@ -7,7 +7,7 @@ import {
   dot,
   lerp,
 } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type FlowerOfLifeSettings = {
   blueprint: {
@@ -89,7 +89,7 @@ export function flowerOfLife(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & FlowerOfLifeSettings,
+  settings: BlueprintSettings & FlowerOfLifeSettings,
 ) {
   const dotRadius = radius * 0.01;
   const total = 6;

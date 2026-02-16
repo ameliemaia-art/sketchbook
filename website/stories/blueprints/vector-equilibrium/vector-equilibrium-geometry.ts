@@ -2,7 +2,7 @@ import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
 import { createCircle, createLine, lerp } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type VectorEquilibriumSettings = {
   blueprint: {
@@ -23,7 +23,7 @@ export function vectorEquilibrium(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & VectorEquilibriumSettings,
+  settings: BlueprintSettings & VectorEquilibriumSettings,
 ) {
   const total = 6;
   const innerRadius = radius / 3;

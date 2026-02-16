@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { germOfLife, GermOfLifeSettings } from "./germ-of-life-geometry";
 
 export default class GermOfLife extends Sketch {
-  settings: SketchSettings & GermOfLifeSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & GermOfLifeSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -46,7 +46,7 @@ export default class GermOfLife extends Sketch {
   }
 }
 
-export class GUIGermOfLife extends GUISketch {
+export class GUIGermOfLife extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: GermOfLife,

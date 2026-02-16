@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { platonic, PlatonicSettings } from "./platonic-geometry";
 
 export default class Platonic extends Sketch {
-  settings: SketchSettings & PlatonicSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & PlatonicSettings = {
+    ...blueprintSettings,
     strokeDepthColor: new paper.Color(1, 1, 1, 0.5),
     grid: {
       visible: true,
@@ -57,7 +57,7 @@ export default class Platonic extends Sketch {
   }
 }
 
-export class GUIPlatonic extends GUISketch {
+export class GUIPlatonic extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: Platonic,

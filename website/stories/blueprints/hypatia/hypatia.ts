@@ -3,14 +3,14 @@ import { FolderApi } from "tweakpane";
 
 import mathSeeded from "@utils/math-seeded";
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { hypatia, HypatiaSettings } from "./hypatia-geometry";
 
-export const hypatiaSettings: SketchSettings & HypatiaSettings = {
-  ...sketchSettings,
+export const hypatiaSettings: BlueprintSettings & HypatiaSettings = {
+  ...blueprintSettings,
   scale: 0.85,
   seed: 25,
   darkness: true,
@@ -52,7 +52,7 @@ export const hypatiaSettings: SketchSettings & HypatiaSettings = {
 };
 
 export default class Hypatia extends Sketch {
-  settings: SketchSettings & HypatiaSettings = hypatiaSettings;
+  settings: BlueprintSettings & HypatiaSettings = hypatiaSettings;
 
   constructor(
     public root: HTMLElement,
@@ -77,7 +77,7 @@ export default class Hypatia extends Sketch {
   }
 }
 
-export class GUIHypatia extends GUISketch {
+export class GUIHypatia extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: Hypatia,

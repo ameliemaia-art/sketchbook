@@ -10,19 +10,20 @@ export default {
   title: "Sketchbook/Blueprints/Template",
 };
 
-export const EggOfLife = () => {
+export const Template = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const pane = new Pane({ title: "Template" });
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
-      const sacred = new TemplateSketch(rootRef.current, canvasRef.current);
-      new GUITemplate(pane, sacred);
+      pane = new Pane({ title: "Template" });
+      const blueprint = new TemplateSketch(rootRef.current, canvasRef.current);
+      new GUITemplate(pane, blueprint);
     }
 
     return () => {
-      pane.dispose();
+      pane?.dispose();
     };
   }, []);
 
@@ -30,7 +31,7 @@ export const EggOfLife = () => {
     <div className="sketch">
       <p className="load-font-stencil load-font-regular">IXIIIIIXI</p>
       <div className="wordmark" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </div>
   );

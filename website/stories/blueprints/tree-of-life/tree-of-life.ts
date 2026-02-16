@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  sketchSettings,
-  SketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { treeOfLife, TreeOfLifeSettings } from "./tree-of-life-geometry";
 
 export default class TreeOfLife extends Sketch {
-  settings: SketchSettings & TreeOfLifeSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & TreeOfLifeSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -58,7 +58,7 @@ export default class TreeOfLife extends Sketch {
   }
 }
 
-export class GUITreeOfLife extends GUISketch {
+export class GUITreeOfLife extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: TreeOfLife,

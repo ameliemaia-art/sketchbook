@@ -15,8 +15,9 @@ export const PathProfile = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
-      const pane = new Pane({ title: "PathProfile" });
+      pane = new Pane({ title: "PathProfile" });
       const pathProfile = new PathProfileSketch(
         rootRef.current,
         canvasRef.current,
@@ -24,14 +25,16 @@ export const PathProfile = () => {
       new GUIPathProfile(pane, pathProfile);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (
     <div className="sketch">
       <p className="load-font-stencil load-font-regular">IXIIIIIXI</p>
       <div className="wordmark" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </div>
   );

@@ -13,19 +13,23 @@ export const Analysis = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
+      pane = new Pane({ title: "Sound" });
       const sound = new SoundSketch(rootRef.current, canvasRef.current);
-      new SoundGUI(new Pane({ title: "Sound" }), sound);
+      new SoundGUI(pane, sound);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (
     <>
       <div ref={rootRef}>
         {/* <button id="startButton">Play</button> */}
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </>
   );

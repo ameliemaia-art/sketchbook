@@ -2,18 +2,18 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  sketchSettings,
-  SketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import {
   vectorEquilibrium,
   VectorEquilibriumSettings,
 } from "./vector-equilibrium-geometry";
 
 export default class VectorEquilibrium extends Sketch {
-  settings: SketchSettings & VectorEquilibriumSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & VectorEquilibriumSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -54,7 +54,7 @@ export default class VectorEquilibrium extends Sketch {
   }
 }
 
-export class GUIVectorEquilibrium extends GUISketch {
+export class GUIVectorEquilibrium extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: VectorEquilibrium,

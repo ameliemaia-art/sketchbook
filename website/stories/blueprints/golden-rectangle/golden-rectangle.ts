@@ -2,18 +2,18 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  sketchSettings,
-  SketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import {
   goldenRectangle,
   GoldenRectangleSettings,
 } from "./golden-rectangle-geometry";
 
 export default class GoldenRectangle extends Sketch {
-  settings: SketchSettings & GoldenRectangleSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & GoldenRectangleSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -51,7 +51,7 @@ export default class GoldenRectangle extends Sketch {
   }
 }
 
-export class GUIGoldenRectangle extends GUISketch {
+export class GUIGoldenRectangle extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: GoldenRectangle,

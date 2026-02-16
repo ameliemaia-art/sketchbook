@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { vesciaPiscis, VesicaPiscisSettings } from "./vescia-piscis-geometry";
 
 export default class VesicaPiscis extends Sketch {
-  settings: SketchSettings & VesicaPiscisSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & VesicaPiscisSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -48,7 +48,7 @@ export default class VesicaPiscis extends Sketch {
   }
 }
 
-export class GUIVesicaPiscis extends GUISketch {
+export class GUIVesicaPiscis extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: VesicaPiscis,

@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { template, TemplateSettings } from "./template-geometry";
 
 export default class Template extends Sketch {
-  settings: SketchSettings & TemplateSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & TemplateSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -44,7 +44,7 @@ export default class Template extends Sketch {
   }
 }
 
-export class GUITemplate extends GUISketch {
+export class GUITemplate extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: Template,

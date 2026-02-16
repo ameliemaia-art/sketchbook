@@ -14,22 +14,26 @@ export const Text = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
+      pane = new Pane({ title: "Text" });
       const Text = new TextSketch(
         rootRef.current,
         "Vector Equilibrium Sperical",
       );
-      new TextGUI(new Pane({ title: "Text" }), Text);
+      new TextGUI(pane, Text);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (
     <>
       <p className="load-font-regular">IXIIIIIXI</p>
       <div className="Text" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </>
   );

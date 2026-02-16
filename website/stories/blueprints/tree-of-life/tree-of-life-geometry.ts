@@ -7,7 +7,7 @@ import {
   debugPoints,
   lerp,
 } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type TreeOfLifeSettings = {
   blueprint: {
@@ -139,7 +139,7 @@ export function treeOfLife(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings & TreeOfLifeSettings,
+  settings: BlueprintSettings & TreeOfLifeSettings,
 ) {
   const startAngle = -Math.PI / 6;
   const innerRadius = radius / 3;

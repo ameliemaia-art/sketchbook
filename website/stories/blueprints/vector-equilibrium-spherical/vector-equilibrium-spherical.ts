@@ -2,18 +2,18 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import {
   vectorEquilibriumSpherical,
   VectorEquilibriumSphericalSettings,
 } from "./vector-equilibrium-spherical-geometry";
 
 export default class VectorEquilibriumSpherical extends Sketch {
-  settings: SketchSettings & VectorEquilibriumSphericalSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & VectorEquilibriumSphericalSettings = {
+    ...blueprintSettings,
     petalRadius: 2,
     petalOffset: 2,
     blueprint: {
@@ -55,7 +55,7 @@ export default class VectorEquilibriumSpherical extends Sketch {
   }
 }
 
-export class GUIVectorEquilibriumSpherical extends GUISketch {
+export class GUIVectorEquilibriumSpherical extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: VectorEquilibriumSpherical,

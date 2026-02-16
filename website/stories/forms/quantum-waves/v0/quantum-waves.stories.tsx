@@ -13,18 +13,22 @@ export const v0 = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
+      pane = new Pane({ title: "Quantum Interferance" });
       const sketch = new QuantumWavesSketch(rootRef.current, canvasRef.current);
-      new QuantumWavesGUI(new Pane({ title: "Quantum Interferance" }), sketch);
+      new QuantumWavesGUI(pane, sketch);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (
     <>
       <div className="quantum-interferance" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </>
   );

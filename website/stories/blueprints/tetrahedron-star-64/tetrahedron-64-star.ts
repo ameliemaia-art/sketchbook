@@ -2,18 +2,18 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import {
   tetrahedron64Star,
   Tetrahedron64StarSettings,
 } from "./tetrahedron-64-star-geometry";
 
 export default class Tetrahedron64Star extends Sketch {
-  settings: SketchSettings & Tetrahedron64StarSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & Tetrahedron64StarSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -60,7 +60,7 @@ export default class Tetrahedron64Star extends Sketch {
   }
 }
 
-export class GUITetrahedron64Star extends GUISketch {
+export class GUITetrahedron64Star extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: Tetrahedron64Star,

@@ -16,25 +16,26 @@ export const WordmarkAlternative = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let pane: Pane | undefined;
     if (rootRef.current && canvasRef.current) {
+      pane = new Pane({ title: "Wordmark Alternative" });
       const wordmark = new WordmarkAlternativeSketch(
         rootRef.current,
         canvasRef.current,
       );
-      new WordmarkAlternativeGUI(
-        new Pane({ title: "Wordmark Alternative" }),
-        wordmark,
-      );
+      new WordmarkAlternativeGUI(pane, wordmark);
     }
 
-    return () => {};
+    return () => {
+      pane?.dispose();
+    };
   }, []);
 
   return (
     <>
       <p className="load-font-stencil">IXIIIIIXI</p>
       <div className="wordmark-alternative" ref={rootRef}>
-        <canvas ref={canvasRef} />;
+        <canvas ref={canvasRef} />
       </div>
     </>
   );

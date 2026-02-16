@@ -3,7 +3,7 @@ import { MathUtils } from "three";
 
 import { createCircle, createLine } from "@utils/paper/utils";
 import { TWO_PI } from "@utils/three/math";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type SriYantraSettings = {
   blueprint: {
@@ -80,7 +80,7 @@ export function sriYantra(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings,
+  settings: BlueprintSettings,
 ) {
   if (settings.blueprint.cosmos) {
     const path = new paper.Path.Circle(center, radius);

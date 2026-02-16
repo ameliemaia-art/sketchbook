@@ -4,18 +4,18 @@ import { seededRandom } from "three/src/math/MathUtils.js";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../../../blueprints/sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../../../blueprints/blueprint/blueprint";
 import {
   graph,
   QuantumWaveFunctionGraphSettings,
 } from "./quantum-wave-function-graph-geometry";
 
 export default class QuantumWaveFunctionGraph extends Sketch {
-  settings: SketchSettings & QuantumWaveFunctionGraphSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & QuantumWaveFunctionGraphSettings = {
+    ...blueprintSettings,
     darkness: true,
     seed: 5,
     grid: {
@@ -79,7 +79,7 @@ export default class QuantumWaveFunctionGraph extends Sketch {
   }
 }
 
-export class GUIQuantumWaveFunctionGraph extends GUISketch {
+export class GUIQuantumWaveFunctionGraph extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: QuantumWaveFunctionGraph,

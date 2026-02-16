@@ -2,7 +2,7 @@ import paper from "paper";
 
 import { TWO_PI } from "@utils/three/math";
 import { createCircle } from "../../../utils/paper/utils";
-import { SketchSettings } from "../sketch/sketch";
+import { BlueprintSettings } from "../blueprint/blueprint";
 
 export type FruitOfLifeSettings = {
   blueprint: {
@@ -18,7 +18,7 @@ export function fruitOfLife(
   form: paper.Group,
   center: paper.Point,
   radius: number,
-  settings: SketchSettings,
+  settings: BlueprintSettings,
 ) {
   const group = new paper.Group();
   const total = 6;

@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { sriYantra, SriYantraSettings } from "./sri-yantra-geometry";
 
 export default class SriYantra extends Sketch {
-  settings: SketchSettings & SriYantraSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & SriYantraSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -83,7 +83,7 @@ export default class SriYantra extends Sketch {
   }
 }
 
-export class GUISriYantra extends GUISketch {
+export class GUISriYantra extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: SriYantra,

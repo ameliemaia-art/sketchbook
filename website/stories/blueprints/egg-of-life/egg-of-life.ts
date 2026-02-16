@@ -2,15 +2,15 @@ import paper from "paper";
 import { FolderApi } from "tweakpane";
 
 import Sketch, {
-  GUISketch,
-  SketchSettings,
-  sketchSettings,
-} from "../sketch/sketch";
+  BlueprintSettings,
+  blueprintSettings,
+  GUIBlueprint,
+} from "../blueprint/blueprint";
 import { eggOfLife, EggOfLifeSettings } from "./egg-of-life-geometry";
 
 export default class EggOfLife extends Sketch {
-  settings: SketchSettings & EggOfLifeSettings = {
-    ...sketchSettings,
+  settings: BlueprintSettings & EggOfLifeSettings = {
+    ...blueprintSettings,
     blueprint: {
       visible: false,
       opacity: 0.5,
@@ -46,7 +46,7 @@ export default class EggOfLife extends Sketch {
   }
 }
 
-export class GUIEggOfLife extends GUISketch {
+export class GUIEggOfLife extends GUIBlueprint {
   constructor(
     gui: FolderApi,
     public target: EggOfLife,
